@@ -297,7 +297,7 @@ export default function CartPage() {
     0
   );
 
-  const deliveryFee = 0;
+  const deliveryFee = 30;
 
   const totalAmount = subtotal + deliveryFee;
 
