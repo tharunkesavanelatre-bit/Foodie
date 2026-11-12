@@ -112,6 +112,35 @@ const SPECIFIC_RECIPE_PRICES: Record<string, number> = {
 };
 
 // ==========================================
+// SAFE STORAGE HELPERS
+// ==========================================
+
+function readStorage<T>(key: string, fallback: T): T {
+  try {
+    const value = localStorage.getItem(key);
+
+    if (!value) return fallback;
+
+    const parsed: unknown = JSON.parse(value);
+
+    return Array.isArray(parsed) ? (parsed as T) : fallback;
+  } catch (error) {
+    console.error(`Unable to read ${key}:`, error);
+    return fallback;
+  }
+}
+
+function writeStorage(key: string, value: unknown): boolean {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (error) {
+    console.error(`Unable to save ${key}:`, error);
+    return false;
+  }
+}
+
+// ==========================================
 // RECIPE PRICE
 // ==========================================
 
@@ -123,8 +152,6 @@ function getRecipePrice(
   const name = recipeName.toLowerCase().trim();
   const recipeCategory = (category || "").toLowerCase();
 
-  // SPECIFIC RECIPE PRICES
-
   for (const [recipe, price] of Object.entries(
     SPECIFIC_RECIPE_PRICES
   )) {
@@ -133,16 +160,12 @@ function getRecipePrice(
     }
   }
 
-  // CATEGORY PRICE RANGES
-
   let minPrice = 129;
   let maxPrice = 249;
 
   if (
     recipeCategory.includes("seafood") ||
-    /fish|prawn|shrimp|crab|lobster|salmon|tuna|squid|octopus|mussel|oyster/.test(
-      name
-    )
+    /fish|prawn|shrimp|crab|lobster|salmon|tuna|squid|octopus|mussel|oyster/.test(name)
   ) {
     minPrice = 229;
     maxPrice = 349;
@@ -174,8 +197,6 @@ function getRecipePrice(
     minPrice = 199;
     maxPrice = 299;
   }
-
-  // GENERATE CONSISTENT PRICE USING RECIPE ID
 
   let hash = 0;
 
@@ -217,20 +238,19 @@ function getIngredients(recipe: Meal): Ingredient[] {
 function getFoodProfile(recipe: Meal): FoodProfile {
   const name = recipe.strMeal.toLowerCase();
   const category = (recipe.strCategory || "").toLowerCase();
-
-  // BIRYANI
+  const area = recipe.strArea || "Different regional cuisines";
 
   if (name.includes("biryani")) {
     return {
       title: "The Story Behind Biryani",
       origin:
-        "Biryani is strongly associated with the Indian subcontinent. Hyderabad, Lucknow, Kolkata and other regions are especially famous for their distinctive biryani styles.",
+        "Biryani is strongly associated with the Indian subcontinent. Hyderabad, Lucknow, Kolkata and other regions are famous for their distinctive biryani styles.",
       background:
         "Biryani brings together aromatic rice, spices and carefully prepared ingredients. Different regions have developed their own versions, with variations in rice, seasoning and cooking techniques.",
       preparation:
         "The preparation often begins with washing and soaking rice. Meat or vegetables are seasoned separately, while aromatic spices develop the base flavour. The rice and prepared ingredients are then layered or combined and cooked until their flavours come together.",
       ingredients:
-        "Rice provides the foundation of the dish. Whole spices, herbs, onions and other seasonings contribute aroma and depth. Depending on the variation, chicken, meat, eggs or vegetables provide the main component.",
+        "Rice provides the foundation of the dish. Whole spices, herbs, onions and other seasonings contribute aroma and depth.",
       stages: [
         "Rice is washed and soaked before cooking to help achieve a suitable texture.",
         "Spices, onions and herbs are prepared to build the aromatic flavour base.",
@@ -239,14 +259,12 @@ function getFoodProfile(recipe: Meal): FoodProfile {
         "The dish is cooked until the rice is tender and the flavours are well combined.",
       ],
       flavour:
-        "Biryani is known for its aromatic spices, fragrant rice and combination of savoury, herbal and mildly sweet notes. Its exact flavour depends on the regional recipe.",
+        "Biryani is known for its aromatic spices, fragrant rice and combination of savoury, herbal and mildly sweet notes.",
       culture:
-        "Hyderabadi, Lucknowi and Kolkata biryani are among the best-known regional varieties. Biryani is commonly served at celebrations, family gatherings and special occasions.",
+        "Hyderabadi, Lucknowi and Kolkata biryani are among the best-known regional varieties. Biryani is commonly served at celebrations and special occasions.",
       cookingMethod: "Rice cooking and aromatic layering",
     };
   }
-
-  // RICE DISHES
 
   if (
     /rice|pulao|pilaf|risotto|fried rice/.test(name) ||
@@ -255,39 +273,37 @@ function getFoodProfile(recipe: Meal): FoodProfile {
     return {
       title: "The World of Rice Dishes",
       origin:
-        "Rice dishes are popular across Asia, the Middle East, Europe and many other regions. Their ingredients and preparation methods vary according to local food traditions.",
+        "Rice dishes are popular across Asia, the Middle East, Europe and many other regions.",
       background:
-        "Rice is a versatile staple that absorbs flavours from spices, vegetables, sauces and other ingredients. Different rice varieties create different textures and cooking results.",
+        "Rice is a versatile staple that absorbs flavours from spices, vegetables, sauces and other ingredients.",
       preparation:
-        "Rice is usually cleaned and prepared before cooking. Depending on the dish, it may be boiled separately, cooked with a seasoned liquid or stir-fried with other ingredients.",
+        "Rice is cleaned and prepared before cooking. Depending on the dish, it may be boiled separately, cooked with a seasoned liquid or stir-fried with other ingredients.",
       ingredients:
         "Rice is the main ingredient, while vegetables, herbs, spices, sauces and proteins provide additional flavour and texture.",
       stages: [
         "Rice is selected and cleaned to prepare it for cooking.",
         "Vegetables, herbs and other ingredients are cut and arranged.",
-        "Spices, sauces or aromatic ingredients are prepared to develop the flavour.",
+        "Spices, sauces or aromatic ingredients are prepared.",
         "Rice is cooked using the method suitable for the dish.",
-        "The remaining ingredients are combined with the rice to complete the dish.",
+        "The remaining ingredients are combined with the rice.",
       ],
       flavour:
-        "Rice dishes can range from mild and fragrant to spicy, savoury or creamy depending on their ingredients and cooking style.",
+        "Rice dishes can range from mild and fragrant to spicy, savoury or creamy.",
       culture:
-        "Rice has an important place in everyday meals and traditional celebrations in countries such as India, China, Japan, Thailand and many others.",
+        "Rice has an important place in everyday meals and traditional celebrations across many countries.",
       cookingMethod: "Boiling, steaming or stir-frying",
     };
   }
-
-  // PIZZA
 
   if (name.includes("pizza")) {
     return {
       title: "The Story Behind Pizza",
       origin:
-        "Modern pizza is especially associated with Naples, Italy, where the traditional Neapolitan style became famous.",
+        "Modern pizza is especially associated with Naples, Italy, where traditional Neapolitan pizza became famous.",
       background:
-        "Pizza is built around a dough base topped with sauce, cheese and other ingredients. Over time, different regions have created their own styles and combinations.",
+        "Pizza is built around a dough base topped with sauce, cheese and other ingredients.",
       preparation:
-        "The dough is prepared and allowed to rise. A sauce is spread over the base, followed by cheese and selected toppings. The assembled pizza is baked until the crust develops colour and the toppings are cooked.",
+        "The dough is prepared and allowed to rise. Sauce, cheese and toppings are arranged over the base before baking.",
       ingredients:
         "Flour, yeast, water and salt form the dough. Tomato sauce, cheese, vegetables, herbs and optional meat provide the toppings.",
       stages: [
@@ -298,14 +314,12 @@ function getFoodProfile(recipe: Meal): FoodProfile {
         "The pizza is baked until the crust is cooked and the cheese melts.",
       ],
       flavour:
-        "Pizza combines a soft or crisp crust with savoury sauce, melted cheese and toppings. Its taste changes depending on the ingredients and style.",
+        "Pizza combines a soft or crisp crust with savoury sauce, melted cheese and toppings.",
       culture:
-        "Naples is famous for traditional Neapolitan pizza. Italian pizza culture has influenced popular pizza styles around the world.",
+        "Naples is famous for traditional Neapolitan pizza, which has influenced pizza styles around the world.",
       cookingMethod: "Dough preparation and oven baking",
     };
   }
-
-  // PASTA
 
   if (/pasta|spaghetti|macaroni|lasagna|penne|fettuccine/.test(name)) {
     return {
@@ -313,37 +327,35 @@ function getFoodProfile(recipe: Meal): FoodProfile {
       origin:
         "Pasta is closely associated with Italian cuisine, which has developed many regional pasta shapes, sauces and preparation traditions.",
       background:
-        "Pasta comes in different shapes and sizes. Each shape works with different sauces and ingredients, creating a wide variety of dishes.",
+        "Pasta comes in different shapes and sizes. Each shape works with different sauces and ingredients.",
       preparation:
-        "Pasta is cooked in water until it reaches the desired texture. Meanwhile, a sauce is prepared using ingredients such as tomatoes, cheese, cream, herbs or vegetables. The cooked pasta is then combined with the sauce.",
+        "Pasta is cooked in water until it reaches the desired texture. Meanwhile, a sauce is prepared and combined with the cooked pasta.",
       ingredients:
         "Pasta forms the base, while sauces, herbs, vegetables, cheese and optional meat create the character of the dish.",
       stages: [
         "The pasta shape is selected according to the dish.",
-        "Water is heated and the pasta is cooked until it reaches the desired texture.",
+        "Water is heated and the pasta is cooked.",
         "The sauce is prepared using the selected ingredients.",
         "The cooked pasta is combined with the sauce.",
         "Herbs, cheese or other finishing ingredients complete the dish.",
       ],
       flavour:
-        "Pasta can be creamy, tangy, cheesy, savoury or herbaceous depending on the sauce and accompanying ingredients.",
+        "Pasta can be creamy, tangy, cheesy, savoury or herbaceous depending on the sauce.",
       culture:
-        "Italy is famous for its regional pasta traditions. Different regions are known for distinctive shapes, sauces and combinations.",
+        "Italy is famous for its regional pasta traditions and distinctive shapes and sauces.",
       cookingMethod: "Boiling and sauce preparation",
     };
   }
-
-  // BURGER
 
   if (name.includes("burger")) {
     return {
       title: "What Makes a Burger Special?",
       origin:
-        "The modern hamburger is strongly associated with the United States, although its food history has influences from other parts of the world.",
+        "The modern hamburger is strongly associated with the United States, with influences from other food traditions.",
       background:
-        "A burger combines a bread bun with a filling and selected toppings. Different styles use different patties, sauces, vegetables and cheeses.",
+        "A burger combines a bread bun with a filling and selected toppings.",
       preparation:
-        "The patty is prepared and cooked, while the bun and toppings are arranged separately. The cooked patty is placed between the bun layers with sauces and other ingredients.",
+        "The patty is prepared and cooked, while the bun and toppings are arranged separately. The ingredients are assembled before serving.",
       ingredients:
         "A bun provides the base. The filling may include a meat or vegetable patty, cheese, lettuce, tomato, onion and sauces.",
       stages: [
@@ -351,17 +363,15 @@ function getFoodProfile(recipe: Meal): FoodProfile {
         "The patty is shaped and seasoned.",
         "The patty is cooked until ready.",
         "The bun is prepared and lightly toasted when required.",
-        "The patty, vegetables, cheese and sauces are assembled inside the bun.",
+        "The patty, vegetables, cheese and sauces are assembled.",
       ],
       flavour:
-        "Burgers bring together soft bread, a savoury filling, fresh vegetables and sauces for a combination of textures and flavours.",
+        "Burgers bring together soft bread, a savoury filling, fresh vegetables and sauces.",
       culture:
         "Burgers are a popular part of American fast-food culture and have developed many international variations.",
       cookingMethod: "Grilling, pan-frying and assembly",
     };
   }
-
-  // SEAFOOD
 
   if (
     /fish|prawn|shrimp|crab|lobster|salmon|tuna|squid|octopus|mussel|oyster/.test(name) ||
@@ -370,13 +380,13 @@ function getFoodProfile(recipe: Meal): FoodProfile {
     return {
       title: "Discover the Seafood Tradition",
       origin:
-        `${recipe.strArea || "Many coastal regions"} has its own seafood traditions. Fish and shellfish dishes vary according to local ingredients, seasonings and cooking methods.`,
+        `${area} has its own seafood traditions. Fish and shellfish dishes vary according to local ingredients and cooking methods.`,
       background:
-        "Seafood dishes use fish, shellfish or other marine ingredients as their main component. Their preparation often focuses on balancing the natural flavour of the seafood with herbs and seasonings.",
+        "Seafood dishes use fish, shellfish or other marine ingredients as their main component.",
       preparation:
-        "The seafood is cleaned and prepared before cooking. Seasonings, herbs and sauces are arranged according to the dish. The seafood is then grilled, steamed, fried or simmered depending on the recipe.",
+        "The seafood is cleaned and prepared before cooking. Seasonings, herbs and sauces are arranged according to the dish.",
       ingredients:
-        "Fish or shellfish provides the main ingredient. Herbs, spices, citrus, vegetables and sauces help develop the overall flavour.",
+        "Fish or shellfish provides the main ingredient. Herbs, spices, citrus, vegetables and sauces develop the flavour.",
       stages: [
         "The seafood is cleaned and prepared.",
         "Herbs, spices and other seasonings are arranged.",
@@ -385,54 +395,50 @@ function getFoodProfile(recipe: Meal): FoodProfile {
         "Sauces, herbs or finishing ingredients complete the dish.",
       ],
       flavour:
-        "Seafood can have a delicate, savoury or rich flavour depending on the variety and the seasonings used.",
+        "Seafood can have a delicate, savoury or rich flavour depending on the variety and seasonings.",
       culture:
-        "Coastal communities around the world have developed distinctive seafood dishes using locally available fish and shellfish.",
+        "Coastal communities around the world have developed distinctive seafood dishes.",
       cookingMethod: "Grilling, steaming, frying or simmering",
     };
   }
-
-  // CHICKEN DISHES
 
   if (name.includes("chicken") || category.includes("chicken")) {
     return {
       title: "The Preparation Behind Chicken Dishes",
       origin:
-        `${recipe.strArea || "Different regional cuisines"} offers its own chicken preparations, with different spice combinations, sauces and cooking techniques.`,
+        `${area} offers its own chicken preparations, with different spice combinations, sauces and cooking techniques.`,
       background:
-        "Chicken is a versatile ingredient used in many cuisines. It can be prepared with spices, herbs, vegetables and sauces to create a wide range of dishes.",
+        "Chicken is a versatile ingredient used in many cuisines.",
       preparation:
-        "The chicken is cleaned and cut into suitable portions. It may be seasoned or marinated before being cooked with the selected spices, sauce or other ingredients.",
+        "The chicken is cleaned and cut into suitable portions. It may be seasoned or marinated before being cooked.",
       ingredients:
-        "Chicken is the main ingredient. Depending on the recipe, onions, garlic, ginger, herbs, spices and sauces contribute additional flavour.",
+        "Chicken is the main ingredient. Onions, garlic, ginger, herbs, spices and sauces contribute additional flavour.",
       stages: [
         "The chicken is cleaned and divided into suitable portions.",
         "Spices, herbs and other seasoning ingredients are prepared.",
         "The chicken is seasoned or marinated when required.",
         "The chicken is cooked using the method suited to the dish.",
-        "The sauce, herbs or finishing ingredients are combined to complete the preparation.",
+        "The sauce, herbs or finishing ingredients complete the preparation.",
       ],
       flavour:
-        "Chicken dishes can be mild, spicy, creamy, smoky or aromatic depending on the ingredients and cooking method.",
+        "Chicken dishes can be mild, spicy, creamy, smoky or aromatic.",
       culture:
-        "Chicken dishes are popular across many food cultures, with regional variations in seasoning, sauces and preparation.",
+        "Chicken dishes are popular across many food cultures, with regional variations.",
       cookingMethod: "Grilling, roasting, frying or simmering",
     };
   }
-
-  // SALAD
 
   if (category.includes("salad") || name.includes("salad")) {
     return {
       title: "Freshness Behind Every Salad",
       origin:
-        `${recipe.strArea || "International cuisines"} has its own salad traditions, using seasonal vegetables, fruits, herbs and dressings.`,
+        `${area} has its own salad traditions, using seasonal vegetables, fruits, herbs and dressings.`,
       background:
-        "Salads bring together fresh or prepared ingredients in different combinations. Their identity often comes from the balance of freshness, texture and dressing.",
+        "Salads bring together fresh or prepared ingredients in different combinations.",
       preparation:
-        "Vegetables and other ingredients are cleaned and cut into suitable sizes. A dressing is prepared separately and combined with the ingredients to bring the flavours together.",
+        "Vegetables and other ingredients are cleaned and cut. A dressing is prepared separately and combined with the ingredients.",
       ingredients:
-        "Fresh vegetables, fruits, herbs, grains, nuts and dressings may be used depending on the style of salad.",
+        "Fresh vegetables, fruits, herbs, grains, nuts and dressings may be used.",
       stages: [
         "Fresh ingredients are selected and cleaned.",
         "Vegetables and fruits are cut into suitable portions.",
@@ -448,8 +454,6 @@ function getFoodProfile(recipe: Meal): FoodProfile {
     };
   }
 
-  // DESSERT
-
   if (
     category.includes("dessert") ||
     /cake|ice cream|pudding|brownie|cookie|mousse|tart|pie/.test(name)
@@ -457,41 +461,39 @@ function getFoodProfile(recipe: Meal): FoodProfile {
     return {
       title: "The Sweet Story Behind This Dessert",
       origin:
-        `${recipe.strArea || "Different regional cuisines"} has its own dessert traditions, ingredients and methods of preparation.`,
+        `${area} has its own dessert traditions, ingredients and methods of preparation.`,
       background:
-        "Desserts bring together ingredients such as flour, sugar, milk, cream, fruits and chocolate. Their preparation may involve baking, chilling, mixing or cooking.",
+        "Desserts bring together ingredients such as flour, sugar, milk, cream, fruits and chocolate.",
       preparation:
-        "The ingredients are measured and prepared according to the dessert type. They are mixed, cooked, baked or chilled as needed before the final presentation.",
+        "The ingredients are measured and prepared according to the dessert type. They are mixed, cooked, baked or chilled as needed.",
       ingredients:
-        "Depending on the dessert, ingredients may include flour, sugar, milk, cream, eggs, fruits, chocolate and flavourings.",
+        "Ingredients may include flour, sugar, milk, cream, eggs, fruits, chocolate and flavourings.",
       stages: [
         "The required ingredients are measured and prepared.",
-        "Dry and wet ingredients are combined when the recipe requires it.",
-        "The mixture is cooked, baked, chilled or set according to the dessert.",
+        "Dry and wet ingredients are combined when required.",
+        "The mixture is cooked, baked, chilled or set.",
         "The prepared dessert is allowed to reach the required texture.",
-        "The final presentation is completed with suitable toppings or garnishes.",
+        "The final presentation is completed with suitable toppings.",
       ],
       flavour:
-        "Desserts can combine sweetness, creaminess, fruitiness and rich flavours, with textures ranging from soft and smooth to crisp.",
+        "Desserts can combine sweetness, creaminess, fruitiness and rich flavours.",
       culture:
-        "Desserts are part of celebrations and everyday food traditions across the world, with many regions known for their own specialties.",
+        "Desserts are part of celebrations and everyday food traditions across the world.",
       cookingMethod: "Mixing, baking, chilling or setting",
     };
   }
-
-  // SOUP
 
   if (category.includes("soup") || name.includes("soup")) {
     return {
       title: "How This Soup Comes Together",
       origin:
-        `${recipe.strArea || "Different regional cuisines"} has its own soup traditions, using local vegetables, herbs, spices and broths.`,
+        `${area} has its own soup traditions, using local vegetables, herbs, spices and broths.`,
       background:
-        "Soup combines ingredients in a liquid base to develop flavour and texture. Some versions are light and clear, while others are thick and creamy.",
+        "Soup combines ingredients in a liquid base to develop flavour and texture.",
       preparation:
-        "The vegetables and other ingredients are prepared before being added to the broth or cooking liquid. They are simmered together until their flavours develop.",
+        "The vegetables and other ingredients are prepared before being added to the broth or cooking liquid.",
       ingredients:
-        "Vegetables, herbs, spices, stock, water and optional meat or dairy products may be used depending on the soup.",
+        "Vegetables, herbs, spices, stock, water and optional meat or dairy products may be used.",
       stages: [
         "Vegetables and other ingredients are cleaned and cut.",
         "A broth or seasoned liquid is prepared.",
@@ -500,14 +502,12 @@ function getFoodProfile(recipe: Meal): FoodProfile {
         "Seasoning and finishing ingredients complete the soup.",
       ],
       flavour:
-        "Soups can be light, savoury, spicy, creamy or rich depending on the ingredients and preparation.",
+        "Soups can be light, savoury, spicy, creamy or rich.",
       culture:
         "Soup is enjoyed in many cultures, from traditional broths to regional vegetable and seafood soups.",
       cookingMethod: "Simmering and slow cooking",
     };
   }
-
-  // GENERAL FALLBACK
 
   return {
     title: `Discover ${recipe.strMeal}`,
@@ -556,10 +556,6 @@ export default function ProductDetailsPage() {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [wishlistMessage, setWishlistMessage] = useState("");
 
-  // ==========================================
-  // RECIPE PRICE
-  // ==========================================
-
   const recipePrice = recipe
     ? getRecipePrice(
         recipe.idMeal,
@@ -580,7 +576,7 @@ export default function ProductDetailsPage() {
       return;
     }
 
-    let isMounted = true;
+    const controller = new AbortController();
 
     const fetchRecipe = async () => {
       setLoading(true);
@@ -590,7 +586,10 @@ export default function ProductDetailsPage() {
       try {
         const response = await fetch(
           `/api/recipe/${encodeURIComponent(recipeId)}`,
-          { cache: "no-store" }
+          {
+            cache: "no-store",
+            signal: controller.signal,
+          }
         );
 
         const data: MealResponse = await response.json();
@@ -601,23 +600,27 @@ export default function ProductDetailsPage() {
           );
         }
 
-        if (!data.meals || data.meals.length === 0) {
+        if (!Array.isArray(data.meals) || data.meals.length === 0) {
           throw new Error("Recipe not found.");
         }
 
-        if (isMounted) {
-          setRecipe(data.meals[0]);
+        const foundRecipe = data.meals[0];
+
+        if (!foundRecipe?.idMeal || !foundRecipe?.strMeal) {
+          throw new Error("Invalid recipe information received.");
         }
+
+        setRecipe(foundRecipe);
       } catch (err) {
-        if (isMounted) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Something went wrong. Please try again."
-          );
-        }
+        if (controller.signal.aborted) return;
+
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Something went wrong. Please try again."
+        );
       } finally {
-        if (isMounted) {
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
       }
@@ -626,7 +629,7 @@ export default function ProductDetailsPage() {
     fetchRecipe();
 
     return () => {
-      isMounted = false;
+      controller.abort();
     };
   }, [recipeId]);
 
@@ -644,29 +647,14 @@ export default function ProductDetailsPage() {
   useEffect(() => {
     if (!recipe) return;
 
-    try {
-      const savedWishlist = localStorage.getItem(WISHLIST_KEY);
+    const wishlist = readStorage<WishlistItem[]>(
+      WISHLIST_KEY,
+      []
+    );
 
-      if (!savedWishlist) {
-        setIsWishlisted(false);
-        return;
-      }
-
-      const parsedWishlist: unknown = JSON.parse(savedWishlist);
-
-      if (Array.isArray(parsedWishlist)) {
-        const exists = parsedWishlist.some(
-          (item: WishlistItem) => item.idMeal === recipe.idMeal
-        );
-
-        setIsWishlisted(exists);
-      } else {
-        setIsWishlisted(false);
-      }
-    } catch (error) {
-      console.error("Unable to check wishlist:", error);
-      setIsWishlisted(false);
-    }
+    setIsWishlisted(
+      wishlist.some((item) => item.idMeal === recipe.idMeal)
+    );
   }, [recipe]);
 
   // ==========================================
@@ -687,55 +675,45 @@ export default function ProductDetailsPage() {
   const handleToggleWishlist = () => {
     if (!recipe) return;
 
-    try {
-      const savedWishlist = localStorage.getItem(WISHLIST_KEY);
+    const wishlist = readStorage<WishlistItem[]>(
+      WISHLIST_KEY,
+      []
+    );
 
-      let wishlist: WishlistItem[] = [];
+    const existingItem = wishlist.some(
+      (item) => item.idMeal === recipe.idMeal
+    );
 
-      if (savedWishlist) {
-        const parsedWishlist: unknown = JSON.parse(savedWishlist);
+    const updatedWishlist = existingItem
+      ? wishlist.filter((item) => item.idMeal !== recipe.idMeal)
+      : [
+          ...wishlist,
+          {
+            idMeal: recipe.idMeal,
+            strMeal: recipe.strMeal,
+            strMealThumb: recipe.strMealThumb,
+            price: recipePrice,
+          },
+        ];
 
-        if (Array.isArray(parsedWishlist)) {
-          wishlist = parsedWishlist as WishlistItem[];
-        }
-      }
-
-      const existingItem = wishlist.some(
-        (item) => item.idMeal === recipe.idMeal
-      );
-
-      if (existingItem) {
-        wishlist = wishlist.filter(
-          (item) => item.idMeal !== recipe.idMeal
-        );
-
-        setIsWishlisted(false);
-        setWishlistMessage("Recipe removed from your wishlist.");
-      } else {
-        const newItem: WishlistItem = {
-          idMeal: recipe.idMeal,
-          strMeal: recipe.strMeal,
-          strMealThumb: recipe.strMealThumb,
-          price: recipePrice,
-        };
-
-        wishlist = [...wishlist, newItem];
-
-        setIsWishlisted(true);
-        setWishlistMessage("Recipe added to your wishlist!");
-      }
-
-      localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
-
-      window.setTimeout(() => {
-        setWishlistMessage("");
-      }, 3500);
-    } catch (error) {
-      console.error("Unable to update wishlist:", error);
+    if (!writeStorage(WISHLIST_KEY, updatedWishlist)) {
       setWishlistMessage(
         "Unable to update wishlist. Please try again."
       );
+      return;
     }
+
+    setIsWishlisted(!existingItem);
+
+    setWishlistMessage(
+      existingItem
+        ? "Recipe removed from your wishlist."
+        : "Recipe added to your wishlist!"
+    );
+
+    window.setTimeout(() => {
+      setWishlistMessage("");
+    }, 3500);
   };
 
   // ==========================================
@@ -745,62 +723,56 @@ export default function ProductDetailsPage() {
   const handleAddToCart = () => {
     if (!recipe) return;
 
-    try {
-      const savedCart = localStorage.getItem(CART_KEY);
+    const cart = readStorage<CartItem[]>(CART_KEY, []);
 
-      let cart: CartItem[] = [];
+    const existingItem = cart.find(
+      (item) => item.idMeal === recipe.idMeal
+    );
 
-      if (savedCart) {
-        const parsedCart: unknown = JSON.parse(savedCart);
-
-        if (Array.isArray(parsedCart)) {
-          cart = parsedCart as CartItem[];
-        }
-      }
-
-      const existingItem = cart.find(
-        (item) => item.idMeal === recipe.idMeal
-      );
-
-      if (existingItem) {
-        cart = cart.map((item) =>
+    const updatedCart = existingItem
+      ? cart.map((item) =>
           item.idMeal === recipe.idMeal
             ? {
                 ...item,
                 price: recipePrice,
-                quantity: Number(item.quantity || 0) + 1,
+                quantity: Math.max(
+                  1,
+                  Number(item.quantity || 0)
+                ) + 1,
               }
             : item
-        );
+        )
+      : [
+          ...cart,
+          {
+            idMeal: recipe.idMeal,
+            strMeal: recipe.strMeal,
+            strMealThumb: recipe.strMealThumb,
+            price: recipePrice,
+            quantity: 1,
+          },
+        ];
 
-        setCartMessage("Recipe quantity updated in your cart!");
-      } else {
-        const newItem: CartItem = {
-          idMeal: recipe.idMeal,
-          strMeal: recipe.strMeal,
-          strMealThumb: recipe.strMealThumb,
-          price: recipePrice,
-          quantity: 1,
-        };
-
-        cart = [...cart, newItem];
-
-        setCartMessage("Recipe successfully added to your cart!");
-      }
-
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-
-      setAddedToCart(true);
-
-      window.setTimeout(() => {
-        setAddedToCart(false);
-        setCartMessage("");
-      }, 4000);
-    } catch (error) {
-      console.error("Unable to add recipe to cart:", error);
-      setCartMessage("Unable to add recipe. Please try again.");
+    if (!writeStorage(CART_KEY, updatedCart)) {
+      setCartMessage(
+        "Unable to add recipe. Please check your browser storage."
+      );
       setAddedToCart(false);
+      return;
     }
+
+    setAddedToCart(true);
+
+    setCartMessage(
+      existingItem
+        ? "Recipe quantity updated in your cart!"
+        : "Recipe successfully added to your cart!"
+    );
+
+    window.setTimeout(() => {
+      setAddedToCart(false);
+      setCartMessage("");
+    }, 4000);
   };
 
   // ==========================================
@@ -828,12 +800,24 @@ export default function ProductDetailsPage() {
       <main className="product-details-page">
         <div className="details-error">
           <AlertCircle size={48} />
+
           <h2>Recipe Not Found</h2>
+
           <p>{error || "Unable to find this recipe."}</p>
 
-          <button onClick={() => router.push("/categories")}>
+          <button
+            type="button"
+            onClick={() => router.push("/categories")}
+          >
             <ArrowLeft size={18} />
             Back to Categories
+          </button>
+
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
           </button>
         </div>
       </main>
@@ -855,7 +839,10 @@ export default function ProductDetailsPage() {
           <span>Foodie</span>
         </Link>
 
-        <nav className="details-navigation" aria-label="Food navigation">
+        <nav
+          className="details-navigation"
+          aria-label="Food navigation"
+        >
           <Link href="/categories" className="details-back">
             <ArrowLeft size={18} />
             Back to Categories
@@ -871,6 +858,10 @@ export default function ProductDetailsPage() {
             <img
               src={recipe.strMealThumb}
               alt={recipe.strMeal}
+              loading="eager"
+              onError={(event) => {
+                event.currentTarget.style.visibility = "hidden";
+              }}
             />
           </div>
         </div>
@@ -887,8 +878,6 @@ export default function ProductDetailsPage() {
             Discover the ingredients, preparation style and
             culinary traditions behind {recipe.strMeal}.
           </p>
-
-          {/* UPDATED RECIPE PRICE */}
 
           <div className="details-recipe-price">
             <strong>₹{recipePrice}</strong>
@@ -950,12 +939,18 @@ export default function ProductDetailsPage() {
               <Plus size={17} />
             </button>
 
-            <Link href="/cart" className="details-view-cart">
+            <Link
+              href="/cart"
+              className="details-view-cart"
+            >
               <ShoppingCart size={18} />
               View Cart
             </Link>
 
-            <Link href="/wishlist" className="details-view-wishlist">
+            <Link
+              href="/wishlist"
+              className="details-view-wishlist"
+            >
               <Heart size={18} />
               View Wishlist
             </Link>
@@ -974,7 +969,10 @@ export default function ProductDetailsPage() {
           )}
 
           {wishlistMessage && (
-            <div className="details-wishlist-message" role="status">
+            <div
+              className="details-wishlist-message"
+              role="status"
+            >
               <CheckCircle2 size={18} />
               <span>{wishlistMessage}</span>
             </div>
@@ -988,6 +986,7 @@ export default function ProductDetailsPage() {
         <div className="details-section-heading">
           <span>FOOD BACKGROUND</span>
           <h2>{foodProfile.title}</h2>
+
           <p>
             Learn about the food traditions, ingredients and
             preparation that make {recipe.strMeal} special.
@@ -999,6 +998,7 @@ export default function ProductDetailsPage() {
             <div className="recipe-curiosity-icon">
               <BookOpen size={25} />
             </div>
+
             <h3>About This Dish</h3>
             <p>{foodProfile.background}</p>
           </article>
@@ -1007,6 +1007,7 @@ export default function ProductDetailsPage() {
             <div className="recipe-curiosity-icon">
               <Globe2 size={25} />
             </div>
+
             <h3>Origin & Famous Regions</h3>
             <p>{foodProfile.origin}</p>
           </article>
@@ -1015,6 +1016,7 @@ export default function ProductDetailsPage() {
             <div className="recipe-curiosity-icon">
               <Sparkles size={25} />
             </div>
+
             <h3>Flavour & Texture</h3>
             <p>{foodProfile.flavour}</p>
           </article>
@@ -1023,6 +1025,7 @@ export default function ProductDetailsPage() {
             <div className="recipe-curiosity-icon">
               <Coffee size={25} />
             </div>
+
             <h3>Food Culture</h3>
             <p>{foodProfile.culture}</p>
           </article>
@@ -1035,6 +1038,7 @@ export default function ProductDetailsPage() {
         <div className="details-section-heading">
           <span>WHAT GOES INTO IT</span>
           <h2>Ingredients Behind the Dish</h2>
+
           <p>
             Take a closer look at the ingredients that give
             {` ${recipe.strMeal} `}its flavour, aroma and character.
@@ -1054,17 +1058,25 @@ export default function ProductDetailsPage() {
 
                 <div className="ingredient-content">
                   <h3>{ingredient.name}</h3>
-                  {ingredient.measure && <p>{ingredient.measure}</p>}
+
+                  {ingredient.measure && (
+                    <p>{ingredient.measure}</p>
+                  )}
                 </div>
 
-                <Leaf size={20} className="ingredient-icon" />
+                <Leaf
+                  size={20}
+                  className="ingredient-icon"
+                />
               </article>
             ))}
           </div>
         ) : (
           <div className="recipe-curiosity-note">
             <Info size={20} />
-            <p>Ingredient information is not available for this dish.</p>
+            <p>
+              Ingredient information is not available for this dish.
+            </p>
           </div>
         )}
       </section>
@@ -1075,6 +1087,7 @@ export default function ProductDetailsPage() {
         <div className="details-section-heading">
           <span>BEHIND THE PREPARATION</span>
           <h2>How This Dish Comes Together</h2>
+
           <p>
             See how the ingredients are prepared, combined and
             cooked to create {recipe.strMeal}.
@@ -1115,7 +1128,10 @@ export default function ProductDetailsPage() {
               </div>
 
               <div className="preparation-stage-content">
-                <span>PREPARATION STAGE {index + 1}</span>
+                <span>
+                  PREPARATION STAGE {index + 1}
+                </span>
+
                 <p>{stage}</p>
               </div>
             </article>
@@ -1130,7 +1146,9 @@ export default function ProductDetailsPage() {
           <div className="details-section-heading">
             <span>RECIPE DETAILS</span>
             <h2>Original Preparation Notes</h2>
-            <p>The preparation details provided for this dish.</p>
+            <p>
+              The preparation details provided for this dish.
+            </p>
           </div>
 
           <div className="original-preparation-content">
