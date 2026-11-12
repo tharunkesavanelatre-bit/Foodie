@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -537,10 +537,10 @@ function getFoodProfile(recipe: Meal): FoodProfile {
 }
 
 // ==========================================
-// COMPONENT
+// PRODUCT DETAILS CONTENT
 // ==========================================
 
-export default function ProductDetailsPage() {
+function ProductDetailsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -1173,5 +1173,27 @@ export default function ProductDetailsPage() {
         </Link>
       </section>
     </main>
+  );
+}
+
+// ==========================================
+// SUSPENSE WRAPPER
+// ==========================================
+
+export default function ProductDetailsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="product-details-page">
+          <div className="details-loading">
+            <div className="details-spinner" />
+            <h2>Preparing Your Recipe</h2>
+            <p>Finding delicious details for you...</p>
+          </div>
+        </main>
+      }
+    >
+      <ProductDetailsContent />
+    </Suspense>
   );
 }
