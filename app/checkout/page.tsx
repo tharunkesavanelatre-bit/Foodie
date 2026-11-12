@@ -748,7 +748,6 @@ export default function CheckoutPage() {
 
                   <div className="checkout-payment-content">
                     <strong>Credit / Debit Card</strong>
-                    <span>Secure demo card payment</span>
                   </div>
 
                   {paymentMethod === "Card" && (
@@ -893,8 +892,7 @@ export default function CheckoutPage() {
             </button>
 
             <div className="checkout-trust">
-              <ShieldCheck size={17} />
-              <span>Safe and secure demo checkout</span>
+              
             </div>
 
             <div className="checkout-delivery-info">
