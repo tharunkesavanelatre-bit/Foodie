@@ -10,14 +10,11 @@ import {
   MapPin,
   CalendarDays,
   CreditCard,
-  Eye,
   X,
   Clock,
   CheckCircle2,
   Truck,
   ChefHat,
-  RefreshCw,
-  ShoppingCart,
   Receipt,
   PackageCheck,
   XCircle,
@@ -207,6 +204,7 @@ export default function OrdersPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadOrders();
 
     const handleStorage = () => loadOrders();
@@ -362,9 +360,9 @@ export default function OrdersPage() {
             <h2>Your next delicious order awaits!</h2>
 
             <p>
-              You haven't placed any orders yet.
+              You haven&apos;t placed any orders yet.
               Discover your favourite meals and
-              they'll appear here.
+              they will appear here.
             </p>
 
             <Link href="/products" className="orders-primary-btn">

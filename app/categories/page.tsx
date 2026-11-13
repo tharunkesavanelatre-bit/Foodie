@@ -12,7 +12,6 @@ import {
   Star,
   Home,
   Heart,
-  PlayCircle,
   Sparkles,
 } from "lucide-react";
 
@@ -329,7 +328,7 @@ export default function CategoriesPage() {
   // SHARED HEADER
   // ==========================================
 
-  const Header = () => (
+  const renderHeader = () => (
     <header className="categories-site-header">
       <div className="categories-header-inner">
 
@@ -384,7 +383,7 @@ export default function CategoriesPage() {
   if (!selectedCategory) {
     return (
       <main className="categories-page">
-        <Header />
+        {renderHeader()}
 
         {/* =====================================
             PREMIUM CATEGORY HERO
@@ -593,7 +592,7 @@ export default function CategoriesPage() {
 
   return (
     <main className="categories-page">
-      <Header />
+      {renderHeader()}
 
       <section className="recipes-hero">
 
@@ -691,7 +690,7 @@ export default function CategoriesPage() {
             <h3>No recipes found</h3>
 
             <p>
-              TheMealDB doesn't currently have recipes matching
+              TheMealDB doesn&apos;t currently have recipes matching
               this category.
             </p>
 

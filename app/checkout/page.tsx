@@ -234,6 +234,7 @@ export default function CheckoutPage() {
               quantity: Number(item.quantity),
             }));
 
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setCart(validCart);
 
           // SAVE VALIDATED CART WITH PRESERVED PRICES

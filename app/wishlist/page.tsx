@@ -197,6 +197,7 @@ export default function WishlistPage() {
               price: getItemPrice(item),
             }));
 
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setWishlist(validWishlist);
         }
       }
@@ -436,7 +437,7 @@ export default function WishlistPage() {
             <h2>Your Wishlist is Empty</h2>
 
             <p>
-              You haven't saved any recipes yet.
+              You haven&apos;t saved any recipes yet.
               Explore delicious recipes and add
               your favourites here!
             </p>

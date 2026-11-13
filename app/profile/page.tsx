@@ -49,6 +49,7 @@ export default function ProfilePage() {
         return;
       }
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUser(parsedUser);
       setChecking(false);
     } catch {

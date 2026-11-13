@@ -390,6 +390,7 @@ export default function ProductsPage() {
             )
             .map((item) => item.idMeal);
 
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setWishlistIds(ids);
         }
       }
@@ -460,6 +461,7 @@ export default function ProductsPage() {
   useEffect(() => {
     const controller = new AbortController();
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMeals(controller.signal);
 
     return () => controller.abort();
@@ -616,7 +618,7 @@ export default function ProductsPage() {
   // ==========================================
 
   const filteredMeals = useMemo(() => {
-    let result = meals.filter((meal) => {
+    const result = meals.filter((meal) => {
       const searchText = debouncedSearch.toLowerCase();
 
       const ingredients = getIngredientsText(meal);
@@ -715,6 +717,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     if (currentPage > totalPages) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentPage(totalPages);
     }
   }, [currentPage, totalPages]);

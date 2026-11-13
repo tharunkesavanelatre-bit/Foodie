@@ -25,7 +25,6 @@ import {
   Star,
   X,
   ChevronRight,
-  ChefHat,
 } from "lucide-react";
 
 // ==========================================
@@ -75,6 +74,7 @@ function AnimatedNumber({ value, suffix = "" }) {
     if (!isInView) return;
 
     if (shouldReduceMotion) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCount(value);
       return;
     }

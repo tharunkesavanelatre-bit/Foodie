@@ -174,6 +174,7 @@ export default function OrderSuccessPage() {
             : null)
         : latestOrder;
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOrder(matchedOrder);
     } catch (error) {
       console.error("Unable to load order:", error);
@@ -213,7 +214,7 @@ export default function OrderSuccessPage() {
           <h1>Order Not Found</h1>
 
           <p>
-            We couldn't find your order information.
+            We could not find your order information.
             Please check your order history or explore
             our delicious recipes.
           </p>

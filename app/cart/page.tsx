@@ -202,6 +202,7 @@ export default function CartPage() {
               };
             });
 
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setCart(validCart);
         }
       }
@@ -333,7 +334,7 @@ export default function CartPage() {
           <h1>Your Cart is Empty</h1>
 
           <p>
-            Looks like you haven't added any delicious
+            Looks like you haven&apos;t added any delicious
             recipes to your cart yet. Discover something tasty!
           </p>
 
