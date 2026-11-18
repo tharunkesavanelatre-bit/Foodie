@@ -12,50 +12,49 @@ import {
   ChefHat,
 } from "lucide-react";
 
-type User = {
-  name: string;
-  email: string;
-  password: string;
-};
-
 export default function LoginForm() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setMessage("");
+    setLoading(true);
 
-    const users: User[] = JSON.parse(
-      localStorage.getItem("fooddie_users") || "[]"
-    );
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const user = users.find(
-      (item) =>
-        item.email === email.trim().toLowerCase() &&
-        item.password === password
-    );
+      const data = await response.json();
 
-    if (!user) {
-      setMessage("Invalid email or password");
-      return;
+      if (!response.ok) {
+        setMessage(data.message || "Login failed");
+        return;
+      }
+
+      localStorage.setItem(
+        "fooddie_session",
+        JSON.stringify(data.user)
+      );
+
+      window.dispatchEvent(new Event("fooddie-auth-change"));
+
+      alert("Login successful!");
+      router.push("/");
+    } catch {
+      setMessage("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    localStorage.setItem(
-      "fooddie_session",
-      JSON.stringify({
-        name: user.name,
-        email: user.email,
-      })
-    );
-
-    window.dispatchEvent(new Event("fooddie-auth-change"));
-
-    alert("Login successful!");
-    router.push("/");
   }
 
   return (
@@ -125,9 +124,13 @@ export default function LoginForm() {
             <p className="auth-error">{message}</p>
           )}
 
-          <button type="submit" className="auth-submit">
-            Sign In
-            <ArrowRight size={19} />
+          <button
+            type="submit"
+            className="auth-submit"
+            disabled={loading}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+            {!loading && <ArrowRight size={19} />}
           </button>
         </form>
 

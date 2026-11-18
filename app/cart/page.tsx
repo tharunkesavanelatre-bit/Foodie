@@ -68,7 +68,7 @@ export default function CartPage() {
               </div>
 
               {cart.map((item) => (
-                <article key={item.name} className="cart-item">
+                <article key={item.id} className="cart-item">
                   <div className="cart-item-image">
                     <Image
                       src={item.image}
@@ -86,7 +86,7 @@ export default function CartPage() {
                     <div className="cart-quantity">
                       <button
                         onClick={() =>
-                          updateQuantity(item.name, item.quantity - 1)
+                          updateQuantity(item.id, item.quantity - 1)
                         }
                         aria-label="Decrease quantity"
                       >
@@ -97,7 +97,7 @@ export default function CartPage() {
 
                       <button
                         onClick={() =>
-                          updateQuantity(item.name, item.quantity + 1)
+                          updateQuantity(item.id, item.quantity + 1)
                         }
                         aria-label="Increase quantity"
                       >
@@ -107,7 +107,7 @@ export default function CartPage() {
                   </div>
 
                   <button
-                    onClick={() => removeItem(item.name)}
+                    onClick={() => removeItem(item.id)}
                     className="cart-remove"
                     aria-label={`Remove ${item.name}`}
                   >

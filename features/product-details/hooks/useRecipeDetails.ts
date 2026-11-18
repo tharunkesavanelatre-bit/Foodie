@@ -2,42 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import type {
-  Meal,
-  CartItem,
-  WishlistItem,
-} from "../types";
+import type { Meal } from "../types";
 
 import { getRecipeDetails } from "../services/recipeDetailsService";
 import { getRecipePrice } from "../utils/recipePrice";
-
-const CART_KEY = "foodie_cart";
-const WISHLIST_KEY = "foodie_wishlist";
-
-function readStorage<T>(key: string, fallback: T): T {
-  try {
-    const value = localStorage.getItem(key);
-
-    if (!value) return fallback;
-
-    const parsed: unknown = JSON.parse(value);
-
-    return Array.isArray(parsed) ? (parsed as T) : fallback;
-  } catch (error) {
-    console.error(`Unable to read ${key}:`, error);
-    return fallback;
-  }
-}
-
-function writeStorage(key: string, value: unknown): boolean {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch (error) {
-    console.error(`Unable to save ${key}:`, error);
-    return false;
-  }
-}
 
 export function useRecipeDetails(recipeId: string | null) {
   const [recipe, setRecipe] = useState<Meal | null>(null);
@@ -58,10 +26,9 @@ export function useRecipeDetails(recipeId: string | null) {
       )
     : 0;
 
-  // Fetch recipe details
+  // FETCH RECIPE DETAILS
   useEffect(() => {
     if (!recipeId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecipe(null);
       setError("Recipe ID is missing.");
       setLoading(false);
@@ -99,123 +66,121 @@ export function useRecipeDetails(recipeId: string | null) {
 
     fetchRecipe();
 
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, [recipeId]);
 
-  // Check wishlist status
+  // CHECK WISHLIST STATUS
   useEffect(() => {
-    if (!recipe) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsWishlisted(false);
-      return;
-    }
+    if (!recipe) return;
 
-    const wishlist = readStorage<WishlistItem[]>(
-      WISHLIST_KEY,
-      []
-    );
+    let cancelled = false;
 
-    setIsWishlisted(
-      wishlist.some((item) => item.idMeal === recipe.idMeal)
-    );
+    const checkWishlist = async () => {
+      try {
+        const response = await fetch("/api/wishlist");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message);
+        }
+
+        const exists = data.items.some(
+          (item: { idMeal: string }) =>
+            item.idMeal === recipe.idMeal
+        );
+
+        if (!cancelled) {
+          setIsWishlisted(exists);
+        }
+      } catch (error) {
+        console.error("Wishlist check error:", error);
+      }
+    };
+
+    checkWishlist();
+
+    return () => {
+      cancelled = true;
+    };
   }, [recipe]);
 
-  // Add or remove wishlist item
-  const handleToggleWishlist = () => {
-    if (!recipe) return;
+  // ADD OR REMOVE WISHLIST ITEM
+  const handleToggleWishlist = async () => {
+  if (!recipe) return;
 
-    const wishlist = readStorage<WishlistItem[]>(
-      WISHLIST_KEY,
-      []
-    );
+  console.log("1. Wishlist button clicked");
 
-    const existingItem = wishlist.some(
-      (item) => item.idMeal === recipe.idMeal
-    );
+  try {
+    const response = await fetch("/api/wishlist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        idMeal: recipe.idMeal,
+        strMeal: recipe.strMeal,
+        strMealThumb: recipe.strMealThumb,
+        strCategory: recipe.strCategory,
+        price: recipePrice,
+      }),
+    });
 
-    const updatedWishlist = existingItem
-      ? wishlist.filter((item) => item.idMeal !== recipe.idMeal)
-      : [
-          ...wishlist,
-          {
-            idMeal: recipe.idMeal,
-            strMeal: recipe.strMeal,
-            strMealThumb: recipe.strMealThumb,
-            price: recipePrice,
-          },
-        ];
+    const data = await response.json();
 
-    if (!writeStorage(WISHLIST_KEY, updatedWishlist)) {
-      setWishlistMessage(
-        "Unable to update wishlist. Please try again."
-      );
-      return;
+    console.log("2. API Status:", response.status);
+    console.log("3. API Response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message);
     }
 
-    setIsWishlisted(!existingItem);
-
+    setIsWishlisted(true);
+    setWishlistMessage("Recipe added to your wishlist!");
+  } catch (error) {
+    console.error("Wishlist Error:", error);
     setWishlistMessage(
-      existingItem
-        ? "Recipe removed from your wishlist."
-        : "Recipe added to your wishlist!"
+      error instanceof Error ? error.message : "Something went wrong."
     );
-
-    window.setTimeout(() => {
-      setWishlistMessage("");
-    }, 3500);
-  };
-
-  // Add recipe to cart
-  const handleAddToCart = () => {
+  }
+};
+  // ADD RECIPE TO CART
+  const handleAddToCart = async () => {
     if (!recipe) return;
 
-    const cart = readStorage<CartItem[]>(CART_KEY, []);
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idMeal: recipe.idMeal,
+          name: recipe.strMeal,
+          price: recipePrice,
+          image: recipe.strMealThumb,
+          category: recipe.strCategory,
+        }),
+      });
 
-    const existingItem = cart.find(
-      (item) => item.idMeal === recipe.idMeal
-    );
+      const data = await response.json();
 
-    const updatedCart = existingItem
-      ? cart.map((item) =>
-          item.idMeal === recipe.idMeal
-            ? {
-                ...item,
-                price: recipePrice,
-                quantity: Math.max(
-                  1,
-                  Number(item.quantity || 0)
-                ) + 1,
-              }
-            : item
-        )
-      : [
-          ...cart,
-          {
-            idMeal: recipe.idMeal,
-            strMeal: recipe.strMeal,
-            strMealThumb: recipe.strMealThumb,
-            price: recipePrice,
-            quantity: 1,
-          },
-        ];
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to add recipe to cart.");
+      }
 
-    if (!writeStorage(CART_KEY, updatedCart)) {
-      setCartMessage(
-        "Unable to add recipe. Please check your browser storage."
-      );
+      setAddedToCart(true);
+      setCartMessage("Recipe successfully added to your cart!");
+    } catch (error) {
+      console.error("Cart error:", error);
+
       setAddedToCart(false);
-      return;
+
+      setCartMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to add recipe to cart."
+      );
     }
-
-    setAddedToCart(true);
-
-    setCartMessage(
-      existingItem
-        ? "Recipe quantity updated in your cart!"
-        : "Recipe successfully added to your cart!"
-    );
 
     window.setTimeout(() => {
       setAddedToCart(false);

@@ -9,10 +9,13 @@ import {
   LayoutGrid,
   Search,
   ShoppingBag,
+  Heart,
   User,
   LogOut,
   Menu,
   X,
+  Info,
+  MapPin,
 } from "lucide-react";
 
 import { useCart } from "@/hooks/useCart";
@@ -32,10 +35,19 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    function updateSession() {
+    async function updateSession() {
       try {
-        const savedSession = localStorage.getItem("fooddie_session");
-        setSession(savedSession ? JSON.parse(savedSession) : null);
+        const response = await fetch("/api/auth/session", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          setSession(null);
+          return;
+        }
+
+        const data = await response.json();
+        setSession(data.user);
       } catch {
         setSession(null);
       } finally {
@@ -45,11 +57,9 @@ export default function Header() {
 
     updateSession();
 
-    window.addEventListener("storage", updateSession);
     window.addEventListener("fooddie-auth-change", updateSession);
 
     return () => {
-      window.removeEventListener("storage", updateSession);
       window.removeEventListener("fooddie-auth-change", updateSession);
     };
   }, []);
@@ -58,21 +68,35 @@ export default function Header() {
     setMenuOpen(false);
   }, [pathname]);
 
-  function handleLogout() {
-    localStorage.removeItem("fooddie_session");
-    setSession(null);
-    setMenuOpen(false);
+  async function handleLogout() {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
 
-    window.dispatchEvent(new Event("fooddie-auth-change"));
+      if (!response.ok) {
+        alert("Unable to log out. Please try again.");
+        return;
+      }
 
-    router.push("/");
-    router.refresh();
+      setSession(null);
+      setMenuOpen(false);
+
+      window.dispatchEvent(new Event("fooddie-auth-change"));
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      alert("Something went wrong. Please try again.");
+    }
   }
 
   const navigationLinks = [
     { label: "Home", href: "/", icon: Home },
     { label: "Categories", href: "/categories", icon: LayoutGrid },
     { label: "Explore Food", href: "/products", icon: Search },
+    { label: "Nearby Restaurants", href: "/restaurants", icon: MapPin },
+    { label: "About Us", href: "/about", icon: Info },
   ];
 
   const cartCount = cart.reduce(
@@ -132,7 +156,23 @@ export default function Header() {
         </nav>
 
         {/* Desktop Actions */}
-        <div className="hidden items-center gap-5 lg:flex">
+        <div className="hidden items-center gap-4 lg:flex">
+
+          {/* Wishlist */}
+          <Link
+            href="/wishlist"
+            aria-label="My Wishlist"
+            className={`flex items-center gap-2 rounded-full px-3 py-3 text-sm font-bold transition ${
+              pathname.startsWith("/wishlist")
+                ? "bg-orange-50 text-orange-600"
+                : "text-stone-600 hover:bg-orange-50 hover:text-orange-600"
+            }`}
+          >
+            <Heart size={20} />
+            Wishlist
+          </Link>
+
+          {/* Cart */}
           <Link
             href="/cart"
             className="group relative flex items-center gap-2.5 rounded-full bg-gradient-to-r from-orange-600 to-orange-500 px-5 py-3 text-sm font-bold !text-white shadow-lg shadow-orange-200/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-200"
@@ -227,6 +267,20 @@ export default function Header() {
               );
             })}
 
+            {/* Mobile Wishlist */}
+            <Link
+              href="/wishlist"
+              className={`flex items-center gap-4 rounded-xl px-4 py-3.5 font-semibold transition ${
+                pathname.startsWith("/wishlist")
+                  ? "bg-orange-50 text-orange-600"
+                  : "text-stone-700 hover:bg-orange-50 hover:text-orange-600"
+              }`}
+            >
+              <Heart size={20} />
+              My Wishlist
+            </Link>
+
+            {/* Mobile Cart */}
             <Link
               href="/cart"
               className="flex items-center justify-between rounded-xl px-4 py-3.5 font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-600"

@@ -13,12 +13,6 @@ import {
   ChefHat,
 } from "lucide-react";
 
-type RegisteredUser = {
-  name: string;
-  email: string;
-  password: string;
-};
-
 export default function RegisterPage() {
   const router = useRouter();
 
@@ -26,36 +20,40 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleRegister(e: React.FormEvent) {
+  async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setMessage("");
+    setLoading(true);
 
-    const users: RegisteredUser[] = JSON.parse(
-      localStorage.getItem("fooddie_users") || "[]"
-    );
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
 
-    const normalizedEmail = email.trim().toLowerCase();
+      const data = await response.json();
 
-    const exists = users.find(
-      (user) => user.email === normalizedEmail
-    );
+      if (!response.ok) {
+        setMessage(data.message || "Registration failed");
+        return;
+      }
 
-    if (exists) {
-      setMessage("Email already registered");
-      return;
+      alert("Account created successfully!");
+      router.push("/login");
+    } catch {
+      setMessage("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    users.push({
-      name: name.trim(),
-      email: normalizedEmail,
-      password,
-    });
-
-    localStorage.setItem("fooddie_users", JSON.stringify(users));
-
-    alert("Account created successfully!");
-    router.push("/login");
   }
 
   return (
@@ -140,9 +138,13 @@ export default function RegisterPage() {
             <p className="auth-error">{message}</p>
           )}
 
-          <button type="submit" className="auth-submit">
-            Create Account
-            <ArrowRight size={19} />
+          <button
+            type="submit"
+            className="auth-submit"
+            disabled={loading}
+          >
+            {loading ? "Creating Account..." : "Create Account"}
+            {!loading && <ArrowRight size={19} />}
           </button>
         </form>
 

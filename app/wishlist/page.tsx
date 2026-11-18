@@ -17,10 +17,6 @@ import {
 
 import "./wishlist.css";
 
-// ==========================================
-// TYPES
-// ==========================================
-
 interface WishlistItem {
   idMeal: string;
   strMeal: string;
@@ -28,21 +24,6 @@ interface WishlistItem {
   price?: number;
   strCategory?: string;
 }
-
-interface CartItem extends WishlistItem {
-  quantity: number;
-}
-
-// ==========================================
-// LOCAL STORAGE KEYS
-// ==========================================
-
-const WISHLIST_KEY = "foodie_wishlist";
-const CART_KEY = "foodie_cart";
-
-// ==========================================
-// SPECIFIC RECIPE PRICES
-// ==========================================
 
 const SPECIFIC_RECIPE_PRICES: Record<string, number> = {
   "chicken biryani": 249,
@@ -65,10 +46,6 @@ const SPECIFIC_RECIPE_PRICES: Record<string, number> = {
   lasagne: 219,
 };
 
-// ==========================================
-// RECIPE PRICING
-// ==========================================
-
 function getRecipePrice(
   recipeId: string,
   recipeName: string,
@@ -77,26 +54,18 @@ function getRecipePrice(
   const name = recipeName.toLowerCase().trim();
   const recipeCategory = (category || "").toLowerCase();
 
-  // SPECIFIC RECIPE PRICES
-
   for (const [recipe, price] of Object.entries(
     SPECIFIC_RECIPE_PRICES
   )) {
-    if (name.includes(recipe)) {
-      return price;
-    }
+    if (name.includes(recipe)) return price;
   }
-
-  // CATEGORY PRICE RANGES
 
   let minPrice = 129;
   let maxPrice = 249;
 
   if (
     recipeCategory.includes("seafood") ||
-    /fish|prawn|shrimp|crab|lobster|salmon|tuna|squid|octopus|mussel|oyster/.test(
-      name
-    )
+    /fish|prawn|shrimp|crab|lobster|salmon|tuna|squid|octopus|mussel|oyster/.test(name)
   ) {
     minPrice = 229;
     maxPrice = 349;
@@ -129,23 +98,14 @@ function getRecipePrice(
     maxPrice = 299;
   }
 
-  // CONSISTENT PRICE USING RECIPE ID
-
   let hash = 0;
 
   for (let i = 0; i < recipeId.length; i++) {
-    hash =
-      (hash * 31 + recipeId.charCodeAt(i)) >>> 0;
+    hash = (hash * 31 + recipeId.charCodeAt(i)) >>> 0;
   }
 
-  const priceRange = maxPrice - minPrice + 1;
-
-  return minPrice + (hash % priceRange);
+  return minPrice + (hash % (maxPrice - minPrice + 1));
 }
-
-// ==========================================
-// GET ITEM PRICE
-// ==========================================
 
 function getItemPrice(item: WishlistItem): number {
   if (
@@ -163,71 +123,10 @@ function getItemPrice(item: WishlistItem): number {
   );
 }
 
-// ==========================================
-// WISHLIST PAGE
-// ==========================================
-
 export default function WishlistPage() {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [message, setMessage] = useState("");
-
-  // ========================================
-  // LOAD WISHLIST
-  // ========================================
-
-  useEffect(() => {
-    try {
-      const savedWishlist = localStorage.getItem(WISHLIST_KEY);
-
-      if (savedWishlist) {
-        const parsedWishlist: unknown = JSON.parse(savedWishlist);
-
-        if (Array.isArray(parsedWishlist)) {
-          const validWishlist: WishlistItem[] = parsedWishlist
-            .filter(
-              (item: WishlistItem) =>
-                item &&
-                typeof item.idMeal === "string" &&
-                typeof item.strMeal === "string" &&
-                typeof item.strMealThumb === "string"
-            )
-            .map((item: WishlistItem) => ({
-              ...item,
-              price: getItemPrice(item),
-            }));
-
-          // eslint-disable-next-line react-hooks/set-state-in-effect
-          setWishlist(validWishlist);
-        }
-      }
-    } catch (error) {
-      console.error("Unable to load wishlist:", error);
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  // ========================================
-  // SAVE WISHLIST
-  // ========================================
-
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    try {
-      localStorage.setItem(
-        WISHLIST_KEY,
-        JSON.stringify(wishlist)
-      );
-    } catch (error) {
-      console.error("Unable to save wishlist:", error);
-    }
-  }, [wishlist, isLoaded]);
-
-  // ========================================
-  // SHOW MESSAGE
-  // ========================================
 
   const showMessage = (text: string) => {
     setMessage(text);
@@ -237,106 +136,124 @@ export default function WishlistPage() {
     }, 3500);
   };
 
-  // ========================================
-  // REMOVE FROM WISHLIST
-  // ========================================
-
-  const handleRemove = (idMeal: string) => {
-    setWishlist((previousWishlist) =>
-      previousWishlist.filter(
-        (item) => item.idMeal !== idMeal
-      )
-    );
-
-    showMessage("Recipe removed from your wishlist.");
-  };
-
-  // ========================================
-  // CLEAR WISHLIST
-  // ========================================
-
-  const handleClearWishlist = () => {
-    setWishlist([]);
-    showMessage("Your wishlist has been cleared.");
-  };
-
-  // ========================================
-  // ADD TO CART
-  // ========================================
-
-  const handleAddToCart = (item: WishlistItem) => {
+  const fetchWishlist = async () => {
     try {
-      const savedCart = localStorage.getItem(CART_KEY);
+      const response = await fetch("/api/wishlist");
+      const data = await response.json();
 
-      let cart: CartItem[] = [];
-
-      if (savedCart) {
-        const parsedCart: unknown = JSON.parse(savedCart);
-
-        if (!Array.isArray(parsedCart)) {
-          throw new Error("Invalid cart data.");
-        }
-
-        cart = parsedCart.filter(
-          (cartItem: CartItem) =>
-            cartItem &&
-            typeof cartItem.idMeal === "string" &&
-            typeof cartItem.strMeal === "string" &&
-            typeof cartItem.strMealThumb === "string" &&
-            Number.isFinite(Number(cartItem.quantity)) &&
-            Number(cartItem.quantity) > 0
-        );
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to load wishlist.");
       }
 
-      // USE SAVED WISHLIST PRICE
-
-      const recipePrice = getItemPrice(item);
-
-      const existingItem = cart.find(
-        (cartItem) => cartItem.idMeal === item.idMeal
+      const items: WishlistItem[] = (data.items || []).map(
+        (item: {
+          idMeal: string;
+          name: string;
+          image: string | null;
+          price: number | null;
+          category: string | null;
+        }) => ({
+          idMeal: item.idMeal,
+          strMeal: item.name,
+          strMealThumb: item.image || "",
+          price: item.price ? Number(item.price) : undefined,
+          strCategory: item.category || undefined,
+        })
       );
 
-      let updatedCart: CartItem[];
+      setWishlist(items);
+    } catch (error) {
+      console.error("Wishlist fetch error:", error);
+      showMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to load wishlist."
+      );
+    } finally {
+      setIsLoaded(true);
+    }
+  };
 
-      if (existingItem) {
-        updatedCart = cart.map((cartItem) =>
-          cartItem.idMeal === item.idMeal
-            ? {
-                ...cartItem,
-                price: recipePrice,
-                strCategory:
-                  item.strCategory || cartItem.strCategory,
-                quantity:
-                  Number(cartItem.quantity) + 1,
-              }
-            : cartItem
-        );
-      } else {
-        updatedCart = [
-          ...cart,
-          {
-            ...item,
-            price: recipePrice,
-            quantity: 1,
-          },
-        ];
+  useEffect(() => {
+    fetchWishlist();
+  }, []);
+
+  const handleRemove = async (idMeal: string) => {
+    try {
+      const response = await fetch(
+        `/api/wishlist/${encodeURIComponent(idMeal)}`,
+        { method: "DELETE" }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to remove recipe.");
       }
 
-      localStorage.setItem(
-        CART_KEY,
-        JSON.stringify(updatedCart)
+      setWishlist((previous) =>
+        previous.filter((item) => item.idMeal !== idMeal)
       );
+
+      showMessage("Recipe removed from your wishlist.");
+    } catch (error) {
+      console.error("Wishlist remove error:", error);
+      showMessage("Unable to remove recipe.");
+    }
+  };
+
+  const handleClearWishlist = async () => {
+    try {
+      const response = await fetch("/api/wishlist", {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to clear wishlist.");
+      }
+
+      setWishlist([]);
+      showMessage("Your wishlist has been cleared.");
+    } catch (error) {
+      console.error("Wishlist clear error:", error);
+      showMessage("Unable to clear wishlist.");
+    }
+  };
+
+  const handleAddToCart = async (item: WishlistItem) => {
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idMeal: item.idMeal,
+          name: item.strMeal,
+          price: getItemPrice(item),
+          image: item.strMealThumb,
+          category: item.strCategory,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to add recipe to cart.");
+      }
 
       showMessage(`${item.strMeal} added to your cart!`);
     } catch (error) {
       console.error("Unable to add item to cart:", error);
-      showMessage("Unable to add recipe to cart.");
+      showMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to add recipe to cart."
+      );
     }
   };
-
-  // ========================================
-  // LOADING SCREEN
-  // ========================================
 
   if (!isLoaded) {
     return (
@@ -347,17 +264,9 @@ export default function WishlistPage() {
     );
   }
 
-  // ========================================
-  // MAIN UI
-  // ========================================
-
   return (
     <main className="wishlist-page">
-
-      {/* HEADER */}
-
       <header className="wishlist-header">
-
         <Link href="/home" className="wishlist-brand">
           <ChefHat size={28} />
           <span>FOODIE</span>
@@ -367,13 +276,9 @@ export default function WishlistPage() {
           <ArrowLeft size={17} />
           Continue Shopping
         </Link>
-
       </header>
 
-      {/* HERO */}
-
       <section className="wishlist-hero">
-
         <div className="wishlist-hero-icon">
           <Heart size={30} fill="currentColor" />
         </div>
@@ -394,16 +299,12 @@ export default function WishlistPage() {
 
         <div className="wishlist-count">
           <Heart size={15} />
-
           <span>
             {wishlist.length} Saved{" "}
             {wishlist.length === 1 ? "Recipe" : "Recipes"}
           </span>
         </div>
-
       </section>
-
-      {/* MESSAGE */}
 
       {message && (
         <div className="wishlist-message" role="status">
@@ -420,16 +321,9 @@ export default function WishlistPage() {
         </div>
       )}
 
-      {/* WISHLIST CONTENT */}
-
       <section className="wishlist-content">
-
         {wishlist.length === 0 ? (
-
-          /* EMPTY WISHLIST */
-
           <div className="wishlist-empty">
-
             <div className="wishlist-empty-icon">
               <Heart size={48} />
             </div>
@@ -450,17 +344,10 @@ export default function WishlistPage() {
               Explore Recipes
               <ArrowRight size={17} />
             </Link>
-
           </div>
-
         ) : (
-
-          /* WISHLIST ITEMS */
-
           <>
-
             <div className="wishlist-section-heading">
-
               <div>
                 <span>YOUR FAVOURITES</span>
                 <h2>Saved Recipes</h2>
@@ -474,13 +361,15 @@ export default function WishlistPage() {
                 <Trash2 size={16} />
                 Clear Wishlist
               </button>
-
             </div>
 
             <div className="wishlist-grid">
-
               {wishlist.map((item, index) => {
                 const recipePrice = getItemPrice(item);
+
+                const recipeHref = /^\d+$/.test(item.idMeal)
+                  ? `/product-details?id=${encodeURIComponent(item.idMeal)}`
+                  : `/products/${encodeURIComponent(item.idMeal)}`;
 
                 return (
                   <article
@@ -490,16 +379,8 @@ export default function WishlistPage() {
                       animationDelay: `${index * 0.08}s`,
                     }}
                   >
-
-                    {/* IMAGE */}
-
                     <div className="wishlist-card-image">
-
-                      <Link
-                        href={`/product-details?id=${encodeURIComponent(
-                          item.idMeal
-                        )}`}
-                      >
+                      <Link href={recipeHref}>
                         <img
                           src={item.strMealThumb}
                           alt={item.strMeal}
@@ -509,23 +390,14 @@ export default function WishlistPage() {
                       <button
                         type="button"
                         className="wishlist-remove-icon"
-                        onClick={() =>
-                          handleRemove(item.idMeal)
-                        }
+                        onClick={() => handleRemove(item.idMeal)}
                         aria-label={`Remove ${item.strMeal} from wishlist`}
                       >
-                        <Heart
-                          size={19}
-                          fill="currentColor"
-                        />
+                        <Heart size={19} fill="currentColor" />
                       </button>
-
                     </div>
 
-                    {/* DETAILS */}
-
                     <div className="wishlist-card-body">
-
                       <span className="wishlist-card-label">
                         <ChefHat size={14} />
                         FOODIE RECIPE
@@ -539,14 +411,9 @@ export default function WishlistPage() {
                         </strong>
                       </div>
 
-                      {/* ACTIONS */}
-
                       <div className="wishlist-card-actions">
-
                         <Link
-                          href={`/product-details?id=${encodeURIComponent(
-                            item.idMeal
-                          )}`}
+                          href={recipeHref}
                           className="wishlist-view-btn"
                         >
                           View Recipe
@@ -561,27 +428,17 @@ export default function WishlistPage() {
                         >
                           <ShoppingCart size={18} />
                         </button>
-
                       </div>
-
                     </div>
-
                   </article>
                 );
               })}
-
             </div>
-
           </>
-
         )}
-
       </section>
 
-      {/* BOTTOM CTA */}
-
       <section className="wishlist-bottom">
-
         <div className="wishlist-bottom-icon">
           <ShoppingBag size={25} />
         </div>
@@ -597,9 +454,7 @@ export default function WishlistPage() {
           Explore Recipes
           <ArrowRight size={17} />
         </Link>
-
       </section>
-
     </main>
   );
 }

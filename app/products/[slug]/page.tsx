@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import AddToCartButton from "@/features/cart/components/AddToCartButton";
+import WishlistButton from "@/features/wishlist/components/WishlistButton";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Star, Sparkles } from "lucide-react";
@@ -18,6 +19,8 @@ async function FoodDetails({ params }: Props) {
   );
 
   if (!food) notFound();
+
+  const foodId = slug;
 
   return (
     <main className="food-details-page">
@@ -68,6 +71,14 @@ async function FoodDetails({ params }: Props) {
                 name={food.name}
                 price={food.price}
                 image={food.image}
+              />
+
+              <WishlistButton
+                id={foodId}
+                name={food.name}
+                price={food.price}
+                image={food.image}
+                category={food.category}
               />
 
               <Link href="/products" className="food-details-explore">

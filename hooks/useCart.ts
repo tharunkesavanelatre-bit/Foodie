@@ -3,72 +3,115 @@
 import { useEffect, useState } from "react";
 
 export type CartItem = {
+  id: string;
+  idMeal?: string | null;
   name: string;
   price: string;
   image: string;
+  category?: string | null;
   quantity: number;
 };
-
-const STORAGE_KEY = "fooddie_cart";
-
-function getCart(): CartItem[] {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveCart(cart: CartItem[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
-  window.dispatchEvent(new Event("fooddie-cart-updated"));
-}
 
 export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  // Fetch cart
+  const fetchCart = async () => {
+    try {
+      const response = await fetch("/api/cart", {
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        setCart([]);
+        return;
+      }
+
+      const data = await response.json();
+      setCart(data.items);
+    } catch (error) {
+      console.error("Cart fetch error:", error);
+    }
+  };
+
   useEffect(() => {
-    const updateCart = () => setCart(getCart());
-
-    updateCart();
-    window.addEventListener("fooddie-cart-updated", updateCart);
-
-    return () =>
-      window.removeEventListener("fooddie-cart-updated", updateCart);
+    fetchCart();
   }, []);
 
-  const addItem = (item: Omit<CartItem, "quantity">) => {
-    const currentCart = getCart();
-    const existing = currentCart.find((food) => food.name === item.name);
+  // Add item
+  const addItem = async (
+    item: Omit<CartItem, "id" | "quantity">
+  ) => {
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(item),
+      });
 
-    const updatedCart = existing
-      ? currentCart.map((food) =>
-          food.name === item.name
-            ? { ...food, quantity: food.quantity + 1 }
-            : food
-        )
-      : [...currentCart, { ...item, quantity: 1 }];
+      const data = await response.json();
 
-    saveCart(updatedCart);
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to add item.");
+      }
+
+      const savedItem: CartItem = data.item;
+
+      setCart((current) => {
+        const exists = current.some(
+          (food) => food.id === savedItem.id
+        );
+
+        if (exists) {
+          return current.map((food) =>
+            food.id === savedItem.id ? savedItem : food
+          );
+        }
+
+        return [...current, savedItem];
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Add cart error:", error);
+      return false;
+    }
   };
 
-  const updateQuantity = (name: string, quantity: number) => {
-    const updatedCart = getCart()
-      .map((food) =>
-        food.name === name ? { ...food, quantity } : food
-      )
-      .filter((food) => food.quantity > 0);
+  // Update quantity
+  const updateQuantity = async (id: string, quantity: number) => {
+    if (quantity <= 0) {
+      await removeItem(id);
+      return;
+    }
 
-    saveCart(updatedCart);
+    await fetch(`/api/cart/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ quantity }),
+    });
+
+    await fetchCart();
   };
 
-  const removeItem = (name: string) => {
-    saveCart(getCart().filter((food) => food.name !== name));
+  // Remove item
+  const removeItem = async (id: string) => {
+    await fetch(`/api/cart/${id}`, {
+      method: "DELETE",
+    });
+
+    await fetchCart();
   };
 
-  const clearCart = () => {
-    saveCart([]);
+  return {
+    cart,
+    addItem,
+    updateQuantity,
+    removeItem,
+    clearCart: fetchCart,
   };
-
-  return { cart, addItem, updateQuantity, removeItem, clearCart };
 }
