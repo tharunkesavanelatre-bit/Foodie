@@ -244,6 +244,8 @@ export default function WishlistPage() {
         throw new Error(data.message || "Unable to add recipe to cart.");
       }
 
+      window.dispatchEvent(new Event("fooddie-cart-change"));
+
       showMessage(`${item.strMeal} added to your cart!`);
     } catch (error) {
       console.error("Unable to add item to cart:", error);

@@ -23,28 +23,86 @@ type Order = {
   pincode: string;
   items: {
     name: string;
-    price: string;
+    price: number;
     quantity: number;
   }[];
+  subtotal: number;
+  delivery: number;
   total: number;
   payment: string;
-  date: string;
+  status: string;
+  createdAt: string;
 };
 
 export default function OrderSuccessPage() {
   const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    try {
-      const savedOrder = localStorage.getItem("fooddie_latest_order");
+    const fetchOrder = async () => {
+      try {
+        const orderId = new URLSearchParams(
+          window.location.search
+        ).get("orderId");
 
-      if (savedOrder) {
-        setOrder(JSON.parse(savedOrder));
+        if (!orderId) {
+          throw new Error("Order ID not found.");
+        }
+
+        const response = await fetch(
+          `/api/orders/${encodeURIComponent(orderId)}`,
+          { cache: "no-store" }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Unable to load order.");
+        }
+
+        setOrder(data.order);
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Unable to load order details."
+        );
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      setOrder(null);
-    }
+    };
+
+    fetchOrder();
   }, []);
+
+  if (loading) {
+    return (
+      <main className="success-page">
+        <div className="success-container">
+          <div className="success-card">
+            <h2>Loading your order details...</h2>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error || !order) {
+    return (
+      <main className="success-page">
+        <div className="success-container">
+          <div className="success-card">
+            <h2>Unable to load order</h2>
+            <p>{error || "Order details are unavailable."}</p>
+            <Link href="/cart" className="success-shop-button">
+              Return to My Cart
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="success-page">
@@ -77,80 +135,84 @@ export default function OrderSuccessPage() {
             placed successfully. Get ready to enjoy something delicious!
           </p>
 
-          {order && (
-            <div className="success-order-card">
-              <div className="success-order-heading">
-                <div>
-                  <span>ORDER DETAILS</span>
-                  <h2>Your Order Summary</h2>
-                </div>
-
-                <div className="success-order-status">
-                  <Check size={13} />
-                  Confirmed
-                </div>
+          <div className="success-order-card">
+            <div className="success-order-heading">
+              <div>
+                <span>ORDER DETAILS</span>
+                <h2>Your Order Summary</h2>
               </div>
 
-              <div className="success-order-divider" />
-
-              <div className="success-order-row">
-                <span>Order ID</span>
-                <strong>{order.orderId}</strong>
-              </div>
-
-              <div className="success-order-row">
-                <span>Customer</span>
-                <strong>{order.name}</strong>
-              </div>
-
-              <div className="success-order-row">
-                <span>Phone Number</span>
-                <strong>{order.phone}</strong>
-              </div>
-
-              <div className="success-order-divider" />
-
-              <div className="success-extra-heading">
-                <Package size={17} />
-                Ordered Items
-              </div>
-
-              {order.items?.map((item, index) => (
-                <div className="success-order-row" key={index}>
-                  <span>{item.name} × {item.quantity}</span>
-                  <strong>{item.price}</strong>
-                </div>
-              ))}
-
-              <div className="success-order-divider" />
-
-              <div className="success-extra-heading">
-                <MapPin size={17} />
-                Delivery Address
-              </div>
-
-              <p className="success-address">
-                {order.address}, {order.city} - {order.pincode}
-              </p>
-
-              <div className="success-order-row">
-                <span>
-                  <CreditCard size={14} /> Payment Method
-                </span>
-                <strong>{order.payment}</strong>
-              </div>
-
-              <div className="success-order-row">
-                <span>Order Date</span>
-                <strong>{order.date}</strong>
-              </div>
-
-              <div className="success-order-total">
-                <span>Total Amount</span>
-                <strong>₹{order.total.toFixed(2)}</strong>
+              <div className="success-order-status">
+                <Check size={13} />
+                {order.status}
               </div>
             </div>
-          )}
+
+            <div className="success-order-divider" />
+
+            <div className="success-order-row">
+              <span>Order ID</span>
+              <strong>{order.orderId}</strong>
+            </div>
+
+            <div className="success-order-row">
+              <span>Customer</span>
+              <strong>{order.name}</strong>
+            </div>
+
+            <div className="success-order-row">
+              <span>Phone Number</span>
+              <strong>{order.phone}</strong>
+            </div>
+
+            <div className="success-order-divider" />
+
+            <div className="success-extra-heading">
+              <Package size={17} />
+              Ordered Items
+            </div>
+
+            {order.items.map((item) => (
+              <div className="success-order-row" key={item.name}>
+                <span>
+                  {item.name} × {item.quantity}
+                </span>
+                <strong>
+                  ₹{(item.price * item.quantity).toFixed(2)}
+                </strong>
+              </div>
+            ))}
+
+            <div className="success-order-divider" />
+
+            <div className="success-extra-heading">
+              <MapPin size={17} />
+              Delivery Address
+            </div>
+
+            <p className="success-address">
+              {order.address}, {order.city} - {order.pincode}
+            </p>
+
+            <div className="success-order-row">
+              <span>
+                <CreditCard size={14} /> Payment Method
+              </span>
+              <strong>{order.payment}</strong>
+            </div>
+
+            <div className="success-order-row">
+              <span>Order Date</span>
+              <strong>
+                {new Date(order.createdAt).toLocaleString("en-IN")}
+              </strong>
+            </div>
+
+            <div className="success-order-total">
+              <span>Total Amount</span>
+              <strong>₹{order.total.toFixed(2)}</strong>
+            </div>
+          </div>
 
           <div className="success-delivery-note">
             <div>
@@ -160,8 +222,8 @@ export default function OrderSuccessPage() {
             <p>
               <strong>What's next?</strong>
               <span>
-                Your order has been recorded. Visit My Orders
-                to check your order information.
+                Your order is confirmed. You can find it anytime
+                in the Confirmed Orders section of My Cart.
               </span>
             </p>
           </div>
@@ -173,9 +235,9 @@ export default function OrderSuccessPage() {
               <ArrowRight size={17} />
             </Link>
 
-            <Link href="/orders" className="success-orders-button">
+            <Link href="/cart" className="success-orders-button">
               <Package size={18} />
-              View My Orders
+              View My Cart
             </Link>
           </div>
 

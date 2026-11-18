@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -18,9 +18,12 @@ import { useCart } from "@/hooks/useCart";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, clearCart } = useCart();
+  const { cart } = useCart();
 
   const [payment, setPayment] = useState("Cash on Delivery");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const submitLock = useRef(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -46,54 +49,49 @@ export default function CheckoutPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (submitLock.current) return;
 
     if (cart.length === 0) {
       alert("Your cart is empty.");
       return;
     }
 
-    const order = {
-      orderId: `FD${Date.now()}`,
-      name: form.name,
-      phone: form.phone,
-      address: form.address,
-      city: form.city,
-      pincode: form.pincode,
-      items: cart.map((item) => ({
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-      })),
-      total,
-      payment,
-      date: new Date().toLocaleString("en-IN"),
-      status: "Confirmed",
-    };
+    submitLock.current = true;
+    setIsSubmitting(true);
 
     try {
-      const savedOrders = JSON.parse(
-        localStorage.getItem("fooddie_orders") || "[]"
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...form,
+          payment,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to place your order.");
+      }
+
+      router.push(
+        `/order-success?orderId=${encodeURIComponent(data.order.orderId)}`
       );
+    } catch (error) {
+      submitLock.current = false;
+      setIsSubmitting(false);
 
-      const updatedOrders = [...savedOrders, order];
-
-      localStorage.setItem(
-        "fooddie_orders",
-        JSON.stringify(updatedOrders)
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Unable to place your order."
       );
-
-      localStorage.setItem(
-        "fooddie_latest_order",
-        JSON.stringify(order)
-      );
-
-      clearCart();
-
-      router.push("/order-success");
-    } catch {
-      alert("Unable to place your order. Please try again.");
     }
   };
 
@@ -248,6 +246,7 @@ export default function CheckoutPage() {
                         value={method.name}
                         checked={payment === method.name}
                         onChange={() => setPayment(method.name)}
+                        disabled={isSubmitting}
                       />
 
                       <div className="checkout-payment-icon">
@@ -273,14 +272,15 @@ export default function CheckoutPage() {
 
             <div className="checkout-order-items">
               {cart.map((item) => (
-                <div key={item.name} className="checkout-order-item">
+                <div key={item.id} className="checkout-order-item">
                   <div>
                     <strong>{item.name}</strong>
                     <span>Quantity: {item.quantity}</span>
                   </div>
 
                   <strong>
-                    ₹{(
+                    ₹
+                    {(
                       Number(item.price.replace(/[^\d.]/g, "")) *
                       item.quantity
                     ).toFixed(2)}
@@ -304,8 +304,12 @@ export default function CheckoutPage() {
               <strong>₹{total.toFixed(2)}</strong>
             </div>
 
-            <button type="submit" className="checkout-place-button">
-              Place Order
+            <button
+              type="submit"
+              className="checkout-place-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Placing Order..." : "Place Order"}
               <ArrowLeft size={18} className="checkout-button-arrow" />
             </button>
 

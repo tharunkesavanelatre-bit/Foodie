@@ -66,6 +66,7 @@ export default function Header() {
 
   useEffect(() => {
     setMenuOpen(false);
+    window.dispatchEvent(new Event("fooddie-cart-change"));
   }, [pathname]);
 
   async function handleLogout() {
@@ -112,21 +113,25 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-orange-100/70 bg-white/90 shadow-[0_4px_25px_rgba(120,53,15,0.05)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+
+      <div className="mx-auto flex w-full max-w-[1700px] items-center justify-between gap-4 px-5 py-4 xl:px-8 2xl:px-10">
 
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-2.5">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-orange-700 text-white shadow-lg shadow-orange-200 transition duration-300 group-hover:rotate-6 group-hover:scale-110">
+        <Link
+          href="/"
+          className="group flex shrink-0 items-center gap-2.5"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-orange-700 text-white shadow-lg shadow-orange-200 transition duration-300 group-hover:rotate-6 group-hover:scale-110">
             <Utensils size={23} />
           </span>
 
-          <span className="text-2xl font-extrabold tracking-tight text-stone-900">
+          <span className="whitespace-nowrap text-2xl font-extrabold tracking-tight text-stone-900">
             fooddie<span className="text-orange-600">.</span>
           </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-2 lg:flex">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
           {navigationLinks.map((link) => {
             const isActive =
               link.href === "/"
@@ -137,7 +142,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`group relative rounded-full px-5 py-3 text-sm font-semibold transition-all duration-300 ${
+                className={`group relative whitespace-nowrap rounded-full px-3 py-3 text-sm font-semibold transition-all duration-300 2xl:px-4 ${
                   isActive
                     ? "bg-orange-50 text-orange-600"
                     : "text-stone-600 hover:bg-orange-50 hover:text-orange-600"
@@ -156,13 +161,13 @@ export default function Header() {
         </nav>
 
         {/* Desktop Actions */}
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden shrink-0 items-center gap-3 xl:flex">
 
           {/* Wishlist */}
           <Link
             href="/wishlist"
             aria-label="My Wishlist"
-            className={`flex items-center gap-2 rounded-full px-3 py-3 text-sm font-bold transition ${
+            className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 py-3 text-sm font-bold transition ${
               pathname.startsWith("/wishlist")
                 ? "bg-orange-50 text-orange-600"
                 : "text-stone-600 hover:bg-orange-50 hover:text-orange-600"
@@ -175,25 +180,31 @@ export default function Header() {
           {/* Cart */}
           <Link
             href="/cart"
-            className="group relative flex items-center gap-2.5 rounded-full bg-gradient-to-r from-orange-600 to-orange-500 px-5 py-3 text-sm font-bold !text-white shadow-lg shadow-orange-200/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-200"
+            className="group relative flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-full bg-gradient-to-r from-orange-600 to-orange-500 px-5 py-3 text-sm font-bold !text-white shadow-lg shadow-orange-200/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-200"
           >
             <ShoppingBag size={18} />
             My Cart
 
-            <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-orange-600">
+            <span className="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-orange-600">
               {cartCount}
             </span>
           </Link>
 
-          <div className={`flex min-w-[220px] items-center justify-end ${authTransition}`}>
+          {/* User Profile */}
+          <div
+            className={`flex min-w-[170px] items-center justify-end ${authTransition}`}
+          >
             {session ? (
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-orange-600">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600">
                   <User size={20} />
                 </div>
 
                 <div className="max-w-28">
-                  <p className="text-xs text-stone-400">Welcome back</p>
+                  <p className="whitespace-nowrap text-xs text-stone-400">
+                    Welcome back
+                  </p>
+
                   <p className="truncate text-sm font-bold text-stone-800">
                     {session.name}
                   </p>
@@ -201,7 +212,7 @@ export default function Header() {
 
                 <button
                   onClick={handleLogout}
-                  className="rounded-full p-2.5 text-stone-500 transition hover:bg-red-50 hover:text-red-500"
+                  className="shrink-0 rounded-full p-2.5 text-stone-500 transition hover:bg-red-50 hover:text-red-500"
                   aria-label="Logout"
                   title="Logout"
                 >
@@ -209,17 +220,17 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <Link
                   href="/login"
-                  className="text-sm font-bold text-stone-700 transition hover:text-orange-600"
+                  className="whitespace-nowrap text-sm font-bold text-stone-700 transition hover:text-orange-600"
                 >
                   Sign In
                 </Link>
 
                 <Link
                   href="/register"
-                  className="rounded-full border border-orange-500 px-5 py-3 text-sm font-bold text-orange-600 transition duration-300 hover:bg-orange-600 hover:text-white"
+                  className="whitespace-nowrap rounded-full border border-orange-500 px-4 py-3 text-sm font-bold text-orange-600 transition duration-300 hover:bg-orange-600 hover:text-white"
                 >
                   Create Account
                 </Link>
@@ -231,7 +242,7 @@ export default function Header() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-stone-800 transition hover:bg-orange-100 lg:hidden"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-stone-800 transition hover:bg-orange-100 xl:hidden"
           aria-label="Toggle navigation menu"
           aria-expanded={menuOpen}
         >
@@ -241,7 +252,8 @@ export default function Header() {
 
       {/* Mobile Navigation */}
       {menuOpen && (
-        <div className="border-t border-orange-100 bg-white px-5 py-6 shadow-xl lg:hidden">
+        <div className="border-t border-orange-100 bg-white px-5 py-6 shadow-xl xl:hidden">
+
           <nav className="space-y-2">
             {navigationLinks.map((link) => {
               const Icon = link.icon;
@@ -267,7 +279,7 @@ export default function Header() {
               );
             })}
 
-            {/* Mobile Wishlist */}
+            {/* Wishlist */}
             <Link
               href="/wishlist"
               className={`flex items-center gap-4 rounded-xl px-4 py-3.5 font-semibold transition ${
@@ -280,7 +292,7 @@ export default function Header() {
               My Wishlist
             </Link>
 
-            {/* Mobile Cart */}
+            {/* Cart */}
             <Link
               href="/cart"
               className="flex items-center justify-between rounded-xl px-4 py-3.5 font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-600"
@@ -298,6 +310,7 @@ export default function Header() {
 
           <div className="my-5 border-t border-orange-100" />
 
+          {/* Mobile Account */}
           <div className={authTransition}>
             {session ? (
               <div className="space-y-4">

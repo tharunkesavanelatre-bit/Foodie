@@ -12,11 +12,13 @@ model User {
   name         String
   email        String    @unique
   passwordHash String
+  role         String    @default("CUSTOMER")
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  sessions     Session[]
-  orders       Order[]
-  cart         Cart?
+
+  sessions Session[]
+  orders   Order[]
+  cart     Cart?
   wishlist Wishlist?
 }
 
@@ -33,20 +35,20 @@ model Session {
 }
 
 model Order {
-  id            String   @id @default(cuid())
-  orderId       String   @unique
-  userId        String
-  name          String
-  phone         String
-  address       String
-  city          String
-  pincode       String
-  payment       String
-  subtotal      Decimal  @db.Decimal(10, 2)
-  delivery      Decimal  @db.Decimal(10, 2)
-  total         Decimal  @db.Decimal(10, 2)
-  status        String   @default("Confirmed")
-  createdAt     DateTime @default(now())
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  userId    String
+  name      String
+  phone     String
+  address   String
+  city      String
+  pincode   String
+  payment   String
+  subtotal  Decimal  @db.Decimal(10, 2)
+  delivery  Decimal  @db.Decimal(10, 2)
+  total     Decimal  @db.Decimal(10, 2)
+  status    String   @default("Pending")
+  createdAt DateTime @default(now())
 
   user  User        @relation(fields: [userId], references: [id])
   items OrderItem[]
@@ -55,12 +57,12 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  name      String
-  price     Decimal @db.Decimal(10, 2)
-  image     String?
-  quantity  Int
+  id       String  @id @default(cuid())
+  orderId  String
+  name     String
+  price    Decimal @db.Decimal(10, 2)
+  image    String?
+  quantity Int
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -91,6 +93,7 @@ model CartItem {
 
   @@index([cartId])
 }
+
 model Wishlist {
   id        String   @id @default(cuid())
   userId    String   @unique
@@ -102,7 +105,7 @@ model Wishlist {
 }
 
 model WishlistItem {
-  id         String  @id @default(cuid())
+  id         String   @id @default(cuid())
   wishlistId String
   idMeal     String
   name       String

@@ -15,7 +15,7 @@ export type CartItem = {
 export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // Fetch cart
+  // Fetch cart from database
   const fetchCart = async () => {
     try {
       const response = await fetch("/api/cart", {
@@ -36,12 +36,17 @@ export function useCart() {
 
   useEffect(() => {
     fetchCart();
+
+    // Listen for cart changes
+    window.addEventListener("fooddie-cart-change", fetchCart);
+
+    return () => {
+      window.removeEventListener("fooddie-cart-change", fetchCart);
+    };
   }, []);
 
   // Add item
-  const addItem = async (
-    item: Omit<CartItem, "id" | "quantity">
-  ) => {
+  const addItem = async (item: Omit<CartItem, "id" | "quantity">) => {
     try {
       const response = await fetch("/api/cart", {
         method: "POST",
@@ -57,21 +62,7 @@ export function useCart() {
         throw new Error(data.message || "Unable to add item.");
       }
 
-      const savedItem: CartItem = data.item;
-
-      setCart((current) => {
-        const exists = current.some(
-          (food) => food.id === savedItem.id
-        );
-
-        if (exists) {
-          return current.map((food) =>
-            food.id === savedItem.id ? savedItem : food
-          );
-        }
-
-        return [...current, savedItem];
-      });
+      window.dispatchEvent(new Event("fooddie-cart-change"));
 
       return true;
     } catch (error) {
@@ -87,7 +78,7 @@ export function useCart() {
       return;
     }
 
-    await fetch(`/api/cart/${id}`, {
+    const response = await fetch(`/api/cart/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -95,16 +86,20 @@ export function useCart() {
       body: JSON.stringify({ quantity }),
     });
 
-    await fetchCart();
+    if (response.ok) {
+      window.dispatchEvent(new Event("fooddie-cart-change"));
+    }
   };
 
   // Remove item
   const removeItem = async (id: string) => {
-    await fetch(`/api/cart/${id}`, {
+    const response = await fetch(`/api/cart/${id}`, {
       method: "DELETE",
     });
 
-    await fetchCart();
+    if (response.ok) {
+      window.dispatchEvent(new Event("fooddie-cart-change"));
+    }
   };
 
   return {
