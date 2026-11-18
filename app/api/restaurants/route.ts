@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       categories: "catering.restaurant,catering.cafe,catering.fast_food",
       filter: `circle:${lon},${lat},${radius}`,
       bias: `proximity:${lon},${lat}`,
-      limit: "50",
+      limit: "100",
       lang: "en",
       apiKey,
     });
