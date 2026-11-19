@@ -1,46 +1,30 @@
 import { NextRequest, NextResponse, connection } from "next/server";
+import { getAdminUser } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
 
-const orderStatuses = [
-  "Pending",
-  "Confirmed",
-  "Preparing",
-  "Ready for Pickup",
-  "Out for Delivery",
-  "Delivered",
-  "Rejected",
-];
-
+// GET – Fetch all customer orders
 export async function GET(request: NextRequest) {
   await connection();
 
   try {
-    const user = await getCurrentUser(request);
+    const admin = await getAdminUser(request);
 
-    if (!user) {
+    if (!admin) {
       return NextResponse.json(
-        { message: "Please login first." },
-        { status: 401 }
-      );
-    }
-
-    if (user.role !== "RESTAURANT") {
-      return NextResponse.json(
-        { message: "Restaurant access required." },
+        { message: "Admin access denied" },
         { status: 403 }
       );
     }
 
     const orders = await prisma.order.findMany({
       include: {
-        items: true,
         user: {
           select: {
             name: true,
             email: true,
           },
         },
+        items: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -61,63 +45,71 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Restaurant orders error:", error);
+    console.error("Admin orders error:", error);
 
     return NextResponse.json(
-      { message: "Unable to fetch orders." },
+      { message: "Unable to fetch orders" },
       { status: 500 }
     );
   }
 }
 
+// PATCH – Update order status
 export async function PATCH(request: NextRequest) {
   await connection();
 
   try {
-    const user = await getCurrentUser(request);
+    const admin = await getAdminUser(request);
 
-    if (!user) {
+    if (!admin) {
       return NextResponse.json(
-        { message: "Please login first." },
-        { status: 401 }
-      );
-    }
-
-    if (user.role !== "RESTAURANT") {
-      return NextResponse.json(
-        { message: "Restaurant access required." },
+        { message: "Admin access denied" },
         { status: 403 }
       );
     }
 
-    const { orderId, status } = await request.json();
+    const body = await request.json();
 
-    if (
-      typeof orderId !== "string" ||
-      typeof status !== "string" ||
-      !orderStatuses.includes(status)
-    ) {
+    const orderId =
+      typeof body.orderId === "string" ? body.orderId : "";
+
+    const status =
+      typeof body.status === "string" ? body.status : "";
+
+    const allowedStatuses = [
+      "Pending",
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+    ];
+
+    if (!orderId || !allowedStatuses.includes(status)) {
       return NextResponse.json(
-        { message: "Invalid order ID or status." },
+        { message: "Invalid order ID or status" },
         { status: 400 }
       );
     }
 
     const order = await prisma.order.update({
-      where: { orderId },
-      data: { status },
+      where: {
+        id: orderId,
+      },
+      data: {
+        status,
+      },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Order status updated successfully.",
+      message: "Order status updated successfully",
       order,
     });
   } catch (error) {
-    console.error("Order status update error:", error);
+    console.error("Update order error:", error);
 
     return NextResponse.json(
-      { message: "Unable to update order status." },
+      { message: "Unable to update order status" },
       { status: 500 }
     );
   }

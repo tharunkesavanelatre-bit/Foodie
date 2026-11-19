@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
         user: {
           name: session.user.name,
           email: session.user.email,
+          role: session.user.role,
         },
       },
       {
