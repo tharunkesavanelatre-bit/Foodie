@@ -58,12 +58,23 @@ export async function POST(request: Request) {
       },
     });
 
+    const adminEmail = process.env.ADMIN_EMAIL
+      ?.trim()
+      .toLowerCase();
+
+    const isAdmin =
+      user.role === "ADMIN" &&
+      !!adminEmail &&
+      user.email.trim().toLowerCase() === adminEmail;
+
     const response = NextResponse.json({
       message: "Login successful",
       user: {
         name: user.name,
         email: user.email,
+        role: user.role,
       },
+      isAdmin,
     });
 
     response.cookies.set("fooddie_session", token, {

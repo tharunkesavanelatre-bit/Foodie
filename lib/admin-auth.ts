@@ -4,7 +4,14 @@ import { getCurrentUser } from "@/lib/auth";
 export async function getAdminUser(request: NextRequest) {
   const user = await getCurrentUser(request);
 
-  if (!user || user.role !== "ADMIN") {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+
+  if (
+    !user ||
+    !adminEmail ||
+    user.email.trim().toLowerCase() !== adminEmail ||
+    user.role !== "ADMIN"
+  ) {
     return null;
   }
 

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -50,6 +49,7 @@ export async function POST(request: Request) {
         name,
         email,
         passwordHash,
+        role: "CUSTOMER",
       },
     });
 

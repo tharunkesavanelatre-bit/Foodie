@@ -49,7 +49,12 @@ export default function LoginForm() {
       window.dispatchEvent(new Event("fooddie-auth-change"));
 
       alert("Login successful!");
-      router.push("/");
+
+      if (data.isAdmin) {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     } catch {
       setMessage("Something went wrong. Please try again.");
     } finally {
