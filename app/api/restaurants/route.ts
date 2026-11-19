@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { connection } from "next/server";
 
 export async function GET(request: NextRequest) {
+  await connection();
+
   try {
     const { searchParams } = new URL(request.url);
 
@@ -26,8 +29,10 @@ export async function GET(request: NextRequest) {
       !searchParams.has("lon") ||
       !Number.isFinite(lat) ||
       !Number.isFinite(lon) ||
-      lat < -90 || lat > 90 ||
-      lon < -180 || lon > 180
+      lat < -90 ||
+      lat > 90 ||
+      lon < -180 ||
+      lon > 180
     ) {
       return NextResponse.json(
         { message: "Valid location is required." },
@@ -70,9 +75,10 @@ export async function GET(request: NextRequest) {
         id: place.place_id,
         name: place.name || "Unnamed Restaurant",
         cuisine: place.catering?.cuisine || "Various",
-        type: place.categories?.find((category: string) =>
-          category.startsWith("catering.")
-        ) || "catering",
+        type:
+          place.categories?.find((category: string) =>
+            category.startsWith("catering.")
+          ) || "catering",
         latitude: place.lat,
         longitude: place.lon,
         address: place.formatted || "",
@@ -87,7 +93,6 @@ export async function GET(request: NextRequest) {
       count: restaurants.length,
       restaurants,
     });
-
   } catch (error) {
     console.error("Restaurant API Error:", error);
 
