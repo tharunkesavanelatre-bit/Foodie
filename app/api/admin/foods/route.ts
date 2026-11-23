@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse, connection } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
+import { getAdminWithPermission } from "@/lib/admin-permission";
+import { PERMISSIONS } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
 // GET – View all food items
@@ -7,7 +8,7 @@ export async function GET(request: NextRequest) {
   await connection();
 
   try {
-    const admin = await getAdminUser(request);
+    const admin = await getAdminWithPermission(request, PERMISSIONS.FOODS);
 
     if (!admin) {
       return NextResponse.json(
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
   await connection();
 
   try {
-    const admin = await getAdminUser(request);
+    const admin = await getAdminWithPermission(request, PERMISSIONS.FOODS);
 
     if (!admin) {
       return NextResponse.json(
@@ -92,7 +93,7 @@ export async function PUT(request: NextRequest) {
   await connection();
 
   try {
-    const admin = await getAdminUser(request);
+    const admin = await getAdminWithPermission(request, PERMISSIONS.FOODS);
 
     if (!admin) {
       return NextResponse.json(
@@ -152,7 +153,7 @@ export async function DELETE(request: NextRequest) {
   await connection();
 
   try {
-    const admin = await getAdminUser(request);
+    const admin = await getAdminWithPermission(request, PERMISSIONS.FOODS);
 
     if (!admin) {
       return NextResponse.json(

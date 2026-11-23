@@ -1,0 +1,253 @@
+.restaurant-profile-page {
+  min-height: 100vh;
+  padding: 35px;
+  background: #fffaf6;
+  color: #292524;
+}
+
+.restaurant-profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.restaurant-profile-header span,
+.restaurant-profile-status-label {
+  color: #ea580c;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.restaurant-profile-header h1 {
+  margin: 8px 0;
+  font-size: 32px;
+}
+
+.restaurant-profile-header p,
+.restaurant-profile-status p,
+.restaurant-profile-section-heading p {
+  color: #78716c;
+}
+
+.restaurant-profile-icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.restaurant-profile-status,
+.restaurant-profile-form {
+  padding: 25px;
+  margin-bottom: 25px;
+  background: white;
+  border: 1px solid #f1e8e1;
+  border-radius: 16px;
+}
+
+.restaurant-profile-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.restaurant-profile-status h2 {
+  margin: 8px 0;
+}
+
+.restaurant-profile-status p {
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.restaurant-open-button,
+.restaurant-close-button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.restaurant-open-button {
+  background: #16a34a;
+}
+
+.restaurant-close-button {
+  background: #dc2626;
+}
+
+.restaurant-profile-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  color: #ea580c;
+}
+
+.restaurant-profile-section-heading h2 {
+  margin: 0 0 7px;
+  color: #292524;
+}
+
+.restaurant-profile-section-heading p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.restaurant-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.restaurant-profile-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  color: #44403c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.restaurant-profile-grid input,
+.restaurant-profile-grid textarea {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #e7ded7;
+  border-radius: 9px;
+  outline-color: #ea580c;
+  font: inherit;
+  font-weight: 400;
+}
+
+.restaurant-profile-grid textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.restaurant-profile-full {
+  grid-column: span 2;
+}
+
+.restaurant-profile-input-icon {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-left: 12px;
+  border: 1px solid #e7ded7;
+  border-radius: 9px;
+  color: #a8a29e;
+}
+
+.restaurant-profile-input-icon input {
+  border: none;
+  outline: none;
+}
+
+.restaurant-profile-label-icon {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.restaurant-profile-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid #f1e8e1;
+  font-size: 13px;
+  color: #78716c;
+}
+
+.restaurant-profile-footer strong {
+  color: #16a34a;
+}
+
+.restaurant-profile-footer button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 9px;
+  background: #ea580c;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.restaurant-profile-footer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.restaurant-profile-success,
+.restaurant-profile-error {
+  padding: 13px 16px;
+  margin-bottom: 20px;
+  border-radius: 9px;
+}
+
+.restaurant-profile-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.restaurant-profile-error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.restaurant-profile-loading {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  color: #ea580c;
+}
+
+.restaurant-profile-loading button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #ea580c;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 650px) {
+  .restaurant-profile-page {
+    padding: 20px 15px;
+  }
+
+  .restaurant-profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-profile-full {
+    grid-column: span 1;
+  }
+
+  .restaurant-profile-status,
+  .restaurant-profile-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .restaurant-profile-header h1 {
+    font-size: 26px;
+  }
+}

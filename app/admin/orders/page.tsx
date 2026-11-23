@@ -2,11 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShoppingBag, RefreshCw } from "lucide-react";
+import {
+  ShoppingBag,
+  RefreshCw,
+  CreditCard,
+  CheckCircle2,
+  Clock,
+  XCircle,
+} from "lucide-react";
 import "../admin.css";
 
 type Order = {
   id: string;
+  orderId: string;
   total: number;
   status: string;
   createdAt: string;
@@ -17,6 +25,12 @@ type Order = {
   items: {
     id: string;
   }[];
+  paymentRecord: {
+    method: string;
+    amount: number;
+    status: string;
+    transactionId: string | null;
+  } | null;
 };
 
 const statuses = [
@@ -47,7 +61,7 @@ export default function AdminOrdersPage() {
         throw new Error(data.message || "Unable to load orders");
       }
 
-      setOrders(data.orders);
+      setOrders(data.orders || []);
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Something went wrong"
@@ -81,6 +95,20 @@ export default function AdminOrdersPage() {
     }
   }
 
+  function getPaymentIcon(status?: string) {
+    switch (status) {
+      case "PAID":
+        return <CheckCircle2 size={16} />;
+
+      case "FAILED":
+      case "REFUNDED":
+        return <XCircle size={16} />;
+
+      default:
+        return <Clock size={16} />;
+    }
+  }
+
   useEffect(() => {
     loadOrders();
   }, []);
@@ -88,7 +116,10 @@ export default function AdminOrdersPage() {
   return (
     <main className="admin-layout">
       <aside className="admin-sidebar">
-        <h2>FOODDIE<span>.</span></h2>
+        <h2>
+          FOODDIE<span>.</span>
+        </h2>
+
         <p className="sidebar-label">ADMIN PANEL</p>
 
         <nav>
@@ -98,6 +129,7 @@ export default function AdminOrdersPage() {
           <Link href="/admin/orders" className="active">
             Orders
           </Link>
+          <Link href="/admin/payments">Payments</Link>
           <Link href="/admin/users">Users</Link>
         </nav>
       </aside>
@@ -106,7 +138,7 @@ export default function AdminOrdersPage() {
         <div className="food-header">
           <div>
             <h1>Order Management</h1>
-            <p>Manage and track customer orders.</p>
+            <p>Manage orders and monitor customer payments.</p>
           </div>
 
           <button
@@ -142,15 +174,20 @@ export default function AdminOrdersPage() {
                   <th>Customer</th>
                   <th>Items</th>
                   <th>Total</th>
+                  <th>Payment</th>
+                  <th>Payment Status</th>
+                  <th>Transaction ID</th>
                   <th>Date</th>
-                  <th>Status</th>
+                  <th>Order Status</th>
                 </tr>
               </thead>
 
               <tbody>
                 {orders.map((order) => (
                   <tr key={order.id}>
-                    <td>#{order.id.slice(-8)}</td>
+                    <td>
+                      #{order.orderId || order.id.slice(-8)}
+                    </td>
 
                     <td>
                       <strong>{order.user.name}</strong>
@@ -160,7 +197,26 @@ export default function AdminOrdersPage() {
 
                     <td>{order.items.length}</td>
 
-                    <td>₹{Number(order.total).toFixed(2)}</td>
+                    <td>
+                      ₹{Number(order.total).toFixed(2)}
+                    </td>
+
+                    <td>
+                      {order.paymentRecord?.method || "N/A"}
+                    </td>
+
+                    <td>
+                      <span className="payment-status">
+                        {getPaymentIcon(order.paymentRecord?.status)}
+                        {order.paymentRecord?.status || "N/A"}
+                      </span>
+                    </td>
+
+                    <td>
+                      <small>
+                        {order.paymentRecord?.transactionId || "Not available"}
+                      </small>
+                    </td>
 
                     <td>
                       {new Date(order.createdAt).toLocaleDateString("en-IN")}

@@ -1,0 +1,357 @@
+.delivery-apply-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 45px 24px;
+  background: #fffaf6;
+}
+
+.delivery-apply-container {
+  width: 100%;
+  max-width: 1080px;
+  min-height: 650px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #f1e6dd;
+  border-radius: 26px;
+  box-shadow: 0 24px 70px rgba(65, 35, 15, 0.08);
+}
+
+.delivery-apply-information {
+  padding: 48px;
+  color: #ffffff;
+  background: linear-gradient(145deg, #f97316, #c2410c);
+}
+
+.delivery-apply-brand {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 850;
+  letter-spacing: -1.5px;
+  text-decoration: none;
+}
+
+.delivery-apply-brand span {
+  color: #ffe0c2;
+}
+
+.delivery-apply-illustration {
+  width: 135px;
+  height: 135px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 55px 0 30px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 35px;
+}
+
+.delivery-apply-tag {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #ffe2ca;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
+
+.delivery-apply-information h1 {
+  margin: 0;
+  font-size: 39px;
+  line-height: 1.2;
+  letter-spacing: -1.5px;
+}
+
+.delivery-apply-information h1 span {
+  color: #ffe0c2;
+}
+
+.delivery-apply-information > p {
+  max-width: 380px;
+  margin: 20px 0 30px;
+  color: #ffeadc;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.delivery-apply-benefit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 17px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.delivery-apply-benefit svg {
+  flex-shrink: 0;
+  color: #ffe0c2;
+}
+
+.delivery-apply-form-section {
+  padding: 42px;
+}
+
+.delivery-apply-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #81766e;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.delivery-apply-back:hover {
+  color: #ea580c;
+}
+
+.delivery-apply-heading {
+  margin-top: 45px;
+}
+
+.delivery-apply-form-icon {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: #ea580c;
+  background: #fff0e6;
+  border-radius: 16px;
+}
+
+.delivery-apply-heading h2 {
+  margin: 0;
+  color: #29231f;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.delivery-apply-heading p {
+  margin: 10px 0 28px;
+  color: #8b8179;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.delivery-apply-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.delivery-apply-form label {
+  margin-bottom: 9px;
+  color: #39312b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.delivery-apply-input {
+  height: 51px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 21px;
+  padding: 0 14px;
+  color: #a69a90;
+  background: #fffdfb;
+  border: 1px solid #e9e0d9;
+  border-radius: 11px;
+  transition: border-color 0.2s ease;
+}
+
+.delivery-apply-input:focus-within {
+  border-color: #ea580c;
+}
+
+.delivery-apply-input input,
+.delivery-apply-input select {
+  width: 100%;
+  height: 100%;
+  color: #29231f;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+}
+
+.delivery-apply-input input::placeholder {
+  color: #b4aaa2;
+}
+
+.delivery-apply-input select {
+  cursor: pointer;
+}
+
+.delivery-apply-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 16px;
+  padding: 12px;
+  color: #b42318;
+  background: #fff1f0;
+  border: 1px solid #ffd6d2;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.delivery-apply-error svg {
+  flex-shrink: 0;
+}
+
+.delivery-apply-submit,
+.delivery-apply-home-button {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #ffffff;
+  background: #ea580c;
+  border: none;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.delivery-apply-submit:hover:not(:disabled),
+.delivery-apply-home-button:hover {
+  background: #c94708;
+  transform: translateY(-1px);
+}
+
+.delivery-apply-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.delivery-apply-note {
+  margin: 17px 0 0;
+  color: #9a9088;
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.delivery-apply-success {
+  width: 100%;
+  max-width: 470px;
+  padding: 45px;
+  background: #ffffff;
+  border: 1px solid #f1e6dd;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(65, 35, 15, 0.08);
+  text-align: center;
+}
+
+.delivery-apply-success-icon {
+  width: 85px;
+  height: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: #16a34a;
+  background: #eaf9ef;
+  border-radius: 50%;
+}
+
+.delivery-apply-success h1 {
+  margin: 0;
+  color: #29231f;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.delivery-apply-success > p {
+  margin: 14px 0 25px;
+  color: #82776f;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.delivery-apply-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  padding: 16px;
+  background: #fff7ed;
+  border: 1px solid #ffedd5;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.delivery-apply-status span {
+  color: #82776f;
+}
+
+.delivery-apply-status strong {
+  color: #c2410c;
+}
+
+.delivery-apply-home-button {
+  width: 100%;
+}
+
+@media (max-width: 850px) {
+  .delivery-apply-container {
+    max-width: 550px;
+    grid-template-columns: 1fr;
+  }
+
+  .delivery-apply-information {
+    padding: 35px;
+  }
+
+  .delivery-apply-illustration {
+    width: 90px;
+    height: 90px;
+    margin: 30px 0 22px;
+  }
+
+  .delivery-apply-illustration svg {
+    width: 55px;
+  }
+
+  .delivery-apply-information h1 {
+    font-size: 32px;
+  }
+
+  .delivery-apply-form-section {
+    padding: 35px;
+  }
+
+  .delivery-apply-heading {
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .delivery-apply-page {
+    padding: 15px;
+  }
+
+  .delivery-apply-information,
+  .delivery-apply-form-section {
+    padding: 27px 22px;
+  }
+
+  .delivery-apply-success {
+    padding: 30px 22px;
+  }
+}

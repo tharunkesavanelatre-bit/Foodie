@@ -1,0 +1,381 @@
+.customers-page {
+  min-height: 100vh;
+  padding: 42px;
+  background: #f8f8fa;
+  color: #20212a;
+}
+
+.customers-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.customers-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 25px;
+  color: #777985;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.customers-back:hover {
+  color: #ea580c;
+}
+
+.customers-eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: #ea580c;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.customers-header h1 {
+  margin: 0;
+  font-size: 31px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.customers-header p {
+  margin: 9px 0 0;
+  color: #858692;
+  font-size: 14px;
+}
+
+.customers-refresh {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 19px;
+  border: 1px solid #e8e8ed;
+  border-radius: 11px;
+  background: white;
+  color: #343540;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.customers-refresh:hover {
+  border-color: #ea580c;
+  color: #ea580c;
+}
+
+.customers-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.customers-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.customers-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 24px;
+  border: 1px solid #eeeeF2;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 5px 20px rgba(25, 25, 40, 0.025);
+}
+
+.customers-stat-icon {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 14px;
+  background: #fff0e7;
+  color: #ea580c;
+}
+
+.customers-stat-card span {
+  color: #858692;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.customers-stat-card h2 {
+  margin: 6px 0 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.customers-content {
+  padding: 27px;
+  border: 1px solid #eeeeF2;
+  border-radius: 17px;
+  background: white;
+  box-shadow: 0 5px 20px rgba(25, 25, 40, 0.025);
+}
+
+.customers-content-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 23px;
+}
+
+.customers-content-heading h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.customers-content-heading p {
+  margin: 6px 0 0;
+  color: #92939d;
+  font-size: 12px;
+}
+
+.customers-count {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fff0e7;
+  color: #ea580c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.customers-search {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  max-width: 440px;
+  margin-bottom: 24px;
+  padding: 12px 15px;
+  border: 1px solid #e9e9ee;
+  border-radius: 10px;
+  color: #92939d;
+}
+
+.customers-search:focus-within {
+  border-color: #ea580c;
+}
+
+.customers-search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #292a33;
+  font-size: 13px;
+}
+
+.customers-table-wrapper {
+  overflow-x: auto;
+}
+
+.customers-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.customers-table th {
+  padding: 15px 13px;
+  border-bottom: 1px solid #eeeeF2;
+  color: #92939d;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.customers-table td {
+  padding: 17px 13px;
+  border-bottom: 1px solid #f1f1f4;
+  color: #646571;
+  font-size: 12px;
+}
+
+.customers-table tbody tr:hover {
+  background: #fffaf7;
+}
+
+.customer-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.customer-avatar {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 12px;
+  background: #fff0e7;
+  color: #ea580c;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.customer-identity strong {
+  display: block;
+  color: #292a33;
+  font-size: 13px;
+}
+
+.customer-identity span {
+  display: block;
+  margin-top: 4px;
+  color: #999aa3;
+  font-size: 11px;
+}
+
+.customer-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.customer-orders {
+  display: inline-grid;
+  min-width: 30px;
+  height: 27px;
+  padding: 0 8px;
+  place-items: center;
+  border-radius: 7px;
+  background: #f3f3f6;
+  color: #363742;
+  font-weight: 700;
+}
+
+.customer-activity {
+  display: inline-block;
+  padding: 7px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.customer-activity.has-orders {
+  background: #e8f8ee;
+  color: #168044;
+}
+
+.customer-activity.no-orders {
+  background: #f2f2f4;
+  color: #777985;
+}
+
+.customers-state {
+  display: flex;
+  min-height: 230px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #999aa3;
+  text-align: center;
+}
+
+.customers-state h3,
+.customers-state p {
+  margin: 0;
+}
+
+.customers-state h3 {
+  color: #343540;
+  font-size: 16px;
+}
+
+.customers-state p {
+  font-size: 13px;
+}
+
+.customers-error {
+  color: #dc2626;
+}
+
+.customers-error button {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #ea580c;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.customers-spinner {
+  animation: customers-spin 1s linear infinite;
+}
+
+@keyframes customers-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .customers-page {
+    padding: 25px;
+  }
+
+  .customers-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .customers-page {
+    padding: 18px;
+  }
+
+  .customers-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .customers-header h1 {
+    font-size: 25px;
+  }
+
+  .customers-content {
+    padding: 17px;
+  }
+
+  .customers-content-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+.customer-view-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fff7ed;
+  color: #ea580c;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.customer-view-button:hover {
+  background: #ea580c;
+  color: white;
+  border-color: #ea580c;
+}

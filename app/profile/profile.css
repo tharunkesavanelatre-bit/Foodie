@@ -582,3 +582,122 @@
     transition-duration: 0.01ms !important;
   }
 }
+/* ==========================================
+   PROFILE EDITING
+========================================== */
+
+.profile-info-content input {
+  width: 100%;
+  max-width: 350px;
+  padding: 11px 13px;
+  border: 1px solid #ffd2b8;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: #262626;
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 0.3s ease;
+}
+
+.profile-info-content input:focus {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.08);
+}
+
+/* EDIT ACTIONS */
+
+.profile-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.profile-save-button,
+.profile-cancel-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 13px 20px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-save-button {
+  border: 1px solid #ea580c;
+  background: #ea580c;
+  color: #fff;
+}
+
+.profile-save-button:hover {
+  background: #c94708;
+  border-color: #c94708;
+  transform: translateY(-2px);
+}
+
+.profile-cancel-button {
+  border: 1px solid #eee0d7;
+  background: #fff;
+  color: #555;
+}
+
+.profile-cancel-button:hover {
+  border-color: #999;
+  background: #f8f8f8;
+}
+
+.profile-save-button:disabled,
+.profile-logout-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* SUCCESS MESSAGE */
+
+.profile-success-message {
+  margin: 0 0 20px;
+  padding: 13px 17px;
+  border: 1px solid #bbebc8;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ERROR MESSAGE */
+
+.form-error {
+  margin: 0 0 20px;
+  padding: 13px 17px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* MOBILE EDIT BUTTONS */
+
+@media (max-width: 650px) {
+  .profile-edit-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profile-save-button,
+  .profile-cancel-button {
+    width: 100%;
+  }
+
+  .profile-info-content input {
+    max-width: 100%;
+  }
+}

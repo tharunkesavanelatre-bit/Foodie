@@ -1,0 +1,1577 @@
+﻿=== PROJECT ROUTES ===
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\layout.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\about\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\admin\layout.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\admin\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\admin\foods\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\admin\foods\new\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\admin\foods\[id]\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\admin\orders\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\admin\dashboard\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\admin\foods\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\admin\orders\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\admin\restaurants\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\auth\login\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\auth\logout\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\auth\register\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\auth\session\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\cart\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\cart\[id]\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\checkout\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\foods\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\orders\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\orders\[orderId]\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\recipe\[id]\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\recipes\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\restaurant\menu\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\restaurant\orders\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\restaurants\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\wishlist\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\api\wishlist\[idMeal]\route.ts
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\cart\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\categories\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\checkout\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\home\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\login\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\order-success\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\orders\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\product-details\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\products\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\products\[slug]\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\profile\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\register\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\restaurants\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\service-test\page.tsx
+C:\Users\THARUN\OneDrive\Desktop\fooddie-professional\app\wishlist\page.tsx
+
+=== IMPORTANT FILE CONTENTS ===
+
+========== prisma\schema.prisma ==========
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("CUSTOMER")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions         Session[]
+  orders           Order[]
+  cart             Cart?
+  wishlist         Wishlist?
+  restaurant       Restaurant?
+  deliveryPartner  DeliveryPartner?
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Restaurant {
+  id          String   @id @default(cuid())
+  ownerId     String   @unique
+  name        String
+  description String?
+  phone       String?
+  email       String?
+  address     String?
+  city        String?
+  pincode     String?
+  status      String   @default("PENDING")
+  isOpen      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner User    @relation(fields: [ownerId], references: [id])
+  foods Food[]
+  orders Order[]
+
+  @@index([status])
+}
+
+model DeliveryPartner {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  phone         String?
+  vehicleType   String?
+  vehicleNumber String?
+  status        String   @default("PENDING")
+  isAvailable   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user        User                 @relation(fields: [userId], references: [id])
+  assignments DeliveryAssignment[]
+
+  @@index([status, isAvailable])
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  userId    String
+  restaurantId String?
+  name      String
+  phone     String
+  address   String
+  city      String
+  pincode   String
+  payment   String
+  subtotal  Decimal  @db.Decimal(10, 2)
+  delivery  Decimal  @db.Decimal(10, 2)
+  total     Decimal  @db.Decimal(10, 2)
+  status    String   @default("Pending")
+  createdAt DateTime @default(now())
+
+  user       User                @relation(fields: [userId], references: [id])
+  restaurant Restaurant?         @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
+  items      OrderItem[]
+  assignment DeliveryAssignment?
+  paymentRecord Payment?
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([status])
+}
+
+model OrderItem {
+  id       String  @id @default(cuid())
+  orderId  String
+  name     String
+  price    Decimal @db.Decimal(10, 2)
+  image    String?
+  quantity Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model DeliveryAssignment {
+  id                String   @id @default(cuid())
+  orderId           String   @unique
+  deliveryPartnerId String
+  status            String   @default("ASSIGNED")
+  assignedAt        DateTime @default(now())
+  pickedUpAt        DateTime?
+  deliveredAt       DateTime?
+  updatedAt         DateTime @updatedAt
+
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  deliveryPartner DeliveryPartner @relation(fields: [deliveryPartnerId], references: [id])
+
+  @@index([deliveryPartnerId, status])
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  method        String
+  amount        Decimal  @db.Decimal(10, 2)
+  status        String   @default("PENDING")
+  provider      String?
+  transactionId String?  @unique
+  paidAt        DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+}
+
+model CartItem {
+  id       String  @id @default(cuid())
+  cartId   String
+  idMeal   String?
+  name     String
+  price    Decimal @db.Decimal(10, 2)
+  image    String?
+  category String?
+  quantity Int     @default(1)
+
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@index([cartId])
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items WishlistItem[]
+}
+
+model WishlistItem {
+  id         String   @id @default(cuid())
+  wishlistId String
+  idMeal     String
+  name       String
+  image      String?
+  price      Decimal? @db.Decimal(10, 2)
+  category   String?
+
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+
+  @@unique([wishlistId, idMeal])
+  @@index([wishlistId])
+}
+
+model Food {
+  id           String   @id @default(cuid())
+  restaurantId String?
+  name         String
+  description  String?
+  category     String
+  image        String?
+  price        Decimal  @db.Decimal(10, 2)
+  isAvailable  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
+
+  @@index([restaurantId])
+}
+
+========== lib\auth.ts ==========
+import { NextRequest } from "next/server";
+import { createHash } from "crypto";
+import { prisma } from "@/lib/prisma";
+
+export async function getCurrentUser(request: NextRequest) {
+  const token = request.cookies.get("fooddie_session")?.value;
+
+  if (!token) {
+    return null;
+  }
+
+  const tokenHash = createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+  const session = await prisma.session.findUnique({
+    where: { tokenHash },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  if (!session || session.expiresAt <= new Date()) {
+    if (session) {
+      await prisma.session.delete({
+        where: { id: session.id },
+      });
+    }
+
+    return null;
+  }
+
+  return session.user;
+}
+
+
+========== lib\authorization.ts ==========
+import { NextRequest } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { UserRole, hasRole } from "@/lib/roles";
+
+export async function getAuthorizedUser(
+  request: NextRequest,
+  allowedRoles: readonly UserRole[]
+) {
+  // Get logged-in user
+  const user = await getCurrentUser(request);
+
+  // Check authentication
+  if (!user) {
+    return null;
+  }
+
+  // Check authorization
+  if (!hasRole(user.role, allowedRoles)) {
+    return null;
+  }
+
+  return user;
+}
+
+========== lib\roles.ts ==========
+// FOODDIE USER ROLES
+
+export const ROLES = {
+  CUSTOMER: "CUSTOMER",
+  RESTAURANT: "RESTAURANT",
+  DELIVERY_PARTNER: "DELIVERY_PARTNER",
+
+  SUPER_ADMIN: "SUPER_ADMIN",
+  OPS_ADMIN: "OPS_ADMIN",
+  SUPPORT_ADMIN: "SUPPORT_ADMIN",
+  FINANCE_ADMIN: "FINANCE_ADMIN",
+  MARKETING_ADMIN: "MARKETING_ADMIN",
+
+  // Temporary support for existing Admin accounts
+  ADMIN: "ADMIN",
+} as const;
+
+// Type for all supported roles
+export type UserRole =
+  (typeof ROLES)[keyof typeof ROLES];
+
+// Admin roles
+export const ADMIN_ROLES: readonly UserRole[] = [
+  ROLES.ADMIN,
+  ROLES.SUPER_ADMIN,
+  ROLES.OPS_ADMIN,
+  ROLES.SUPPORT_ADMIN,
+  ROLES.FINANCE_ADMIN,
+  ROLES.MARKETING_ADMIN,
+];
+
+// Check whether a user has an admin role
+export function isAdminRole(role: string): boolean {
+  return ADMIN_ROLES.includes(role as UserRole);
+}
+
+// Check whether a user has an allowed role
+export function hasRole(
+  role: string,
+  allowedRoles: readonly UserRole[]
+): boolean {
+  return allowedRoles.includes(role as UserRole);
+}
+
+========== lib\permissions.ts ==========
+import { ROLES, UserRole } from "@/lib/roles";
+
+// Available FOODDIE permissions
+export const PERMISSIONS = {
+  DASHBOARD: "dashboard:view",
+  ORDERS: "orders:manage",
+  FOODS: "foods:manage",
+  RESTAURANTS: "restaurants:manage",
+  CUSTOMERS: "customers:manage",
+  PAYMENTS: "payments:manage",
+  COUPONS: "coupons:manage",
+  ADMINS: "admins:manage",
+} as const;
+
+export type Permission =
+  (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
+
+// Permissions assigned to each Admin role
+export const ROLE_PERMISSIONS: Partial<
+  Record<UserRole, readonly Permission[]>
+> = {
+  [ROLES.SUPER_ADMIN]: Object.values(PERMISSIONS),
+
+  [ROLES.OPS_ADMIN]: [
+    PERMISSIONS.DASHBOARD,
+    PERMISSIONS.ORDERS,
+    PERMISSIONS.FOODS,
+    PERMISSIONS.RESTAURANTS,
+  ],
+
+  [ROLES.SUPPORT_ADMIN]: [
+    PERMISSIONS.DASHBOARD,
+    PERMISSIONS.ORDERS,
+    PERMISSIONS.CUSTOMERS,
+  ],
+
+  [ROLES.FINANCE_ADMIN]: [
+    PERMISSIONS.DASHBOARD,
+    PERMISSIONS.PAYMENTS,
+  ],
+
+  [ROLES.MARKETING_ADMIN]: [
+    PERMISSIONS.DASHBOARD,
+    PERMISSIONS.COUPONS,
+  ],
+};
+
+// Check whether an Admin has a permission
+export function hasPermission(
+  role: UserRole,
+  permission: Permission
+): boolean {
+  return ROLE_PERMISSIONS[role]?.includes(permission) ?? false;
+}
+
+========== lib\admin-auth.ts ==========
+import { NextRequest } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+
+export async function getAdminUser(request: NextRequest) {
+  const user = await getCurrentUser(request);
+
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+
+  if (
+    !user ||
+    !adminEmail ||
+    user.email.trim().toLowerCase() !== adminEmail ||
+    user.role !== "ADMIN"
+  ) {
+    return null;
+  }
+
+  return user;
+}
+
+========== lib\admin-permission.ts ==========
+import { NextRequest } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { isAdminRole, UserRole } from "@/lib/roles";
+import {
+  hasPermission,
+  Permission,
+} from "@/lib/permissions";
+
+export async function getAdminWithPermission(
+  request: NextRequest,
+  permission: Permission
+) {
+  const user = await getCurrentUser(request);
+
+  if (!user || !isAdminRole(user.role)) {
+    return null;
+  }
+
+  // Support existing Admin account
+  if (user.role === "ADMIN") {
+    const adminEmail = process.env.ADMIN_EMAIL
+      ?.trim()
+      .toLowerCase();
+
+    if (
+      !adminEmail ||
+      user.email.trim().toLowerCase() !== adminEmail
+    ) {
+      return null;
+    }
+
+    return user;
+  }
+
+  // Check role-based permission
+  if (!hasPermission(user.role as UserRole, permission)) {
+    return null;
+  }
+
+  return user;
+}
+
+========== app\api\auth\register\route.ts ==========
+import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    const name = String(body.name || "").trim();
+    const email = String(body.email || "").trim().toLowerCase();
+    const password = String(body.password || "");
+
+    if (!name || !email || !password) {
+      return NextResponse.json(
+        { message: "All fields are required" },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json(
+        { message: "Password must contain at least 8 characters" },
+        { status: 400 }
+      );
+    }
+
+    if (name.length > 100 || email.length > 255) {
+      return NextResponse.json(
+        { message: "Name or email is too long" },
+        { status: 400 }
+      );
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { message: "Email already registered" },
+        { status: 409 }
+      );
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    await prisma.user.create({
+      data: {
+        name,
+        email,
+        passwordHash,
+        role: "CUSTOMER",
+      },
+    });
+
+    return NextResponse.json(
+      { message: "Account created successfully" },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Registration error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to create account. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+========== app\api\auth\login\route.ts ==========
+import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { createHash, randomBytes } from "crypto";
+import { prisma } from "@/lib/prisma";
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    const email = String(body.email || "").trim().toLowerCase();
+    const password = String(body.password || "");
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Invalid email or password" },
+        { status: 401 }
+      );
+    }
+
+    const passwordMatches = await bcrypt.compare(
+      password,
+      user.passwordHash
+    );
+
+    if (!passwordMatches) {
+      return NextResponse.json(
+        { message: "Invalid email or password" },
+        { status: 401 }
+      );
+    }
+
+    const token = randomBytes(32).toString("hex");
+
+    const tokenHash = createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const expiresAt = new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000
+    );
+
+    await prisma.session.create({
+      data: {
+        tokenHash,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
+    const adminEmail = process.env.ADMIN_EMAIL
+      ?.trim()
+      .toLowerCase();
+
+    const isAdmin =
+      user.role === "ADMIN" &&
+      !!adminEmail &&
+      user.email.trim().toLowerCase() === adminEmail;
+
+    const response = NextResponse.json({
+      message: "Login successful",
+      user: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      isAdmin,
+    });
+
+    response.cookies.set("fooddie_session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      expires: expiresAt,
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Login error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to log in. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+
+========== app\api\checkout\route.ts ==========
+import { NextRequest, NextResponse, connection } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+
+export async function POST(request: NextRequest) {
+  await connection();
+
+  try {
+    const user = await getCurrentUser(request);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Please login first." },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+
+    const { name, phone, address, city, pincode, payment } = body;
+
+    if (!name || !phone || !address || !city || !pincode || !payment) {
+      return NextResponse.json(
+        { message: "Please complete all delivery details." },
+        { status: 400 }
+      );
+    }
+
+    const order = await prisma.$transaction(async (tx) => {
+      const cart = await tx.cart.findUnique({
+        where: { userId: user.id },
+        include: { items: true },
+      });
+
+      if (!cart || cart.items.length === 0) {
+        throw new Error("Your cart is empty.");
+      }
+
+      const subtotal = cart.items.reduce(
+        (sum, item) => sum + Number(item.price) * item.quantity,
+        0
+      );
+
+      const delivery = 30;
+      const total = subtotal + delivery;
+
+      const newOrder = await tx.order.create({
+        data: {
+          orderId: `FD${Date.now()}`,
+          userId: user.id,
+          name,
+          phone,
+          address,
+          city,
+          pincode,
+          payment,
+          subtotal,
+          delivery,
+          total,
+          status: "Pending",
+          items: {
+            create: cart.items.map((item) => ({
+              name: item.name,
+              price: item.price,
+              image: item.image,
+              quantity: item.quantity,
+            })),
+          },
+        },
+        include: {
+          items: true,
+        },
+      });
+
+      await tx.cartItem.deleteMany({
+        where: { cartId: cart.id },
+      });
+
+      return newOrder;
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Order placed successfully. Waiting for restaurant confirmation.",
+      order: {
+        ...order,
+        subtotal: Number(order.subtotal),
+        delivery: Number(order.delivery),
+        total: Number(order.total),
+        items: order.items.map((item) => ({
+          ...item,
+          price: Number(item.price),
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("Checkout error:", error);
+
+    return NextResponse.json(
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to place your order.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+
+========== app\api\orders\route.ts ==========
+import { NextRequest, NextResponse, connection } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+
+export async function GET(request: NextRequest) {
+  await connection();
+
+  try {
+    const user = await getCurrentUser(request);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Please login first." },
+        { status: 401 }
+      );
+    }
+
+    const orders = await prisma.order.findMany({
+      where: {
+        userId: user.id,
+      },
+      include: {
+        items: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      orders: orders.map((order) => ({
+        ...order,
+        subtotal: Number(order.subtotal),
+        delivery: Number(order.delivery),
+        total: Number(order.total),
+        items: order.items.map((item) => ({
+          ...item,
+          price: Number(item.price),
+        })),
+      })),
+    });
+  } catch (error) {
+    console.error("Orders fetch error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to fetch confirmed orders." },
+      { status: 500 }
+    );
+  }
+}
+
+========== app\api\admin\orders\route.ts ==========
+import { NextRequest, NextResponse, connection } from "next/server";
+import { getAdminUser } from "@/lib/admin-auth";
+import { prisma } from "@/lib/prisma";
+
+// GET â€“ Fetch all customer orders
+export async function GET(request: NextRequest) {
+  await connection();
+
+  try {
+    const admin = await getAdminUser(request);
+
+    if (!admin) {
+      return NextResponse.json(
+        { message: "Admin access denied" },
+        { status: 403 }
+      );
+    }
+
+    const orders = await prisma.order.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        items: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      orders: orders.map((order) => ({
+        ...order,
+        subtotal: Number(order.subtotal),
+        delivery: Number(order.delivery),
+        total: Number(order.total),
+        items: order.items.map((item) => ({
+          ...item,
+          price: Number(item.price),
+        })),
+      })),
+    });
+  } catch (error) {
+    console.error("Admin orders error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to fetch orders" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH â€“ Update order status
+export async function PATCH(request: NextRequest) {
+  await connection();
+
+  try {
+    const admin = await getAdminUser(request);
+
+    if (!admin) {
+      return NextResponse.json(
+        { message: "Admin access denied" },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+
+    const orderId =
+      typeof body.orderId === "string" ? body.orderId : "";
+
+    const status =
+      typeof body.status === "string" ? body.status : "";
+
+    const allowedStatuses = [
+      "Pending",
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+    ];
+
+    if (!orderId || !allowedStatuses.includes(status)) {
+      return NextResponse.json(
+        { message: "Invalid order ID or status" },
+        { status: 400 }
+      );
+    }
+
+    const order = await prisma.order.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        status,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Order status updated successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Update order error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to update order status" },
+      { status: 500 }
+    );
+  }
+}
+
+========== app\api\admin\restaurants\route.ts ==========
+import { NextRequest, NextResponse, connection } from "next/server";
+import { getAdminWithPermission } from "@/lib/admin-permission";
+import { PERMISSIONS } from "@/lib/permissions";
+import { prisma } from "@/lib/prisma";
+
+// GET - View all restaurants
+export async function GET(request: NextRequest) {
+  await connection();
+
+  try {
+    const admin = await getAdminWithPermission(
+      request,
+      PERMISSIONS.RESTAURANTS
+    );
+
+    if (!admin) {
+      return NextResponse.json(
+        { message: "Admin access denied." },
+        { status: 403 }
+      );
+    }
+
+    const restaurants = await prisma.restaurant.findMany({
+      include: {
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      restaurants,
+    });
+  } catch (error) {
+    console.error("Fetch restaurants error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to fetch restaurants." },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH - Approve or reject restaurant
+export async function PATCH(request: NextRequest) {
+  await connection();
+
+  try {
+    const admin = await getAdminWithPermission(
+      request,
+      PERMISSIONS.RESTAURANTS
+    );
+
+    if (!admin) {
+      return NextResponse.json(
+        { message: "Admin access denied." },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+
+    const id = typeof body.id === "string" ? body.id : "";
+    const status =
+      typeof body.status === "string" ? body.status : "";
+
+    if (!id || !["APPROVED", "REJECTED"].includes(status)) {
+      return NextResponse.json(
+        { message: "Invalid restaurant ID or status." },
+        { status: 400 }
+      );
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id },
+    });
+
+    if (!restaurant) {
+      return NextResponse.json(
+        { message: "Restaurant not found." },
+        { status: 404 }
+      );
+    }
+
+    if (restaurant.status !== "PENDING") {
+      return NextResponse.json(
+        { message: "This application has already been reviewed." },
+        { status: 400 }
+      );
+    }
+
+    const updatedRestaurant = await prisma.restaurant.update({
+      where: { id },
+      data: { status },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message:
+        status === "APPROVED"
+          ? "Restaurant approved successfully."
+          : "Restaurant rejected successfully.",
+      restaurant: updatedRestaurant,
+    });
+  } catch (error) {
+    console.error("Restaurant approval error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to update restaurant status." },
+      { status: 500 }
+    );
+  }
+}
+
+========== app\api\restaurant\menu\route.ts ==========
+import { NextRequest, NextResponse, connection } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getAuthorizedUser } from "@/lib/authorization";
+import { ROLES } from "@/lib/roles";
+
+// GET - View restaurant menu
+export async function GET(request: NextRequest) {
+  await connection();
+
+  try {
+    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Restaurant access denied." },
+        { status: 403 }
+      );
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { ownerId: user.id },
+      include: {
+        foods: { orderBy: { createdAt: "desc" } },
+      },
+    });
+
+    if (!restaurant) {
+      return NextResponse.json(
+        { message: "Restaurant profile not found." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      restaurant: {
+        id: restaurant.id,
+        name: restaurant.name,
+        status: restaurant.status,
+        isOpen: restaurant.isOpen,
+      },
+      foods: restaurant.foods,
+    });
+  } catch (error) {
+    console.error("Restaurant menu error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to fetch restaurant menu." },
+      { status: 500 }
+    );
+  }
+}
+
+// POST - Add food
+export async function POST(request: NextRequest) {
+  await connection();
+
+  try {
+    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Restaurant access denied." },
+        { status: 403 }
+      );
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { ownerId: user.id },
+    });
+
+    if (!restaurant || restaurant.status !== "APPROVED") {
+      return NextResponse.json(
+        { message: "Approved restaurant not found." },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+
+    const name = String(body.name || "").trim();
+    const category = String(body.category || "").trim();
+    const price = Number(body.price);
+
+    if (!name || !category || !Number.isFinite(price) || price <= 0) {
+      return NextResponse.json(
+        { message: "Enter valid food details." },
+        { status: 400 }
+      );
+    }
+
+    const food = await prisma.food.create({
+      data: {
+        restaurantId: restaurant.id,
+        name,
+        category,
+        price,
+        description: body.description || null,
+        image: body.image || null,
+      },
+    });
+
+    return NextResponse.json(
+      { success: true, message: "Food added successfully.", food },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Add food error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to add food." },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT - Update food
+export async function PUT(request: NextRequest) {
+  await connection();
+
+  try {
+    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Restaurant access denied." },
+        { status: 403 }
+      );
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { ownerId: user.id },
+    });
+
+    if (!restaurant || restaurant.status !== "APPROVED") {
+      return NextResponse.json(
+        { message: "Approved restaurant not found." },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+
+    const id = String(body.id || "");
+    const name = String(body.name || "").trim();
+    const category = String(body.category || "").trim();
+    const price = Number(body.price);
+
+    if (!id || !name || !category || !Number.isFinite(price) || price <= 0) {
+      return NextResponse.json(
+        { message: "Invalid food details." },
+        { status: 400 }
+      );
+    }
+
+    const existingFood = await prisma.food.findFirst({
+      where: { id, restaurantId: restaurant.id },
+    });
+
+    if (!existingFood) {
+      return NextResponse.json(
+        { message: "Food item not found." },
+        { status: 404 }
+      );
+    }
+
+    const food = await prisma.food.update({
+      where: { id },
+      data: {
+        name,
+        category,
+        price,
+        description: body.description || null,
+        image: body.image || null,
+        isAvailable: body.isAvailable !== false,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Food updated successfully.",
+      food,
+    });
+  } catch (error) {
+    console.error("Update food error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to update food." },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE - Remove food
+export async function DELETE(request: NextRequest) {
+  await connection();
+
+  try {
+    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Restaurant access denied." },
+        { status: 403 }
+      );
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { ownerId: user.id },
+    });
+
+    if (!restaurant || restaurant.status !== "APPROVED") {
+      return NextResponse.json(
+        { message: "Approved restaurant not found." },
+        { status: 403 }
+      );
+    }
+
+    const id = new URL(request.url).searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Food ID is required." },
+        { status: 400 }
+      );
+    }
+
+    const food = await prisma.food.findFirst({
+      where: { id, restaurantId: restaurant.id },
+    });
+
+    if (!food) {
+      return NextResponse.json(
+        { message: "Food item not found." },
+        { status: 404 }
+      );
+    }
+
+    await prisma.food.delete({ where: { id } });
+
+    return NextResponse.json({
+      success: true,
+      message: "Food deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Delete food error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to delete food." },
+      { status: 500 }
+    );
+  }
+}
+
+========== app\api\restaurant\orders\route.ts ==========
+import { NextRequest, NextResponse, connection } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getAuthorizedUser } from "@/lib/authorization";
+import { ROLES } from "@/lib/roles";
+
+// GET - View restaurant orders
+export async function GET(request: NextRequest) {
+  await connection();
+
+  try {
+    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Restaurant access denied." },
+        { status: 403 }
+      );
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { ownerId: user.id },
+    });
+
+    if (!restaurant) {
+      return NextResponse.json(
+        { message: "Restaurant profile not found." },
+        { status: 404 }
+      );
+    }
+
+    const orders = await prisma.order.findMany({
+      where: {
+        restaurantId: restaurant.id,
+      },
+      include: {
+        items: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      orders: orders.map((order) => ({
+        ...order,
+        subtotal: Number(order.subtotal),
+        delivery: Number(order.delivery),
+        total: Number(order.total),
+        items: order.items.map((item) => ({
+          ...item,
+          price: Number(item.price),
+        })),
+      })),
+    });
+  } catch (error) {
+    console.error("Restaurant orders error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to fetch restaurant orders." },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH - Accept or reject an order
+export async function PATCH(request: NextRequest) {
+  await connection();
+
+  try {
+    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Restaurant access denied." },
+        { status: 403 }
+      );
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { ownerId: user.id },
+    });
+
+    if (!restaurant || restaurant.status !== "APPROVED") {
+      return NextResponse.json(
+        { message: "Approved restaurant not found." },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+
+    const orderId =
+      typeof body.orderId === "string" ? body.orderId : "";
+
+    const status =
+      typeof body.status === "string" ? body.status : "";
+
+    if (!orderId || !["Processing", "Cancelled"].includes(status)) {
+      return NextResponse.json(
+        { message: "Invalid order ID or status." },
+        { status: 400 }
+      );
+    }
+
+    const existingOrder = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+        restaurantId: restaurant.id,
+        status: "Pending",
+      },
+    });
+
+    if (!existingOrder) {
+      return NextResponse.json(
+        { message: "Pending order not found in your restaurant." },
+        { status: 404 }
+      );
+    }
+
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: { status },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message:
+        status === "Processing"
+          ? "Order accepted successfully."
+          : "Order rejected successfully.",
+      order,
+    });
+  } catch (error) {
+    console.error("Restaurant order update error:", error);
+
+    return NextResponse.json(
+      { message: "Unable to update order." },
+      { status: 500 }
+    );
+  }
+}
+
+========== app\admin\layout.tsx ==========
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { createHash } from "crypto";
+import { prisma } from "@/lib/prisma";
+
+export default async function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const cookieStore = await cookies();
+
+  const token = cookieStore.get("fooddie_session")?.value;
+
+  if (!token) {
+    redirect("/login");
+  }
+
+  const tokenHash = createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+  const session = await prisma.session.findUnique({
+    where: { tokenHash },
+    include: {
+      user: {
+        select: {
+          email: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  if (!session || session.expiresAt <= new Date()) {
+    redirect("/login");
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+
+  if (
+    !adminEmail ||
+    session.user.email.trim().toLowerCase() !== adminEmail ||
+    session.user.role !== "ADMIN"
+  ) {
+    redirect("/");
+  }
+
+  return <>{children}</>;
+}
+
+========== app\layout.tsx ==========
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+
+import AppLayout from "@/components/layout/AppLayout";
+
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: {
+    default: "FOODDIE | Discover Delicious Food",
+    template: "%s | FOODDIE",
+  },
+  description:
+    "Discover delicious food, explore exciting flavours, and find your next favourite meal with FOODDIE.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body id="top" className="flex min-h-full flex-col">
+        <AppLayout>{children}</AppLayout>
+      </body>
+    </html>
+  );
+}

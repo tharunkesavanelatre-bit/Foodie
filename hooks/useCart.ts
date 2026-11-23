@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 export type CartItem = {
   id: string;
+  foodId?: string | null;
   idMeal?: string | null;
   name: string;
   price: string;

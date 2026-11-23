@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { foods } from "@/data/foods";
+import { getRecipePrice } from "@/features/product-details/utils/recipePrice";
 
-// Get cart items
 export async function GET(request: NextRequest) {
   await connection();
 
@@ -10,18 +11,14 @@ export async function GET(request: NextRequest) {
     const user = await getCurrentUser(request);
 
     if (!user) {
-      return NextResponse.json(
-        { message: "Please login first." },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Please login first." }, { status: 401 });
     }
 
     const items = await prisma.cartItem.findMany({
-      where: {
-        cart: { userId: user.id },
-      },
+      where: { cart: { userId: user.id } },
       select: {
         id: true,
+        foodId: true,
         idMeal: true,
         name: true,
         price: true,
@@ -31,31 +28,22 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const formattedItems = items.map((item) => ({
-      ...item,
-      price: item.price.toString(),
-      image: item.image || "",
-    }));
-
     return NextResponse.json(
-      { items: formattedItems },
       {
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      }
+        items: items.map((item) => ({
+          ...item,
+          price: item.price.toString(),
+          image: item.image || "",
+        })),
+      },
+      { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {
     console.error("Cart fetch error:", error);
-
-    return NextResponse.json(
-      { message: "Unable to fetch cart." },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Unable to fetch cart." }, { status: 500 });
   }
 }
 
-// Add item to cart
 export async function POST(request: NextRequest) {
   await connection();
 
@@ -63,27 +51,89 @@ export async function POST(request: NextRequest) {
     const user = await getCurrentUser(request);
 
     if (!user) {
-      return NextResponse.json(
-        { message: "Please login first." },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Please login first." }, { status: 401 });
     }
 
     const body = await request.json();
 
-    const name = String(body.name || "").trim();
-    const price = Number(
-      String(body.price || "").replace(/[^\d.]/g, "")
-    );
-    const image = String(body.image || "");
+    const foodId = body.foodId ? String(body.foodId) : null;
     const idMeal = body.idMeal ? String(body.idMeal) : null;
-    const category = body.category ? String(body.category) : null;
+    const requestedName = String(body.name || "").trim();
 
-    if (!name || !Number.isFinite(price) || price <= 0) {
-      return NextResponse.json(
-        { message: "Invalid food details." },
-        { status: 400 }
+    let name = "";
+    let price = 0;
+    let image = "";
+    let category: string | null = null;
+
+    // Restaurant food: price comes from the database.
+    if (foodId) {
+      const food = await prisma.food.findFirst({
+        where: {
+          id: foodId,
+          isAvailable: true,
+          restaurant: {
+            status: "APPROVED",
+            isOpen: true,
+          },
+        },
+        include: { restaurant: true },
+      });
+
+      if (!food || !food.restaurant) {
+        return NextResponse.json(
+          { message: "This restaurant food is currently unavailable." },
+          { status: 404 }
+        );
+      }
+
+      name = food.name;
+      price = Number(food.price);
+      image = food.image || "";
+      category = food.category;
+    }
+
+    // TheMealDB recipe: verify the recipe before calculating its price.
+    else if (idMeal) {
+      const response = await fetch(
+        `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${encodeURIComponent(idMeal)}`,
+        { signal: AbortSignal.timeout(10000), cache: "no-store" }
       );
+
+      if (!response.ok) {
+        return NextResponse.json({ message: "Unable to verify recipe." }, { status: 502 });
+      }
+
+      const data = await response.json();
+      const meal = data.meals?.[0];
+
+      if (!meal) {
+        return NextResponse.json({ message: "Recipe not found." }, { status: 404 });
+      }
+
+      name = meal.strMeal;
+      image = meal.strMealThumb || "";
+      category = meal.strCategory || null;
+      price = getRecipePrice(idMeal, name, category || undefined);
+    }
+
+    // Existing static catalogue foods.
+    else {
+      const staticFood = foods.find(
+        (item) => item.name.toLowerCase() === requestedName.toLowerCase()
+      );
+
+      if (!staticFood) {
+        return NextResponse.json({ message: "Invalid food item." }, { status: 400 });
+      }
+
+      name = staticFood.name;
+      price = Number(staticFood.price.replace(/[^\d.]/g, ""));
+      image = staticFood.image;
+      category = staticFood.category;
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+      return NextResponse.json({ message: "Invalid food price." }, { status: 400 });
     }
 
     const cart = await prisma.cart.upsert({
@@ -92,10 +142,43 @@ export async function POST(request: NextRequest) {
       update: {},
     });
 
+    // Prevent mixing restaurant orders with other food sources
+    // or combining foods from different restaurants.
+    const existingItems = await prisma.cartItem.findMany({
+      where: { cartId: cart.id },
+      include: {
+        food: { select: { restaurantId: true } },
+      },
+    });
+
+    if (foodId) {
+      const restaurantId = await prisma.food.findUnique({
+        where: { id: foodId },
+        select: { restaurantId: true },
+      });
+
+      if (
+        !restaurantId?.restaurantId ||
+        existingItems.some(
+          (item) => item.food?.restaurantId !== restaurantId.restaurantId
+        )
+      ) {
+        return NextResponse.json(
+          { message: "Please complete your current cart before ordering from another food source or restaurant." },
+          { status: 409 }
+        );
+      }
+    } else if (existingItems.some((item) => item.foodId)) {
+      return NextResponse.json(
+        { message: "Please complete your restaurant order before adding other foods." },
+        { status: 409 }
+      );
+    }
+
     const existingItem = await prisma.cartItem.findFirst({
       where: {
         cartId: cart.id,
-        ...(idMeal ? { idMeal } : { name }),
+        ...(foodId ? { foodId } : idMeal ? { idMeal } : { name }),
       },
     });
 
@@ -105,6 +188,7 @@ export async function POST(request: NextRequest) {
           data: {
             quantity: { increment: 1 },
             price,
+            name,
             image,
             category,
           },
@@ -112,6 +196,7 @@ export async function POST(request: NextRequest) {
       : await prisma.cartItem.create({
           data: {
             cartId: cart.id,
+            foodId,
             idMeal,
             name,
             price,
@@ -123,15 +208,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
+        success: true,
         message: "Item added to cart.",
         item: {
-          id: savedItem.id,
-          idMeal: savedItem.idMeal,
-          name: savedItem.name,
+          ...savedItem,
           price: savedItem.price.toString(),
           image: savedItem.image || "",
-          category: savedItem.category,
-          quantity: savedItem.quantity,
         },
       },
       { status: 201 }

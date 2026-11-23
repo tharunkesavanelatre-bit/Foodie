@@ -1,0 +1,317 @@
+.delivery-profile-page {
+  min-height: 100vh;
+  padding: 30px;
+  background: #fffaf6;
+  color: #292524;
+}
+
+.delivery-profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #f1e8e1;
+}
+
+.delivery-profile-header a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #57534e;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.delivery-profile-header strong {
+  font-size: 22px;
+}
+
+.delivery-profile-header strong span {
+  color: #ea580c;
+}
+
+.delivery-profile-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 35px 0;
+}
+
+.delivery-profile-heading > div:first-child > span {
+  color: #ea580c;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.delivery-profile-heading h1 {
+  margin: 9px 0;
+  font-size: 32px;
+}
+
+.delivery-profile-heading p {
+  color: #78716c;
+}
+
+.delivery-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border-radius: 30px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.delivery-profile-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.delivery-profile-sidebar,
+.delivery-profile-form-card {
+  padding: 25px;
+  border: 1px solid #f1e8e1;
+  border-radius: 16px;
+  background: white;
+}
+
+.delivery-profile-sidebar {
+  text-align: center;
+}
+
+.delivery-profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 85px;
+  height: 85px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.delivery-profile-sidebar h2 {
+  margin: 8px 0;
+  font-size: 19px;
+}
+
+.delivery-profile-sidebar > p {
+  overflow-wrap: anywhere;
+  color: #78716c;
+  font-size: 12px;
+}
+
+.delivery-profile-divider {
+  height: 1px;
+  margin: 22px 0;
+  background: #f1e8e1;
+}
+
+.delivery-profile-account-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 17px 0;
+  text-align: left;
+}
+
+.delivery-profile-account-info span {
+  color: #78716c;
+  font-size: 12px;
+}
+
+.delivery-profile-account-info strong {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+}
+
+.delivery-approved,
+.delivery-online {
+  color: #16a34a;
+}
+
+.delivery-offline {
+  color: #dc2626;
+}
+
+.delivery-profile-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  margin-top: 22px;
+  border-radius: 9px;
+  background: #fff7ed;
+  color: #ea580c;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.delivery-profile-form-heading {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1e8e1;
+}
+
+.delivery-profile-form-heading h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.delivery-profile-form-heading p {
+  margin: 0;
+  color: #78716c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.delivery-profile-form-card form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  padding-top: 22px;
+}
+
+.delivery-profile-readonly,
+.delivery-profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.delivery-profile-readonly label,
+.delivery-profile-field label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.delivery-profile-readonly > div,
+.delivery-profile-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 47px;
+  padding: 0 13px;
+  border: 1px solid #eee7e1;
+  border-radius: 9px;
+  color: #ea580c;
+}
+
+.delivery-profile-readonly > div {
+  background: #fafaf9;
+}
+
+.delivery-profile-readonly > div span {
+  overflow-wrap: anywhere;
+  color: #57534e;
+  font-size: 13px;
+}
+
+.delivery-profile-readonly small {
+  color: #a8a29e;
+  font-size: 11px;
+}
+
+.delivery-profile-input input,
+.delivery-profile-input select {
+  width: 100%;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #292524;
+  font: inherit;
+  font-size: 13px;
+}
+
+.delivery-profile-save {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  grid-column: 1 / -1;
+  padding: 14px;
+  border: none;
+  border-radius: 9px;
+  background: #ea580c;
+  color: white;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.delivery-profile-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.delivery-profile-error,
+.delivery-profile-success {
+  padding: 12px;
+  margin-top: 18px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.delivery-profile-error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.delivery-profile-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.delivery-profile-loading {
+  display: flex;
+  min-height: 70vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #78716c;
+}
+
+.delivery-profile-loading button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #ea580c;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 800px) {
+  .delivery-profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .delivery-profile-page {
+    padding: 20px 14px;
+  }
+
+  .delivery-profile-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .delivery-profile-form-card form {
+    grid-template-columns: 1fr;
+  }
+
+  .delivery-profile-save {
+    grid-column: auto;
+  }
+}

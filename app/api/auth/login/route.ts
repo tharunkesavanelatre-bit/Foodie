@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { createHash, randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
+import { isAdminRole } from "@/lib/roles";
 
 export async function POST(request: Request) {
   try {
@@ -40,6 +41,20 @@ export async function POST(request: Request) {
       );
     }
 
+    const adminEmail = process.env.ADMIN_EMAIL
+      ?.trim()
+      .toLowerCase();
+
+    const isAdmin =
+      isAdminRole(user.role) &&
+      (
+        user.role !== "ADMIN" ||
+        (
+          !!adminEmail &&
+          user.email.trim().toLowerCase() === adminEmail
+        )
+      );
+
     const token = randomBytes(32).toString("hex");
 
     const tokenHash = createHash("sha256")
@@ -57,15 +72,6 @@ export async function POST(request: Request) {
         expiresAt,
       },
     });
-
-    const adminEmail = process.env.ADMIN_EMAIL
-      ?.trim()
-      .toLowerCase();
-
-    const isAdmin =
-      user.role === "ADMIN" &&
-      !!adminEmail &&
-      user.email.trim().toLowerCase() === adminEmail;
 
     const response = NextResponse.json({
       message: "Login successful",

@@ -8,10 +8,10 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser(request);
 
-    if (!user) {
+    if (!user || user.role !== "CUSTOMER") {
       return NextResponse.json(
-        { message: "Please login first." },
-        { status: 401 }
+        { message: "Customer access denied." },
+        { status: 403 }
       );
     }
 
@@ -21,6 +21,18 @@ export async function GET(request: NextRequest) {
       },
       include: {
         items: true,
+        paymentRecord: true,
+        assignment: {
+          include: {
+            deliveryPartner: {
+              select: {
+                phone: true,
+                vehicleType: true,
+                vehicleNumber: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -31,9 +43,20 @@ export async function GET(request: NextRequest) {
       success: true,
       orders: orders.map((order) => ({
         ...order,
+
         subtotal: Number(order.subtotal),
-        delivery: Number(order.delivery),
+        deliveryFee: Number(order.delivery),
+        discount: Number(order.discount ?? 0),
+        couponCode: order.couponCode,
         total: Number(order.total),
+
+        paymentRecord: order.paymentRecord
+          ? {
+              ...order.paymentRecord,
+              amount: Number(order.paymentRecord.amount),
+            }
+          : null,
+
         items: order.items.map((item) => ({
           ...item,
           price: Number(item.price),
@@ -41,10 +64,10 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Orders fetch error:", error);
+    console.error("Customer orders error:", error);
 
     return NextResponse.json(
-      { message: "Unable to fetch confirmed orders." },
+      { message: "Unable to fetch orders." },
       { status: 500 }
     );
   }

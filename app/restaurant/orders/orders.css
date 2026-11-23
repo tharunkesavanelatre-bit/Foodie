@@ -1,0 +1,275 @@
+.restaurant-orders-page {
+  min-height: 100vh;
+  background: #fffaf6;
+  color: #292524;
+}
+
+.restaurant-orders-header {
+  height: 75px;
+  padding: 0 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid #f1e8e2;
+}
+
+.restaurant-orders-header h2 {
+  color: #ea580c;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.restaurant-orders-header h2 span {
+  color: #292524;
+}
+
+.restaurant-back-link,
+.restaurant-orders-header button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #57534e;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.restaurant-orders-header button {
+  padding: 10px 15px;
+  border: 1px solid #f1e8e2;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+}
+
+.restaurant-orders-content {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 25px;
+}
+
+.restaurant-orders-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.restaurant-orders-title p {
+  color: #ea580c;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.restaurant-orders-title h1 {
+  margin: 10px 0;
+  font-size: 30px;
+}
+
+.restaurant-orders-title span {
+  color: #78716c;
+  font-size: 14px;
+}
+
+.restaurant-orders-count {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border-radius: 10px;
+  background: #fff0e5;
+  color: #ea580c;
+  font-weight: 700;
+}
+
+.restaurant-orders-message {
+  margin-bottom: 20px;
+  padding: 13px 16px;
+  border-radius: 9px;
+  background: #fff0e5;
+  color: #c2410c;
+  font-size: 14px;
+}
+
+.restaurant-orders-list {
+  display: grid;
+  gap: 20px;
+}
+
+.restaurant-order-card {
+  padding: 24px;
+  border: 1px solid #f1e8e2;
+  border-radius: 15px;
+  background: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.restaurant-order-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #f1e8e2;
+}
+
+.restaurant-order-top span:first-child {
+  color: #a8a29e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.restaurant-order-top h3 {
+  margin: 7px 0 0;
+  font-size: 18px;
+}
+
+.restaurant-order-badge {
+  padding: 7px 13px;
+  border-radius: 20px;
+  background: #fff0e5;
+  color: #ea580c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.restaurant-order-customer {
+  padding: 15px 0;
+  border-bottom: 1px solid #f1e8e2;
+}
+
+.restaurant-order-customer p {
+  margin: 8px 0;
+  color: #78716c;
+  font-size: 13px;
+}
+
+.restaurant-order-customer strong {
+  color: #292524;
+}
+
+.restaurant-order-items {
+  padding: 15px 0;
+}
+
+.restaurant-order-items h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.restaurant-order-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 9px 0;
+  color: #78716c;
+  font-size: 13px;
+}
+
+.restaurant-order-item strong {
+  color: #292524;
+}
+
+.restaurant-order-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding-top: 17px;
+  border-top: 1px solid #f1e8e2;
+}
+
+.restaurant-order-bottom > strong {
+  color: #ea580c;
+  font-size: 18px;
+}
+
+.restaurant-order-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.restaurant-order-actions button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.restaurant-accept-button {
+  background: #16a34a;
+}
+
+.restaurant-reject-button {
+  background: #dc2626;
+}
+
+.restaurant-order-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.restaurant-orders-empty {
+  padding: 70px 20px;
+  text-align: center;
+  color: #a8a29e;
+  background: white;
+  border: 1px solid #f1e8e2;
+  border-radius: 15px;
+}
+
+.restaurant-orders-empty h3 {
+  color: #292524;
+}
+
+.restaurant-orders-empty p {
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .restaurant-orders-header {
+    padding: 0 5%;
+  }
+
+  .restaurant-orders-header h2 {
+    font-size: 19px;
+  }
+
+  .restaurant-orders-content {
+    margin: 25px auto;
+    padding: 0 15px;
+  }
+
+  .restaurant-orders-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .restaurant-orders-title h1 {
+    font-size: 25px;
+  }
+
+  .restaurant-order-card {
+    padding: 17px;
+  }
+
+  .restaurant-order-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .restaurant-order-actions {
+    width: 100%;
+  }
+
+  .restaurant-order-actions button {
+    justify-content: center;
+    flex: 1;
+  }
+}

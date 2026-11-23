@@ -6,11 +6,8 @@ type Context = {
   params: Promise<{ id: string }>;
 };
 
-// Update quantity
-export async function PATCH(
-  request: NextRequest,
-  context: Context
-) {
+// Update cart quantity
+export async function PATCH(request: NextRequest, context: Context) {
   await connection();
 
   try {
@@ -26,9 +23,9 @@ export async function PATCH(
     const { id } = await context.params;
     const { quantity } = await request.json();
 
-    if (!Number.isInteger(quantity) || quantity < 1) {
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
       return NextResponse.json(
-        { message: "Invalid quantity." },
+        { message: "Quantity must be between 1 and 99." },
         { status: 400 }
       );
     }
@@ -37,6 +34,11 @@ export async function PATCH(
       where: {
         id,
         cart: { userId: user.id },
+      },
+      include: {
+        food: {
+          include: { restaurant: true },
+        },
       },
     });
 
@@ -47,29 +49,44 @@ export async function PATCH(
       );
     }
 
-    await prisma.cartItem.update({
+    if (
+      item.foodId &&
+      (!item.food ||
+        !item.food.isAvailable ||
+        item.food.restaurant?.status !== "APPROVED" ||
+        !item.food.restaurant.isOpen)
+    ) {
+      return NextResponse.json(
+        { message: "This food is currently unavailable." },
+        { status: 409 }
+      );
+    }
+
+    const updatedItem = await prisma.cartItem.update({
       where: { id },
       data: { quantity },
     });
 
     return NextResponse.json({
-      message: "Quantity updated.",
+      success: true,
+      message: "Cart quantity updated.",
+      item: {
+        ...updatedItem,
+        price: updatedItem.price.toString(),
+      },
     });
   } catch (error) {
     console.error("Cart update error:", error);
 
     return NextResponse.json(
-      { message: "Unable to update quantity." },
+      { message: "Unable to update cart quantity." },
       { status: 500 }
     );
   }
 }
 
-// Remove item
-export async function DELETE(
-  request: NextRequest,
-  context: Context
-) {
+// Remove cart item
+export async function DELETE(request: NextRequest, context: Context) {
   await connection();
 
   try {
@@ -89,6 +106,7 @@ export async function DELETE(
         id,
         cart: { userId: user.id },
       },
+      select: { id: true },
     });
 
     if (!item) {
@@ -99,17 +117,18 @@ export async function DELETE(
     }
 
     await prisma.cartItem.delete({
-      where: { id },
+      where: { id: item.id },
     });
 
     return NextResponse.json({
-      message: "Item removed.",
+      success: true,
+      message: "Item removed successfully.",
     });
   } catch (error) {
-    console.error("Cart remove error:", error);
+    console.error("Cart delete error:", error);
 
     return NextResponse.json(
-      { message: "Unable to remove item." },
+      { message: "Unable to remove cart item." },
       { status: 500 }
     );
   }

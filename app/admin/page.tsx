@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
 import {
   LayoutDashboard,
   Utensils,
-  Tags,
   ShoppingBag,
+  CreditCard,
+  Bike,
+  Store,
   Users,
+  TicketPercent,
 } from "lucide-react";
 
 import "./admin.css";
@@ -16,16 +20,70 @@ import "./admin.css";
 type DashboardData = {
   name: string;
   email: string;
+  role: string;
+  permissions: string[];
+
   statistics: {
     users: number;
     orders: number;
     pendingOrders: number;
     revenue: number;
+    totalPayments: number;
+    successfulPayments: number;
+    pendingPayments: number;
+    failedPayments: number;
+    collectedAmount: number;
   };
 };
 
+const navigation = [
+  {
+    title: "Food Management",
+    href: "/admin/foods",
+    permission: "foods:manage",
+    icon: Utensils,
+  },
+  {
+    title: "Restaurants",
+    href: "/admin/restaurants",
+    permission: "restaurants:manage",
+    icon: Store,
+  },
+  {
+    title: "Orders",
+    href: "/admin/orders",
+    permission: "orders:manage",
+    icon: ShoppingBag,
+  },
+  {
+    title: "Customers",
+    href: "/admin/customers",
+    permission: "customers:manage",
+    icon: Users,
+  },
+  {
+    title: "Coupons",
+    href: "/admin/coupons",
+    permission: "coupons:manage",
+    icon: TicketPercent,
+  },
+  {
+    title: "Payments",
+    href: "/admin/payments",
+    permission: "payments:manage",
+    icon: CreditCard,
+  },
+  {
+    title: "Delivery Partners",
+    href: "/admin/delivery-partners",
+    permission: "delivery-partners:manage",
+    icon: Bike,
+  },
+];
+
 export default function AdminDashboard() {
   const router = useRouter();
+
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -46,6 +104,8 @@ export default function AdminDashboard() {
         setData({
           name: result.admin.name,
           email: result.admin.email,
+          role: result.admin.role,
+          permissions: result.permissions,
           statistics: result.statistics,
         });
       } catch {
@@ -61,20 +121,58 @@ export default function AdminDashboard() {
   if (loading) return <p>Loading dashboard...</p>;
   if (!data) return null;
 
+  const hasPermission = (permission: string) =>
+    data.permissions.includes(permission);
+
   const cards = [
-    { title: "Total Users", value: data.statistics.users },
-    { title: "Total Orders", value: data.statistics.orders },
-    { title: "Pending Orders", value: data.statistics.pendingOrders },
-    {
-      title: "Total Revenue",
-      value: `₹${data.statistics.revenue.toLocaleString("en-IN")}`,
-    },
+    ...(hasPermission("customers:manage")
+      ? [{ title: "Total Users", value: data.statistics.users }]
+      : []),
+
+    ...(hasPermission("orders:manage")
+      ? [
+          { title: "Total Orders", value: data.statistics.orders },
+          { title: "Pending Orders", value: data.statistics.pendingOrders },
+        ]
+      : []),
+
+    ...(hasPermission("payments:manage")
+      ? [
+          {
+            title: "Total Revenue",
+            value: `₹${data.statistics.revenue.toLocaleString("en-IN")}`,
+          },
+          {
+            title: "Total Payments",
+            value: data.statistics.totalPayments,
+          },
+          {
+            title: "Successful Payments",
+            value: data.statistics.successfulPayments,
+          },
+          {
+            title: "Pending Payments",
+            value: data.statistics.pendingPayments,
+          },
+          {
+            title: "Failed Payments",
+            value: data.statistics.failedPayments,
+          },
+          {
+            title: "Collected Amount",
+            value: `₹${data.statistics.collectedAmount.toLocaleString("en-IN")}`,
+          },
+        ]
+      : []),
   ];
 
   return (
     <main className="admin-layout">
       <aside className="admin-sidebar">
-        <h2>FOODDIE<span>.</span></h2>
+        <h2>
+          FOODDIE<span>.</span>
+        </h2>
+
         <p className="sidebar-label">ADMIN PANEL</p>
 
         <nav>
@@ -83,30 +181,29 @@ export default function AdminDashboard() {
             Dashboard
           </Link>
 
-          <Link href="/admin/foods">
-            <Utensils size={19} />
-            Food Management
-          </Link>
+          {navigation.map((item) => {
+            if (!hasPermission(item.permission)) return null;
 
-          <Link href="/admin/categories">
-            <Tags size={19} />
-            Categories
-          </Link>
+            const Icon = item.icon;
 
-          <Link href="/admin/orders">
-            <ShoppingBag size={19} />
-            Orders
-          </Link>
-
-          <Link href="/admin/users">
-            <Users size={19} />
-            Users
-          </Link>
+            return (
+              <Link href={item.href} key={item.href}>
+                <Icon size={19} />
+                {item.title}
+              </Link>
+            );
+          })}
         </nav>
+
+        <div className="admin-sidebar-user">
+          <p>{data.name}</p>
+          <span>{data.role.replaceAll("_", " ")}</span>
+        </div>
       </aside>
 
       <section className="admin-dashboard">
         <h1>Dashboard Overview</h1>
+
         <p>Welcome back, {data.name}!</p>
         <p>{data.email}</p>
 

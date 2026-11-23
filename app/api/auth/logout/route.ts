@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { NextRequest, NextResponse, connection } from "next/server";
 import { createHash } from "crypto";
 import { prisma } from "@/lib/prisma";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  await connection();
+
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("fooddie_session")?.value;
+    const token = request.cookies.get("fooddie_session")?.value;
 
     if (token) {
       const tokenHash = createHash("sha256")
@@ -19,7 +19,8 @@ export async function POST() {
     }
 
     const response = NextResponse.json({
-      message: "Logged out successfully",
+      success: true,
+      message: "Logged out successfully.",
     });
 
     response.cookies.set("fooddie_session", "", {
@@ -27,7 +28,7 @@ export async function POST() {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      expires: new Date(0),
+      maxAge: 0,
     });
 
     return response;
@@ -35,7 +36,7 @@ export async function POST() {
     console.error("Logout error:", error);
 
     return NextResponse.json(
-      { message: "Unable to log out" },
+      { message: "Unable to logout." },
       { status: 500 }
     );
   }

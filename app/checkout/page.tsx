@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
 import {
   ArrowLeft,
   MapPin,
@@ -12,9 +13,18 @@ import {
   ShieldCheck,
   Wallet,
   Banknote,
+  TicketPercent,
+  CheckCircle2,
+  X,
 } from "lucide-react";
 
 import { useCart } from "@/hooks/useCart";
+
+type AppliedCoupon = {
+  code: string;
+  description: string | null;
+  discount: number;
+};
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -22,6 +32,14 @@ export default function CheckoutPage() {
 
   const [payment, setPayment] = useState("Cash on Delivery");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] =
+    useState<AppliedCoupon | null>(null);
+
+  const [couponMessage, setCouponMessage] = useState("");
+  const [couponError, setCouponError] = useState(false);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
   const submitLock = useRef(false);
 
@@ -41,12 +59,76 @@ export default function CheckoutPage() {
   );
 
   const delivery = cart.length > 0 ? 30 : 0;
-  const total = subtotal + delivery;
+  const discount = appliedCoupon
+    ? Math.min(appliedCoupon.discount, subtotal)
+    : 0;
+
+  const total = Math.max(0, subtotal - discount + delivery);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim().toUpperCase();
+
+    if (!code) {
+      setCouponError(true);
+      setCouponMessage("Please enter a coupon code.");
+      return;
+    }
+
+    if (appliedCoupon) {
+      setCouponError(true);
+      setCouponMessage("Remove the current coupon before applying another.");
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    setCouponMessage("");
+    setCouponError(false);
+
+    try {
+      const response = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code,
+          subtotal,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to apply coupon.");
+      }
+
+      setAppliedCoupon(data.coupon);
+      setCouponCode(data.coupon.code);
+      setCouponMessage(data.message || "Coupon applied successfully!");
+      setCouponError(false);
+    } catch (error) {
+      setCouponError(true);
+      setCouponMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to apply coupon."
+      );
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponMessage("Coupon removed.");
+    setCouponError(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,6 +153,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           ...form,
           payment,
+          couponCode: appliedCoupon?.code || null,
         }),
       });
 
@@ -289,6 +372,66 @@ export default function CheckoutPage() {
               ))}
             </div>
 
+            <section className="checkout-coupon">
+              <div className="checkout-coupon-heading">
+                <TicketPercent size={20} />
+                <div>
+                  <h3>Have a coupon?</h3>
+                  <p>Apply a code and save on your order.</p>
+                </div>
+              </div>
+
+              {appliedCoupon ? (
+                <div className="checkout-coupon-applied">
+                  <div className="checkout-coupon-success">
+                    <CheckCircle2 size={19} />
+                    <div>
+                      <strong>{appliedCoupon.code}</strong>
+                      <span>Coupon successfully applied</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="checkout-coupon-remove"
+                    onClick={handleRemoveCoupon}
+                    disabled={isSubmitting}
+                    aria-label="Remove coupon"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              ) : (
+                <div className="checkout-coupon-input">
+                  <input
+                    type="text"
+                    placeholder="Enter coupon code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    disabled={isApplyingCoupon || isSubmitting}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={isApplyingCoupon || isSubmitting}
+                  >
+                    {isApplyingCoupon ? "Applying..." : "Apply"}
+                  </button>
+                </div>
+              )}
+
+              {couponMessage && (
+                <p
+                  className={`checkout-coupon-message ${
+                    couponError ? "error" : "success"
+                  }`}
+                >
+                  {couponMessage}
+                </p>
+              )}
+            </section>
+
             <div className="checkout-price-row">
               <span>Subtotal</span>
               <strong>₹{subtotal.toFixed(2)}</strong>
@@ -299,6 +442,13 @@ export default function CheckoutPage() {
               <strong>₹{delivery.toFixed(2)}</strong>
             </div>
 
+            {discount > 0 && (
+              <div className="checkout-price-row checkout-discount-row">
+                <span>Coupon Discount</span>
+                <strong>- ₹{discount.toFixed(2)}</strong>
+              </div>
+            )}
+
             <div className="checkout-total">
               <span>Total Amount</span>
               <strong>₹{total.toFixed(2)}</strong>
@@ -307,7 +457,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               className="checkout-place-button"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isApplyingCoupon}
             >
               {isSubmitting ? "Placing Order..." : "Place Order"}
               <ArrowLeft size={18} className="checkout-button-arrow" />

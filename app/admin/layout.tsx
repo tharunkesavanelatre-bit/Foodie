@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHash } from "crypto";
 import { prisma } from "@/lib/prisma";
+import { isAdminRole } from "@/lib/roles";
 
 export default async function AdminLayout({
   children,
@@ -36,14 +37,23 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-
-  if (
-    !adminEmail ||
-    session.user.email.trim().toLowerCase() !== adminEmail ||
-    session.user.role !== "ADMIN"
-  ) {
+  // Allow only recognized admin roles.
+  if (!isAdminRole(session.user.role)) {
     redirect("/");
+  }
+
+  // Preserve email verification for the legacy ADMIN account.
+  if (session.user.role === "ADMIN") {
+    const adminEmail = process.env.ADMIN_EMAIL
+      ?.trim()
+      .toLowerCase();
+
+    if (
+      !adminEmail ||
+      session.user.email.trim().toLowerCase() !== adminEmail
+    ) {
+      redirect("/");
+    }
   }
 
   return <>{children}</>;
