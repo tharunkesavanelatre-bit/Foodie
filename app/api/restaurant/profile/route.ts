@@ -1,226 +1,196 @@
 import { NextRequest, NextResponse, connection } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthorizedUser } from "@/lib/authorization";
-import { ROLES } from "@/lib/roles";
 
-// GET - View restaurant profile
+// Calculate distance between two GPS coordinates
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const earthRadius = 6371;
+
+  const toRadians = (degrees: number) =>
+    (degrees * Math.PI) / 180;
+
+  const latitudeDifference = toRadians(lat2 - lat1);
+  const longitudeDifference = toRadians(lon2 - lon1);
+
+  const a =
+    Math.sin(latitudeDifference / 2) ** 2 +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(longitudeDifference / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return earthRadius * c;
+}
+
+// GET - Display nearby approved restaurants
 export async function GET(request: NextRequest) {
   await connection();
 
   try {
-    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
+    const searchParams = request.nextUrl.searchParams;
 
-    if (!user) {
+    const latitudeParam = searchParams.get("latitude");
+    const longitudeParam = searchParams.get("longitude");
+    const radiusParam = searchParams.get("radius");
+
+    const hasLatitude = latitudeParam !== null;
+    const hasLongitude = longitudeParam !== null;
+
+    if (hasLatitude !== hasLongitude) {
       return NextResponse.json(
-        { message: "Restaurant access denied." },
-        { status: 403 }
-      );
-    }
-
-    const restaurant = await prisma.restaurant.findUnique({
-      where: { ownerId: user.id },
-    });
-
-    if (!restaurant) {
-      return NextResponse.json(
-        { message: "Restaurant profile not found." },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      restaurant,
-    });
-  } catch (error) {
-    console.error("Restaurant profile error:", error);
-
-    return NextResponse.json(
-      { message: "Unable to fetch restaurant profile." },
-      { status: 500 }
-    );
-  }
-}
-
-// POST - Register a new restaurant
-export async function POST(request: NextRequest) {
-  await connection();
-
-  try {
-    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "Restaurant access denied." },
-        { status: 403 }
-      );
-    }
-
-    const existingRestaurant = await prisma.restaurant.findUnique({
-      where: { ownerId: user.id },
-    });
-
-    if (existingRestaurant) {
-      return NextResponse.json(
-        { message: "You have already registered a restaurant." },
-        { status: 409 }
-      );
-    }
-
-    const body = await request.json();
-
-    const fields = [
-      "name",
-      "description",
-      "phone",
-      "email",
-      "address",
-      "city",
-      "pincode",
-    ] as const;
-
-    for (const field of fields) {
-      if (
-        typeof body[field] !== "string" ||
-        !body[field].trim()
-      ) {
-        return NextResponse.json(
-          { message: `${field} is required.` },
-          { status: 400 }
-        );
-      }
-    }
-
-    const restaurant = await prisma.restaurant.create({
-      data: {
-        ownerId: user.id,
-        name: body.name.trim(),
-        description: body.description.trim(),
-        phone: body.phone.trim(),
-        email: body.email.trim(),
-        address: body.address.trim(),
-        city: body.city.trim(),
-        pincode: body.pincode.trim(),
-        status: "PENDING",
-        isOpen: false,
-      },
-    });
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Restaurant registration submitted successfully. Waiting for admin approval.",
-        restaurant,
-      },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("Restaurant registration error:", error);
-
-    return NextResponse.json(
-      { message: "Unable to register restaurant." },
-      { status: 500 }
-    );
-  }
-}
-
-// PATCH - Update restaurant profile
-export async function PATCH(request: NextRequest) {
-  await connection();
-
-  try {
-    const user = await getAuthorizedUser(request, [ROLES.RESTAURANT]);
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "Restaurant access denied." },
-        { status: 403 }
-      );
-    }
-
-    const restaurant = await prisma.restaurant.findUnique({
-      where: { ownerId: user.id },
-    });
-
-    if (!restaurant || restaurant.status !== "APPROVED") {
-      return NextResponse.json(
-        { message: "Approved restaurant not found." },
-        { status: 403 }
-      );
-    }
-
-    const body = await request.json();
-
-    const data: {
-      name?: string;
-      description?: string;
-      phone?: string;
-      email?: string;
-      address?: string;
-      city?: string;
-      pincode?: string;
-      isOpen?: boolean;
-    } = {};
-
-    const fields = [
-      "name",
-      "description",
-      "phone",
-      "email",
-      "address",
-      "city",
-      "pincode",
-    ] as const;
-
-    for (const field of fields) {
-      if (body[field] !== undefined) {
-        if (
-          typeof body[field] !== "string" ||
-          !body[field].trim()
-        ) {
-          return NextResponse.json(
-            { message: `Invalid ${field}.` },
-            { status: 400 }
-          );
-        }
-
-        data[field] = body[field].trim();
-      }
-    }
-
-    if (body.isOpen !== undefined) {
-      if (typeof body.isOpen !== "boolean") {
-        return NextResponse.json(
-          { message: "Invalid restaurant availability." },
-          { status: 400 }
-        );
-      }
-
-      data.isOpen = body.isOpen;
-    }
-
-    if (Object.keys(data).length === 0) {
-      return NextResponse.json(
-        { message: "No changes provided." },
+        {
+          success: false,
+          message: "Both latitude and longitude are required.",
+        },
         { status: 400 }
       );
     }
 
-    const updatedRestaurant = await prisma.restaurant.update({
-      where: { id: restaurant.id },
-      data,
+    let latitude: number | null = null;
+    let longitude: number | null = null;
+
+    if (hasLatitude && hasLongitude) {
+      latitude = Number(latitudeParam);
+      longitude = Number(longitudeParam);
+
+      if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude) ||
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Invalid location coordinates.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    const radius = radiusParam === null ? 10 : Number(radiusParam);
+
+    if (
+      !Number.isFinite(radius) ||
+      radius <= 0 ||
+      radius > 100
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Radius must be between 0 and 100 kilometres.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const restaurants = await prisma.restaurant.findMany({
+      where: {
+        status: "APPROVED",
+        isOpen: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        address: true,
+        city: true,
+        pincode: true,
+        latitude: true,
+        longitude: true,
+        isOpen: true,
+        _count: {
+          select: {
+            foods: {
+              where: {
+                isAvailable: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Restaurant profile updated successfully.",
-      restaurant: updatedRestaurant,
-    });
-  } catch (error) {
-    console.error("Restaurant profile update error:", error);
+    // Without customer coordinates, return all open restaurants
+    if (latitude === null || longitude === null) {
+      return NextResponse.json(
+        {
+          success: true,
+          locationBased: false,
+          total: restaurants.length,
+          restaurants: restaurants.map((restaurant) => ({
+            ...restaurant,
+            distanceKm: null,
+          })),
+        },
+        {
+          headers: {
+            "Cache-Control": "no-store",
+          },
+        }
+      );
+    }
+
+    // Calculate distance and filter restaurants within radius
+    const nearbyRestaurants = restaurants
+      .filter(
+        (restaurant) =>
+          restaurant.latitude !== null &&
+          restaurant.longitude !== null
+      )
+      .map((restaurant) => {
+        const distanceKm = calculateDistance(
+          latitude,
+          longitude,
+          restaurant.latitude!,
+          restaurant.longitude!
+        );
+
+        return {
+          ...restaurant,
+          distanceKm: Number(distanceKm.toFixed(2)),
+        };
+      })
+      .filter((restaurant) => restaurant.distanceKm <= radius)
+      .sort((a, b) => a.distanceKm - b.distanceKm);
 
     return NextResponse.json(
-      { message: "Unable to update restaurant profile." },
+      {
+        success: true,
+        locationBased: true,
+        customerLocation: {
+          latitude,
+          longitude,
+        },
+        radiusKm: radius,
+        total: nearbyRestaurants.length,
+        restaurants: nearbyRestaurants,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Public restaurants error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unable to fetch restaurants.",
+      },
       { status: 500 }
     );
   }
