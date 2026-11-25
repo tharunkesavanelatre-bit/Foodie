@@ -13,8 +13,11 @@ import {
   ChefHat,
 } from "lucide-react";
 
+import { useToast } from "@/components/ui/ToastProvider";
+
 export default function RegisterPage() {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -43,14 +46,26 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage(data.message || "Registration failed");
+        const errorMessage =
+          data.message || "Registration failed";
+
+        setMessage(errorMessage);
+        showToast(errorMessage, "error");
         return;
       }
 
-      alert("Account created successfully!");
+      showToast(
+        "Your account has been created successfully!",
+        "success"
+      );
+
       router.push("/login");
     } catch {
-      setMessage("Something went wrong. Please try again.");
+      const errorMessage =
+        "Something went wrong. Please try again.";
+
+      setMessage(errorMessage);
+      showToast(errorMessage, "error");
     } finally {
       setLoading(false);
     }

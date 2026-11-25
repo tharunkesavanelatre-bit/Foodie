@@ -3,8 +3,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, MapPin, ShoppingCart, Utensils } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  ShoppingCart,
+  Utensils,
+} from "lucide-react";
+
 import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/components/ui/ToastProvider";
 
 import "./restaurant-menu.css";
 
@@ -32,6 +39,7 @@ export default function RestaurantMenuPage() {
   const restaurantId = params.id as string;
 
   const { addItem } = useCart();
+  const { showToast } = useToast();
 
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,16 +88,26 @@ export default function RestaurantMenuPage() {
         category: food.category,
       });
 
-      alert(`${food.name} added to cart!`);
+      showToast(
+        `${food.name} added to your cart!`,
+        "success"
+      );
     } catch {
-      alert("Unable to add this item. Please try again.");
+      showToast(
+        "Unable to add this item. Please try again.",
+        "error"
+      );
     } finally {
       setAddingFood(null);
     }
   }
 
   if (loading) {
-    return <main className="restaurant-menu-loading">Loading restaurant menu...</main>;
+    return (
+      <main className="restaurant-menu-loading">
+        Loading restaurant menu...
+      </main>
+    );
   }
 
   if (error || !restaurant) {
@@ -111,10 +129,15 @@ export default function RestaurantMenuPage() {
 
       <section className="restaurant-menu-hero">
         <div>
-          <span className="restaurant-menu-label">FOODDIE RESTAURANT PARTNER</span>
+          <span className="restaurant-menu-label">
+            FOODDIE RESTAURANT PARTNER
+          </span>
+
           <h1>{restaurant.name}</h1>
 
-          {restaurant.description && <p>{restaurant.description}</p>}
+          {restaurant.description && (
+            <p>{restaurant.description}</p>
+          )}
 
           <div className="restaurant-menu-location">
             <MapPin size={17} />
@@ -122,21 +145,33 @@ export default function RestaurantMenuPage() {
               restaurant.address,
               restaurant.city,
               restaurant.pincode,
-            ].filter(Boolean).join(", ") || "Location not provided"}
+            ]
+              .filter(Boolean)
+              .join(", ") || "Location not provided"}
           </div>
 
-          <span className="restaurant-menu-open">● Open Now</span>
+          <span className="restaurant-menu-open">
+            ● Open Now
+          </span>
         </div>
 
-        <div className="restaurant-menu-hero-icon">🍽️</div>
+        <div className="restaurant-menu-hero-icon">
+          🍽️
+        </div>
       </section>
 
       <section className="restaurant-menu-content">
         <div className="restaurant-menu-heading">
           <div>
-            <span className="restaurant-menu-label">MADE WITH FLAVOUR</span>
+            <span className="restaurant-menu-label">
+              MADE WITH FLAVOUR
+            </span>
+
             <h2>Explore the Menu</h2>
-            <p>Choose your favourites and add them to your cart.</p>
+
+            <p>
+              Choose your favourites and add them to your cart.
+            </p>
           </div>
 
           <div className="restaurant-menu-count">
@@ -149,12 +184,17 @@ export default function RestaurantMenuPage() {
           <div className="restaurant-menu-empty">
             <Utensils size={35} />
             <h3>Menu coming soon</h3>
-            <p>This restaurant has not added available food items yet.</p>
+            <p>
+              This restaurant has not added available food items yet.
+            </p>
           </div>
         ) : (
           <div className="restaurant-food-grid">
             {restaurant.foods.map((food) => (
-              <article className="restaurant-food-card" key={food.id}>
+              <article
+                className="restaurant-food-card"
+                key={food.id}
+              >
                 <div className="restaurant-food-image">
                   {food.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -171,10 +211,14 @@ export default function RestaurantMenuPage() {
 
                   <h3>{food.name}</h3>
 
-                  {food.description && <p>{food.description}</p>}
+                  {food.description && (
+                    <p>{food.description}</p>
+                  )}
 
                   <div className="restaurant-food-bottom">
-                    <strong>₹{Number(food.price).toFixed(2)}</strong>
+                    <strong>
+                      ₹{Number(food.price).toFixed(2)}
+                    </strong>
 
                     <button
                       type="button"
@@ -182,7 +226,10 @@ export default function RestaurantMenuPage() {
                       disabled={addingFood === food.id}
                     >
                       <ShoppingCart size={16} />
-                      {addingFood === food.id ? "Adding..." : "Add"}
+
+                      {addingFood === food.id
+                        ? "Adding..."
+                        : "Add"}
                     </button>
                   </div>
                 </div>

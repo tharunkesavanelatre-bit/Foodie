@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 import Header from "./Header";
 import Footer from "./Footer";
+import { ToastProvider } from "../ui/ToastProvider";
 
 function LayoutContent({
   children,
@@ -35,8 +36,10 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={null}>
-      <LayoutContent>{children}</LayoutContent>
-    </Suspense>
+    <ToastProvider>
+      <Suspense fallback={null}>
+        <LayoutContent>{children}</LayoutContent>
+      </Suspense>
+    </ToastProvider>
   );
 }

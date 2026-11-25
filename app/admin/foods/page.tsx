@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, Plus, Trash2, Pencil } from "lucide-react";
+import { useToast } from "@/components/ui/ToastProvider";
+
 import "../admin.css";
 
 type Food = {
@@ -15,9 +17,12 @@ type Food = {
 };
 
 export default function AdminFoodsPage() {
+  const { showToast } = useToast();
+
   const [foods, setFoods] = useState<Food[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function loadFoods() {
     try {
@@ -26,13 +31,14 @@ export default function AdminFoodsPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Unable to load foods");
+        throw new Error("Unable to load foods.");
       }
 
       const data = await response.json();
       setFoods(data.foods);
     } catch (error) {
       console.error(error);
+      showToast("Unable to load food items.", "error");
     } finally {
       setLoading(false);
     }
@@ -43,25 +49,53 @@ export default function AdminFoodsPage() {
   }, []);
 
   async function deleteFood(id: string) {
-    if (!confirm("Are you sure you want to delete this food?")) {
+    const selectedFood = foods.find((food) => food.id === id);
+
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this food?"
+      )
+    ) {
       return;
     }
 
+    setDeletingId(id);
+
     try {
-      const response = await fetch(`/api/admin/foods?id=${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin/foods?id=${encodeURIComponent(id)}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error("Unable to delete food");
+        throw new Error(
+          data.message || "Unable to delete food."
+        );
       }
 
       setFoods((previous) =>
         previous.filter((food) => food.id !== id)
       );
+
+      showToast(
+        `${selectedFood?.name || "Food item"} deleted successfully.`,
+        "success"
+      );
     } catch (error) {
       console.error(error);
-      alert("Unable to delete food.");
+
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "Unable to delete food.",
+        "error"
+      );
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -134,7 +168,10 @@ export default function AdminFoodsPage() {
                     <td>
                       <div className="food-name">
                         {food.image && (
-                          <img src={food.image} alt={food.name} />
+                          <img
+                            src={food.image}
+                            alt={food.name}
+                          />
                         )}
                         {food.name}
                       </div>
@@ -143,11 +180,14 @@ export default function AdminFoodsPage() {
                     <td>{food.category}</td>
 
                     <td>
-                      ₹{Number(food.price).toLocaleString("en-IN")}
+                      ₹
+                      {Number(food.price).toLocaleString("en-IN")}
                     </td>
 
                     <td>
-                      {food.isAvailable ? "Available" : "Unavailable"}
+                      {food.isAvailable
+                        ? "Available"
+                        : "Unavailable"}
                     </td>
 
                     <td>
@@ -163,8 +203,13 @@ export default function AdminFoodsPage() {
                         className="food-action-btn delete"
                         title="Delete food"
                         onClick={() => deleteFood(food.id)}
+                        disabled={deletingId === food.id}
                       >
-                        <Trash2 size={17} />
+                        {deletingId === food.id ? (
+                          <span>...</span>
+                        ) : (
+                          <Trash2 size={17} />
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -172,7 +217,9 @@ export default function AdminFoodsPage() {
 
                 {filteredFoods.length === 0 && (
                   <tr>
-                    <td colSpan={5}>No food items found.</td>
+                    <td colSpan={5}>
+                      No food items found.
+                    </td>
                   </tr>
                 )}
               </tbody>

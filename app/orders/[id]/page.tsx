@@ -17,6 +17,8 @@ import {
   Receipt,
 } from "lucide-react";
 
+import { useToast } from "@/components/ui/ToastProvider";
+
 import "./order-details.css";
 
 type Order = {
@@ -64,6 +66,8 @@ export default function OrderDetailsPage() {
   const params = useParams();
   const id = params.id as string;
 
+  const { showToast } = useToast();
+
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -86,7 +90,9 @@ export default function OrderDetailsPage() {
       setOrder(data.order);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Something went wrong."
+        err instanceof Error
+          ? err.message
+          : "Something went wrong."
       );
     } finally {
       setLoading(false);
@@ -98,7 +104,13 @@ export default function OrderDetailsPage() {
   }, [id]);
 
   async function cancelOrder() {
-    if (!confirm("Are you sure you want to cancel this order?")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to cancel this order?"
+      )
+    ) {
+      return;
+    }
 
     setCancelling(true);
 
@@ -111,12 +123,24 @@ export default function OrderDetailsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to cancel order.");
+        throw new Error(
+          data.message || "Unable to cancel order."
+        );
       }
 
       await fetchOrder();
+
+      showToast(
+        "Your order has been cancelled successfully.",
+        "success"
+      );
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Cancellation failed.");
+      showToast(
+        err instanceof Error
+          ? err.message
+          : "Cancellation failed.",
+        "error"
+      );
     } finally {
       setCancelling(false);
     }
@@ -139,7 +163,13 @@ export default function OrderDetailsPage() {
     );
   }
 
-  const steps = ["Pending", "Processing", "Shipped", "Delivered"];
+  const steps = [
+    "Pending",
+    "Processing",
+    "Shipped",
+    "Delivered",
+  ];
+
   const currentStep = steps.indexOf(order.status);
 
   return (
@@ -151,7 +181,9 @@ export default function OrderDetailsPage() {
 
       <section className="order-details-header">
         <div>
-          <span className="order-details-label">ORDER DETAILS</span>
+          <span className="order-details-label">
+            ORDER DETAILS
+          </span>
           <h1>Order #{order.orderId}</h1>
           <p>
             Placed on{" "}
@@ -159,7 +191,9 @@ export default function OrderDetailsPage() {
           </p>
         </div>
 
-        <span className={`order-status ${order.status.toLowerCase()}`}>
+        <span
+          className={`order-status ${order.status.toLowerCase()}`}
+        >
           {order.status}
         </span>
       </section>
@@ -184,7 +218,9 @@ export default function OrderDetailsPage() {
               return (
                 <div
                   key={step}
-                  className={`tracking-step ${completed ? "completed" : ""}`}
+                  className={`tracking-step ${
+                    completed ? "completed" : ""
+                  }`}
                 >
                   <span className="tracking-icon">
                     {completed ? (
@@ -258,7 +294,9 @@ export default function OrderDetailsPage() {
                   <Tag size={15} />
                   Coupon Discount
                 </span>
-                <strong>-{formatPrice(order.discount)}</strong>
+                <strong>
+                  -{formatPrice(order.discount)}
+                </strong>
               </div>
             </>
           )}
@@ -308,7 +346,8 @@ export default function OrderDetailsPage() {
 
             {order.paymentRecord?.transactionId && (
               <p>
-                Transaction ID: {order.paymentRecord.transactionId}
+                Transaction ID:{" "}
+                {order.paymentRecord.transactionId}
               </p>
             )}
           </section>
@@ -320,12 +359,16 @@ export default function OrderDetailsPage() {
                 Delivery Partner
               </h2>
 
-              <p>Phone: {order.assignment.deliveryPartner.phone}</p>
               <p>
-                Vehicle: {order.assignment.deliveryPartner.vehicleType}
+                Phone: {order.assignment.deliveryPartner.phone}
               </p>
               <p>
-                Number: {order.assignment.deliveryPartner.vehicleNumber}
+                Vehicle:{" "}
+                {order.assignment.deliveryPartner.vehicleType}
+              </p>
+              <p>
+                Number:{" "}
+                {order.assignment.deliveryPartner.vehicleNumber}
               </p>
             </section>
           )}

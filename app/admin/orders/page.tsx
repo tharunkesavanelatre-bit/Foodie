@@ -5,11 +5,13 @@ import Link from "next/link";
 import {
   ShoppingBag,
   RefreshCw,
-  CreditCard,
   CheckCircle2,
   Clock,
   XCircle,
 } from "lucide-react";
+
+import { useToast } from "@/components/ui/ToastProvider";
+
 import "../admin.css";
 
 type Order = {
@@ -42,9 +44,14 @@ const statuses = [
 ];
 
 export default function AdminOrdersPage() {
+  const { showToast } = useToast();
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(
+    null
+  );
 
   async function loadOrders() {
     setLoading(true);
@@ -58,20 +65,27 @@ export default function AdminOrdersPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to load orders");
+        throw new Error(
+          data.message || "Unable to load orders."
+        );
       }
 
       setOrders(data.orders || []);
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Something went wrong"
-      );
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Something went wrong.";
+
+      setError(message);
     } finally {
       setLoading(false);
     }
   }
 
   async function updateStatus(orderId: string, status: string) {
+    setUpdatingOrderId(orderId);
+
     try {
       const response = await fetch("/api/admin/orders", {
         method: "PATCH",
@@ -84,14 +98,26 @@ export default function AdminOrdersPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to update status");
+        throw new Error(
+          data.message || "Unable to update order status."
+        );
       }
 
       await loadOrders();
-    } catch (error) {
-      alert(
-        error instanceof Error ? error.message : "Update failed"
+
+      showToast(
+        `Order status updated to ${status}.`,
+        "success"
       );
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "Order status update failed.",
+        "error"
+      );
+    } finally {
+      setUpdatingOrderId(null);
     }
   }
 
@@ -138,7 +164,9 @@ export default function AdminOrdersPage() {
         <div className="food-header">
           <div>
             <h1>Order Management</h1>
-            <p>Manage orders and monitor customer payments.</p>
+            <p>
+              Manage orders and monitor customer payments.
+            </p>
           </div>
 
           <button
@@ -146,7 +174,10 @@ export default function AdminOrdersPage() {
             onClick={loadOrders}
             disabled={loading}
           >
-            <RefreshCw size={17} />
+            <RefreshCw
+              size={17}
+              className={loading ? "animate-spin" : ""}
+            />
             Refresh
           </button>
         </div>
@@ -159,13 +190,19 @@ export default function AdminOrdersPage() {
           </div>
         </div>
 
-        {error && <p className="form-error">{error}</p>}
+        {error && (
+          <p className="form-error">{error}</p>
+        )}
 
         <div className="food-table-wrapper">
           {loading ? (
-            <p className="order-message">Loading orders...</p>
+            <p className="order-message">
+              Loading orders...
+            </p>
           ) : orders.length === 0 ? (
-            <p className="order-message">No orders found.</p>
+            <p className="order-message">
+              No orders found.
+            </p>
           ) : (
             <table className="food-table">
               <thead>
@@ -207,35 +244,51 @@ export default function AdminOrdersPage() {
 
                     <td>
                       <span className="payment-status">
-                        {getPaymentIcon(order.paymentRecord?.status)}
+                        {getPaymentIcon(
+                          order.paymentRecord?.status
+                        )}
                         {order.paymentRecord?.status || "N/A"}
                       </span>
                     </td>
 
                     <td>
                       <small>
-                        {order.paymentRecord?.transactionId || "Not available"}
+                        {order.paymentRecord?.transactionId ||
+                          "Not available"}
                       </small>
                     </td>
 
                     <td>
-                      {new Date(order.createdAt).toLocaleDateString("en-IN")}
+                      {new Date(
+                        order.createdAt
+                      ).toLocaleDateString("en-IN")}
                     </td>
 
                     <td>
                       <select
                         className="order-status-select"
                         value={order.status}
+                        disabled={updatingOrderId === order.id}
                         onChange={(event) =>
-                          updateStatus(order.id, event.target.value)
+                          updateStatus(
+                            order.id,
+                            event.target.value
+                          )
                         }
                       >
                         {statuses.map((status) => (
-                          <option key={status} value={status}>
+                          <option
+                            key={status}
+                            value={status}
+                          >
                             {status}
                           </option>
                         ))}
                       </select>
+
+                      {updatingOrderId === order.id && (
+                        <small>Updating...</small>
+                      )}
                     </td>
                   </tr>
                 ))}

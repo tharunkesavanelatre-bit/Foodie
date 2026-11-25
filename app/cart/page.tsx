@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 
 import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/components/ui/ToastProvider";
+
 import "./cart.css";
 
 type OrderItem = {
@@ -46,6 +48,7 @@ type Order = {
 
 export default function CartPage() {
   const { cart, updateQuantity, removeItem } = useCart();
+  const { showToast } = useToast();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -67,7 +70,9 @@ export default function CartPage() {
         setOrders(data.orders || []);
       } catch (error) {
         setOrderError(
-          error instanceof Error ? error.message : "Unable to load orders."
+          error instanceof Error
+            ? error.message
+            : "Unable to load orders."
         );
       } finally {
         setLoadingOrders(false);
@@ -76,6 +81,42 @@ export default function CartPage() {
 
     fetchOrders();
   }, []);
+
+  function handleQuantityChange(
+    itemId: string,
+    itemName: string,
+    quantity: number
+  ) {
+    try {
+      updateQuantity(itemId, quantity);
+
+      showToast(
+        `${itemName} quantity updated.`,
+        "success"
+      );
+    } catch {
+      showToast(
+        "Unable to update quantity. Please try again.",
+        "error"
+      );
+    }
+  }
+
+  function handleRemoveItem(itemId: string, itemName: string) {
+    try {
+      removeItem(itemId);
+
+      showToast(
+        `${itemName} removed from your cart.`,
+        "success"
+      );
+    } catch {
+      showToast(
+        "Unable to remove this item. Please try again.",
+        "error"
+      );
+    }
+  }
 
   const subtotal = cart.reduce(
     (total, item) =>
@@ -87,12 +128,18 @@ export default function CartPage() {
   const delivery = cart.length > 0 ? 30 : 0;
   const total = subtotal + delivery;
 
-  const totalSpent = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalSpent = orders.reduce(
+    (sum, order) => sum + order.total,
+    0
+  );
 
   const totalItems = orders.reduce(
     (sum, order) =>
       sum +
-      order.items.reduce((itemSum, item) => itemSum + item.quantity, 0),
+      order.items.reduce(
+        (itemSum, item) => itemSum + item.quantity,
+        0
+      ),
     0
   );
 
@@ -106,9 +153,13 @@ export default function CartPage() {
 
         <div className="cart-heading">
           <div>
-            <span className="cart-label">YOUR FOOD SELECTION</span>
+            <span className="cart-label">
+              YOUR FOOD SELECTION
+            </span>
             <h1>My Shopping Cart</h1>
-            <p>Manage your food selections and previous orders.</p>
+            <p>
+              Manage your food selections and previous orders.
+            </p>
           </div>
 
           <div className="cart-heading-icon">
@@ -121,11 +172,15 @@ export default function CartPage() {
         <section className="cart-section">
           <div className="cart-section-heading">
             <div>
-              <span className="cart-label">CURRENT SELECTION</span>
+              <span className="cart-label">
+                CURRENT SELECTION
+              </span>
               <h2>Active Cart</h2>
             </div>
 
-            <span className="cart-count">{cart.length} items</span>
+            <span className="cart-count">
+              {cart.length} items
+            </span>
           </div>
 
           {cart.length === 0 ? (
@@ -137,11 +192,14 @@ export default function CartPage() {
               <h1>Your cart is waiting!</h1>
 
               <p>
-                You haven't added any delicious food yet. Let's find something
-                you love.
+                You haven't added any delicious food yet.
+                Let's find something you love.
               </p>
 
-              <Link href="/products" className="cart-primary-button">
+              <Link
+                href="/products"
+                className="cart-primary-button"
+              >
                 Explore Foods
               </Link>
             </div>
@@ -153,7 +211,10 @@ export default function CartPage() {
                 </div>
 
                 {cart.map((item) => (
-                  <article key={item.id} className="cart-item">
+                  <article
+                    key={item.id}
+                    className="cart-item"
+                  >
                     <div className="cart-item-image">
                       <Image
                         src={item.image}
@@ -171,7 +232,11 @@ export default function CartPage() {
                       <div className="cart-quantity">
                         <button
                           onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
+                            handleQuantityChange(
+                              item.id,
+                              item.name,
+                              item.quantity - 1
+                            )
                           }
                           aria-label="Decrease quantity"
                         >
@@ -182,7 +247,11 @@ export default function CartPage() {
 
                         <button
                           onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
+                            handleQuantityChange(
+                              item.id,
+                              item.name,
+                              item.quantity + 1
+                            )
                           }
                           aria-label="Increase quantity"
                         >
@@ -195,13 +264,16 @@ export default function CartPage() {
                       <strong>
                         ₹
                         {(
-                          Number(item.price.replace(/[^\d.]/g, "")) *
-                          item.quantity
+                          Number(
+                            item.price.replace(/[^\d.]/g, "")
+                          ) * item.quantity
                         ).toFixed(2)}
                       </strong>
 
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() =>
+                          handleRemoveItem(item.id, item.name)
+                        }
                         className="cart-remove-button"
                         aria-label={`Remove ${item.name}`}
                       >
@@ -211,7 +283,10 @@ export default function CartPage() {
                   </article>
                 ))}
 
-                <Link href="/products" className="cart-continue-link">
+                <Link
+                  href="/products"
+                  className="cart-continue-link"
+                >
                   <ShoppingBasket size={18} />
                   Add More Delicious Foods
                 </Link>
@@ -237,7 +312,10 @@ export default function CartPage() {
                   <strong>₹{total.toFixed(2)}</strong>
                 </div>
 
-                <Link href="/checkout" className="cart-checkout-button">
+                <Link
+                  href="/checkout"
+                  className="cart-checkout-button"
+                >
                   Proceed to Checkout
                 </Link>
 
@@ -260,9 +338,13 @@ export default function CartPage() {
         <section className="purchase-history">
           <div className="purchase-heading">
             <div>
-              <span className="cart-label">YOUR PURCHASE HISTORY</span>
+              <span className="cart-label">
+                YOUR PURCHASE HISTORY
+              </span>
               <h2>Orders & Purchases</h2>
-              <p>All your confirmed food orders in one place.</p>
+              <p>
+                All your confirmed food orders in one place.
+              </p>
             </div>
 
             <div className="purchase-count">
@@ -274,24 +356,26 @@ export default function CartPage() {
             </div>
           </div>
 
-          {!loadingOrders && !orderError && orders.length > 0 && (
-            <div className="purchase-stats">
-              <div>
-                <span>Total Orders</span>
-                <strong>{orders.length}</strong>
-              </div>
+          {!loadingOrders &&
+            !orderError &&
+            orders.length > 0 && (
+              <div className="purchase-stats">
+                <div>
+                  <span>Total Orders</span>
+                  <strong>{orders.length}</strong>
+                </div>
 
-              <div>
-                <span>Total Spent</span>
-                <strong>₹{totalSpent.toFixed(2)}</strong>
-              </div>
+                <div>
+                  <span>Total Spent</span>
+                  <strong>₹{totalSpent.toFixed(2)}</strong>
+                </div>
 
-              <div>
-                <span>Items Purchased</span>
-                <strong>{totalItems}</strong>
+                <div>
+                  <span>Items Purchased</span>
+                  <strong>{totalItems}</strong>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {loadingOrders ? (
             <div className="cart-loader" />
@@ -301,16 +385,24 @@ export default function CartPage() {
             <div className="purchase-empty">
               <PackageCheck size={42} />
               <h3>Your purchase history is empty</h3>
-              <p>Your confirmed orders will appear here after checkout.</p>
+              <p>
+                Your confirmed orders will appear here after checkout.
+              </p>
 
-              <Link href="/products" className="cart-primary-button">
+              <Link
+                href="/products"
+                className="cart-primary-button"
+              >
                 Explore Foods
               </Link>
             </div>
           ) : (
             <div className="purchase-list">
               {orders.map((order) => (
-                <article key={order.id} className="purchase-card">
+                <article
+                  key={order.id}
+                  className="purchase-card"
+                >
                   <div className="purchase-card-top">
                     <div>
                       <span className="purchase-overline">
@@ -327,12 +419,17 @@ export default function CartPage() {
 
                   <div className="purchase-date">
                     <CalendarDays size={16} />
-                    {new Date(order.createdAt).toLocaleString("en-IN")}
+                    {new Date(
+                      order.createdAt
+                    ).toLocaleString("en-IN")}
                   </div>
 
                   <div className="purchase-items">
                     {order.items.map((item) => (
-                      <div key={item.id} className="purchase-item">
+                      <div
+                        key={item.id}
+                        className="purchase-item"
+                      >
                         <div className="purchase-item-image">
                           {item.image ? (
                             <Image
@@ -350,12 +447,16 @@ export default function CartPage() {
                         <div className="purchase-item-info">
                           <h4>{item.name}</h4>
                           <span>
-                            ₹{item.price.toFixed(2)} × {item.quantity}
+                            ₹{item.price.toFixed(2)} ×{" "}
+                            {item.quantity}
                           </span>
                         </div>
 
                         <strong className="purchase-item-price">
-                          ₹{(item.price * item.quantity).toFixed(2)}
+                          ₹
+                          {(
+                            item.price * item.quantity
+                          ).toFixed(2)}
                         </strong>
                       </div>
                     ))}
@@ -367,7 +468,8 @@ export default function CartPage() {
                       <div>
                         <span>DELIVERY ADDRESS</span>
                         <p>
-                          {order.address}, {order.city} - {order.pincode}
+                          {order.address}, {order.city} -{" "}
+                          {order.pincode}
                         </p>
                       </div>
                     </div>
@@ -384,10 +486,14 @@ export default function CartPage() {
                   <div className="purchase-total">
                     <div>
                       <span>Order Total</span>
-                      <small>Including delivery charges</small>
+                      <small>
+                        Including delivery charges
+                      </small>
                     </div>
 
-                    <strong>₹{order.total.toFixed(2)}</strong>
+                    <strong>
+                      ₹{order.total.toFixed(2)}
+                    </strong>
                   </div>
                 </article>
               ))}

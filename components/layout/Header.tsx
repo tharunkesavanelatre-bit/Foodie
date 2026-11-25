@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/components/ui/ToastProvider";
 
 type UserSession = {
   name: string;
@@ -29,6 +30,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { cart } = useCart();
+  const { showToast } = useToast();
 
   const [session, setSession] = useState<UserSession | null>(null);
   const [authLoaded, setAuthLoaded] = useState(false);
@@ -76,7 +78,7 @@ export default function Header() {
       });
 
       if (!response.ok) {
-        alert("Unable to log out. Please try again.");
+        showToast("Unable to log out. Please try again.", "error");
         return;
       }
 
@@ -85,10 +87,12 @@ export default function Header() {
 
       window.dispatchEvent(new Event("fooddie-auth-change"));
 
+      showToast("You have been logged out successfully.", "success");
+
       router.push("/");
       router.refresh();
     } catch {
-      alert("Something went wrong. Please try again.");
+      showToast("Something went wrong. Please try again.", "error");
     }
   }
 

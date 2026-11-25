@@ -10,7 +10,14 @@ import {
   XCircle,
   RotateCcw,
   Receipt,
+  X,
+  Hash,
+  Save,
+  Pencil,
 } from "lucide-react";
+
+import { useToast } from "@/components/ui/ToastProvider";
+
 import "../admin.css";
 
 type Payment = {
@@ -35,9 +42,23 @@ type Payment = {
 const statuses = ["PENDING", "PAID", "FAILED", "REFUNDED"];
 
 export default function AdminPaymentsPage() {
+  const { showToast } = useToast();
+
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [updatingPaymentId, setUpdatingPaymentId] = useState<
+    string | null
+  >(null);
+
+  const [updatingTransactionId, setUpdatingTransactionId] =
+    useState<string | null>(null);
+
+  const [selectedPayment, setSelectedPayment] =
+    useState<Payment | null>(null);
+
+  const [transactionIdInput, setTransactionIdInput] = useState("");
 
   async function loadPayments() {
     setLoading(true);
@@ -51,20 +72,27 @@ export default function AdminPaymentsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to load payments");
+        throw new Error(
+          data.message || "Unable to load payments."
+        );
       }
 
       setPayments(data.payments || []);
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Something went wrong"
-      );
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Something went wrong.";
+
+      setError(message);
     } finally {
       setLoading(false);
     }
   }
 
   async function updateStatus(id: string, status: string) {
+    setUpdatingPaymentId(id);
+
     try {
       const response = await fetch("/api/admin/payments", {
         method: "PATCH",
@@ -77,27 +105,48 @@ export default function AdminPaymentsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to update payment");
+        throw new Error(
+          data.message || "Unable to update payment."
+        );
       }
 
       await loadPayments();
-    } catch (error) {
-      alert(
-        error instanceof Error ? error.message : "Payment update failed"
+
+      showToast(
+        `Payment status updated to ${status}.`,
+        "success"
       );
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "Payment update failed.",
+        "error"
+      );
+    } finally {
+      setUpdatingPaymentId(null);
     }
   }
 
-  async function updateTransactionId(
-    id: string,
-    currentTransactionId: string | null
-  ) {
-    const transactionId = window.prompt(
-      "Enter transaction ID:",
-      currentTransactionId || ""
-    );
+  function openTransactionModal(payment: Payment) {
+    setSelectedPayment(payment);
+    setTransactionIdInput(payment.transactionId || "");
+  }
 
-    if (transactionId === null) return;
+  function closeTransactionModal() {
+    if (updatingTransactionId) return;
+
+    setSelectedPayment(null);
+    setTransactionIdInput("");
+  }
+
+  async function saveTransactionId() {
+    if (!selectedPayment) return;
+
+    const id = selectedPayment.id;
+    const transactionId = transactionIdInput.trim();
+
+    setUpdatingTransactionId(id);
 
     try {
       const response = await fetch("/api/admin/payments", {
@@ -107,29 +156,60 @@ export default function AdminPaymentsPage() {
         },
         body: JSON.stringify({
           id,
-          transactionId: transactionId.trim() || null,
+          transactionId: transactionId || null,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to update transaction ID");
+        throw new Error(
+          data.message || "Unable to update transaction ID."
+        );
       }
 
+      setSelectedPayment(null);
+      setTransactionIdInput("");
+
       await loadPayments();
+
+      showToast(
+        transactionId
+          ? "Transaction ID updated successfully."
+          : "Transaction ID removed successfully.",
+        "success"
+      );
     } catch (error) {
-      alert(
+      showToast(
         error instanceof Error
           ? error.message
-          : "Transaction update failed"
+          : "Transaction update failed.",
+        "error"
       );
+    } finally {
+      setUpdatingTransactionId(null);
     }
   }
 
   useEffect(() => {
     loadPayments();
   }, []);
+
+  useEffect(() => {
+    if (!selectedPayment) return;
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        closeTransactionModal();
+      }
+    }
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [selectedPayment, updatingTransactionId]);
 
   const paidCount = payments.filter(
     (payment) => payment.status === "PAID"
@@ -149,7 +229,10 @@ export default function AdminPaymentsPage() {
 
   const collectedAmount = payments
     .filter((payment) => payment.status === "PAID")
-    .reduce((total, payment) => total + Number(payment.amount), 0);
+    .reduce(
+      (total, payment) => total + Number(payment.amount),
+      0
+    );
 
   return (
     <main className="admin-layout">
@@ -176,7 +259,9 @@ export default function AdminPaymentsPage() {
         <div className="food-header">
           <div>
             <h1>Payment Management</h1>
-            <p>Monitor transactions and manage customer payments.</p>
+            <p>
+              Monitor transactions and manage customer payments.
+            </p>
           </div>
 
           <button
@@ -184,7 +269,10 @@ export default function AdminPaymentsPage() {
             onClick={loadPayments}
             disabled={loading}
           >
-            <RefreshCw size={17} />
+            <RefreshCw
+              size={17}
+              className={loading ? "animate-spin" : ""}
+            />
             Refresh
           </button>
         </div>
@@ -231,9 +319,13 @@ export default function AdminPaymentsPage() {
 
         <div className="food-table-wrapper">
           {loading ? (
-            <p className="order-message">Loading payments...</p>
+            <p className="order-message">
+              Loading payments...
+            </p>
           ) : payments.length === 0 ? (
-            <p className="order-message">No payments found.</p>
+            <p className="order-message">
+              No payments found.
+            </p>
           ) : (
             <table className="food-table">
               <thead>
@@ -255,29 +347,42 @@ export default function AdminPaymentsPage() {
                     <td>#{payment.id.slice(-8)}</td>
 
                     <td>
-                      <strong>{payment.order.user.name}</strong>
+                      <strong>
+                        {payment.order.user.name}
+                      </strong>
                       <br />
-                      <small>{payment.order.user.email}</small>
+                      <small>
+                        {payment.order.user.email}
+                      </small>
                     </td>
 
                     <td>#{payment.order.orderId}</td>
 
                     <td>{payment.method}</td>
 
-                    <td>₹{Number(payment.amount).toFixed(2)}</td>
+                    <td>
+                      ₹{Number(payment.amount).toFixed(2)}
+                    </td>
 
                     <td>
                       <button
                         type="button"
                         className="order-status-select"
+                        disabled={
+                          updatingTransactionId === payment.id
+                        }
                         onClick={() =>
-                          updateTransactionId(
-                            payment.id,
-                            payment.transactionId
-                          )
+                          openTransactionModal(payment)
                         }
                       >
                         {payment.transactionId || "Add Transaction ID"}
+                        <Pencil
+                          size={13}
+                          style={{
+                            marginLeft: "6px",
+                            display: "inline",
+                          }}
+                        />
                       </button>
                     </td>
 
@@ -291,8 +396,14 @@ export default function AdminPaymentsPage() {
                       <select
                         className="order-status-select"
                         value={payment.status}
+                        disabled={
+                          updatingPaymentId === payment.id
+                        }
                         onChange={(event) =>
-                          updateStatus(payment.id, event.target.value)
+                          updateStatus(
+                            payment.id,
+                            event.target.value
+                          )
                         }
                       >
                         {statuses.map((status) => (
@@ -301,6 +412,10 @@ export default function AdminPaymentsPage() {
                           </option>
                         ))}
                       </select>
+
+                      {updatingPaymentId === payment.id && (
+                        <small>Updating...</small>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -309,6 +424,131 @@ export default function AdminPaymentsPage() {
           )}
         </div>
       </section>
+
+      {/* Transaction ID Modal */}
+      {selectedPayment && (
+        <div
+          className="transaction-modal-overlay"
+          onClick={closeTransactionModal}
+        >
+          <div
+            className="transaction-modal"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="transaction-modal-title"
+          >
+            <div className="transaction-modal-header">
+              <div className="transaction-modal-icon">
+                <Hash size={25} />
+              </div>
+
+              <button
+                type="button"
+                className="transaction-modal-close"
+                onClick={closeTransactionModal}
+                disabled={!!updatingTransactionId}
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <span className="transaction-modal-label">
+              PAYMENT MANAGEMENT
+            </span>
+
+            <h2 id="transaction-modal-title">
+              Transaction ID
+            </h2>
+
+            <p className="transaction-modal-description">
+              Add or update the transaction reference for this
+              payment.
+            </p>
+
+            <div className="transaction-modal-order">
+              <span>Payment ID</span>
+              <strong>
+                #{selectedPayment.id.slice(-8)}
+              </strong>
+            </div>
+
+            <div className="transaction-modal-order">
+              <span>Order ID</span>
+              <strong>
+                #{selectedPayment.order.orderId}
+              </strong>
+            </div>
+
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                saveTransactionId();
+              }}
+            >
+              <label
+                htmlFor="transaction-id-input"
+                className="transaction-modal-field-label"
+              >
+                Transaction Reference
+              </label>
+
+              <div className="transaction-modal-input-wrapper">
+                <Hash size={19} />
+
+                <input
+                  id="transaction-id-input"
+                  type="text"
+                  placeholder="Enter transaction ID"
+                  value={transactionIdInput}
+                  onChange={(event) =>
+                    setTransactionIdInput(event.target.value)
+                  }
+                  disabled={!!updatingTransactionId}
+                  autoFocus
+                />
+              </div>
+
+              <p className="transaction-modal-hint">
+                Leave empty to remove the existing transaction ID.
+              </p>
+
+              <div className="transaction-modal-actions">
+                <button
+                  type="button"
+                  className="transaction-modal-cancel"
+                  onClick={closeTransactionModal}
+                  disabled={!!updatingTransactionId}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="transaction-modal-save"
+                  disabled={!!updatingTransactionId}
+                >
+                  {updatingTransactionId ? (
+                    <>
+                      <RefreshCw
+                        size={17}
+                        className="animate-spin"
+                      />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={17} />
+                      Save Transaction ID
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -1,7 +1,10 @@
 "use client";
 
-import { ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { ShoppingCart, Loader2 } from "lucide-react";
+
 import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/components/ui/ToastProvider";
 
 type Props = {
   name: string;
@@ -15,19 +18,46 @@ export default function AddToCartButton({
   image,
 }: Props) {
   const { addItem } = useCart();
+  const { showToast } = useToast();
 
-  const handleAddToCart = () => {
-    addItem({ name, price, image });
-    alert(`${name} added to cart!`);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = async () => {
+    if (isAdding) return;
+
+    setIsAdding(true);
+
+    showToast(
+      `${name} added to your cart successfully!`,
+      "success"
+    );
+
+    try {
+      await addItem({ name, price, image });
+    } catch {
+      showToast(
+        `Unable to add ${name} to your cart. Please try again.`,
+        "error"
+      );
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
     <button
+      type="button"
       onClick={handleAddToCart}
-      className="flex items-center gap-2 bg-orange-600 text-white px-8 py-3 rounded-full hover:bg-orange-700 transition"
+      disabled={isAdding}
+      className="flex items-center gap-2 rounded-full bg-orange-600 px-8 py-3 text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
     >
-      <ShoppingCart size={19} />
-      Add to Cart
+      {isAdding ? (
+        <Loader2 size={19} className="animate-spin" />
+      ) : (
+        <ShoppingCart size={19} />
+      )}
+
+      {isAdding ? "Adding..." : "Add to Cart"}
     </button>
   );
 }

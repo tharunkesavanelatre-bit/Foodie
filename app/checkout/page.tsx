@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { useCart } from "@/hooks/useCart";
+import { useToast } from "@/components/ui/ToastProvider";
 
 type AppliedCoupon = {
   code: string;
@@ -29,6 +30,7 @@ type AppliedCoupon = {
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart } = useCart();
+  const { showToast } = useToast();
 
   const [payment, setPayment] = useState("Cash on Delivery");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,6 +61,7 @@ export default function CheckoutPage() {
   );
 
   const delivery = cart.length > 0 ? 30 : 0;
+
   const discount = appliedCoupon
     ? Math.min(appliedCoupon.discount, subtotal)
     : 0;
@@ -77,12 +80,21 @@ export default function CheckoutPage() {
     if (!code) {
       setCouponError(true);
       setCouponMessage("Please enter a coupon code.");
+
+      showToast("Please enter a coupon code.", "warning");
       return;
     }
 
     if (appliedCoupon) {
       setCouponError(true);
-      setCouponMessage("Remove the current coupon before applying another.");
+      setCouponMessage(
+        "Remove the current coupon before applying another."
+      );
+
+      showToast(
+        "Remove the current coupon before applying another.",
+        "warning"
+      );
       return;
     }
 
@@ -110,15 +122,25 @@ export default function CheckoutPage() {
 
       setAppliedCoupon(data.coupon);
       setCouponCode(data.coupon.code);
-      setCouponMessage(data.message || "Coupon applied successfully!");
-      setCouponError(false);
-    } catch (error) {
-      setCouponError(true);
       setCouponMessage(
+        data.message || "Coupon applied successfully!"
+      );
+      setCouponError(false);
+
+      showToast(
+        `Coupon ${data.coupon.code} applied successfully!`,
+        "success"
+      );
+    } catch (error) {
+      const message =
         error instanceof Error
           ? error.message
-          : "Unable to apply coupon."
-      );
+          : "Unable to apply coupon.";
+
+      setCouponError(true);
+      setCouponMessage(message);
+
+      showToast(message, "error");
     } finally {
       setIsApplyingCoupon(false);
     }
@@ -129,6 +151,8 @@ export default function CheckoutPage() {
     setCouponCode("");
     setCouponMessage("Coupon removed.");
     setCouponError(false);
+
+    showToast("Coupon removed successfully.", "info");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,7 +161,7 @@ export default function CheckoutPage() {
     if (submitLock.current) return;
 
     if (cart.length === 0) {
-      alert("Your cart is empty.");
+      showToast("Your cart is empty. Add food before checkout.", "warning");
       return;
     }
 
@@ -160,21 +184,31 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to place your order.");
+        throw new Error(
+          data.message || "Unable to place your order."
+        );
       }
 
+      showToast(
+        "Your order has been placed successfully!",
+        "success"
+      );
+
       router.push(
-        `/order-success?orderId=${encodeURIComponent(data.order.orderId)}`
+        `/order-success?orderId=${encodeURIComponent(
+          data.order.orderId
+        )}`
       );
     } catch (error) {
       submitLock.current = false;
       setIsSubmitting(false);
 
-      alert(
+      const message =
         error instanceof Error
           ? error.message
-          : "Unable to place your order."
-      );
+          : "Unable to place your order.";
+
+      showToast(message, "error");
     }
   };
 
@@ -186,7 +220,9 @@ export default function CheckoutPage() {
         </div>
 
         <h1>Your cart is empty</h1>
-        <p>Add something delicious before proceeding to checkout.</p>
+        <p>
+          Add something delicious before proceeding to checkout.
+        </p>
 
         <Link href="/products" className="checkout-empty-button">
           Explore Foods
@@ -206,7 +242,9 @@ export default function CheckoutPage() {
         <div className="checkout-heading">
           <span>ALMOST THERE!</span>
           <h1>Complete Your Order</h1>
-          <p>Just a few details before deliciousness reaches you.</p>
+          <p>
+            Just a few details before deliciousness reaches you.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="checkout-layout">
@@ -355,7 +393,10 @@ export default function CheckoutPage() {
 
             <div className="checkout-order-items">
               {cart.map((item) => (
-                <div key={item.id} className="checkout-order-item">
+                <div
+                  key={item.id}
+                  className="checkout-order-item"
+                >
                   <div>
                     <strong>{item.name}</strong>
                     <span>Quantity: {item.quantity}</span>
@@ -407,7 +448,9 @@ export default function CheckoutPage() {
                     type="text"
                     placeholder="Enter coupon code"
                     value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    onChange={(e) =>
+                      setCouponCode(e.target.value.toUpperCase())
+                    }
                     disabled={isApplyingCoupon || isSubmitting}
                   />
 
@@ -460,7 +503,10 @@ export default function CheckoutPage() {
               disabled={isSubmitting || isApplyingCoupon}
             >
               {isSubmitting ? "Placing Order..." : "Place Order"}
-              <ArrowLeft size={18} className="checkout-button-arrow" />
+              <ArrowLeft
+                size={18}
+                className="checkout-button-arrow"
+              />
             </button>
 
             <div className="checkout-trust">

@@ -12,8 +12,11 @@ import {
   ChefHat,
 } from "lucide-react";
 
+import { useToast } from "@/components/ui/ToastProvider";
+
 export default function LoginForm() {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +41,10 @@ export default function LoginForm() {
 
       if (!response.ok) {
         setMessage(data.message || "Login failed");
+        showToast(
+          data.message || "Unable to login. Please try again.",
+          "error"
+        );
         return;
       }
 
@@ -48,7 +55,7 @@ export default function LoginForm() {
 
       window.dispatchEvent(new Event("fooddie-auth-change"));
 
-      alert("Login successful!");
+      showToast("Welcome back! You're successfully logged in.", "success");
 
       if (data.isAdmin) {
         router.push("/admin");
@@ -57,6 +64,10 @@ export default function LoginForm() {
       }
     } catch {
       setMessage("Something went wrong. Please try again.");
+      showToast(
+        "Something went wrong. Please try again.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
