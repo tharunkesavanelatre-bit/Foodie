@@ -138,7 +138,7 @@ export default function DeliveryProfilePage() {
         </Link>
 
         <strong>
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </strong>
       </header>
 
@@ -183,7 +183,7 @@ export default function DeliveryProfilePage() {
 
           <Link href="/delivery/assignments" className="delivery-profile-link">
             <Bike size={17} />
-            My Deliveries →
+            My Deliveries â†’
           </Link>
         </aside>
 

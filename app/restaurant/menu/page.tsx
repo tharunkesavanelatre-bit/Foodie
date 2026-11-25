@@ -283,7 +283,7 @@ export default function RestaurantMenuPage() {
 
               <input
                 type="number"
-                placeholder="Price (₹)"
+                placeholder="Price (â‚¹)"
                 min="1"
                 step="0.01"
                 value={form.price}
@@ -361,7 +361,7 @@ export default function RestaurantMenuPage() {
                 <p>{food.description}</p>
 
                 <div className="menu-food-bottom">
-                  <strong>₹{food.price.toFixed(2)}</strong>
+                  <strong>â‚¹{food.price.toFixed(2)}</strong>
 
                   <div className="menu-food-actions">
                     <button

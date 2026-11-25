@@ -6,7 +6,7 @@ import { ArrowLeft, ChefHat } from "lucide-react";
 export default function RecipeDetailsHeader() {
   return (
     <header className="details-header">
-      <Link href="/home" className="details-brand">
+      <Link href="/" className="details-brand">
         <ChefHat size={27} />
         <span>Foodie</span>
       </Link>
@@ -23,3 +23,5 @@ export default function RecipeDetailsHeader() {
     </header>
   );
 }
+
+

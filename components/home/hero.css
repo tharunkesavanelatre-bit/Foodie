@@ -108,6 +108,7 @@
   object-fit: cover;
   border-radius: 50%;
   transition: transform 0.7s ease;
+  cursor: pointer;
 }
 
 .hero-food-image:hover {

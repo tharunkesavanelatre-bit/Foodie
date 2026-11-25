@@ -107,7 +107,7 @@ export default function RestaurantOrdersPage() {
           Dashboard
         </Link>
 
-        <h2>FOODDIE<span>.</span></h2>
+        <h2>Foodie<span>.</span></h2>
 
         <button onClick={loadOrders}>
           <RefreshCw size={17} />
@@ -178,11 +178,11 @@ export default function RestaurantOrdersPage() {
                   {order.items.map((item, index) => (
                     <div className="restaurant-order-item" key={index}>
                       <span>
-                        {item.name} × {item.quantity}
+                        {item.name} Ã— {item.quantity}
                       </span>
 
                       <strong>
-                        ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                        â‚¹{(item.price * item.quantity).toLocaleString("en-IN")}
                       </strong>
                     </div>
                   ))}
@@ -190,7 +190,7 @@ export default function RestaurantOrdersPage() {
 
                 <div className="restaurant-order-bottom">
                   <strong>
-                    Total: ₹{order.total.toLocaleString("en-IN")}
+                    Total: â‚¹{order.total.toLocaleString("en-IN")}
                   </strong>
 
                   {order.status === "Pending" && (
@@ -227,3 +227,4 @@ export default function RestaurantOrdersPage() {
     </main>
   );
 }
+

@@ -140,7 +140,7 @@ export default function AdminDashboard() {
       ? [
           {
             title: "Total Revenue",
-            value: `₹${data.statistics.revenue.toLocaleString("en-IN")}`,
+            value: `â‚¹${data.statistics.revenue.toLocaleString("en-IN")}`,
           },
           {
             title: "Total Payments",
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
           },
           {
             title: "Collected Amount",
-            value: `₹${data.statistics.collectedAmount.toLocaleString("en-IN")}`,
+            value: `â‚¹${data.statistics.collectedAmount.toLocaleString("en-IN")}`,
           },
         ]
       : []),
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
     <main className="admin-layout">
       <aside className="admin-sidebar">
         <h2>
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </h2>
 
         <p className="sidebar-label">ADMIN PANEL</p>

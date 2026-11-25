@@ -67,7 +67,7 @@ export default function AddFoodPage() {
     <main className="admin-layout">
       <aside className="admin-sidebar">
         <h2>
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </h2>
 
         <p className="sidebar-label">ADMIN PANEL</p>
@@ -90,7 +90,7 @@ export default function AddFoodPage() {
         </Link>
 
         <h1>Add New Food</h1>
-        <p>Add a new item to your FOODDIE menu.</p>
+        <p>Add a new item to your Foodie menu.</p>
 
         <form className="food-form" onSubmit={handleSubmit}>
           <label>Food Name</label>
@@ -129,7 +129,7 @@ export default function AddFoodPage() {
             placeholder="Enter food image URL"
           />
 
-          <label>Price (₹)</label>
+          <label>Price (â‚¹)</label>
           <input
             name="price"
             type="number"

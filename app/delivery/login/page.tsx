@@ -72,7 +72,7 @@ export default function DeliveryLoginPage() {
     <main className="delivery-login-page">
       <section className="delivery-login-card">
         <Link href="/" className="delivery-login-brand">
-          fooddie<span>.</span>
+          Foodie<span>.</span>
         </Link>
 
         <div className="delivery-login-icon">

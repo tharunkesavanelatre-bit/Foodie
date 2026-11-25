@@ -140,7 +140,7 @@ export default function DeliveryAssignmentsPage() {
         </Link>
 
         <div className="assignments-brand">
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </div>
       </header>
 
@@ -261,11 +261,11 @@ export default function DeliveryAssignmentsPage() {
                   {order.items.map((item) => (
                     <div className="assignment-item" key={item.id}>
                       <span>
-                        {item.name} × {item.quantity}
+                        {item.name} Ã— {item.quantity}
                       </span>
 
                       <strong>
-                        ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                        â‚¹{(item.price * item.quantity).toLocaleString("en-IN")}
                       </strong>
                     </div>
                   ))}
@@ -274,7 +274,7 @@ export default function DeliveryAssignmentsPage() {
                 <div className="assignment-total">
                   <span>Order Total</span>
                   <strong>
-                    ₹{order.total.toLocaleString("en-IN")}
+                    â‚¹{order.total.toLocaleString("en-IN")}
                   </strong>
                 </div>
 

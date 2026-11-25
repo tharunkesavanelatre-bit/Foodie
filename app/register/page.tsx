@@ -82,12 +82,12 @@ export default function RegisterPage() {
             <span className="auth-logo-icon">
               <Utensils size={23} />
             </span>
-            fooddie<span>.</span>
+            Foodie<span>.</span>
           </Link>
 
           <span className="auth-welcome-badge">
             <Sparkles size={14} />
-            JOIN FOODDIE
+            JOIN Foodie
           </span>
         </div>
 
@@ -99,7 +99,7 @@ export default function RegisterPage() {
           <h1>Create Your Account</h1>
 
           <p>
-            Join FOODDIE and discover something delicious every day.
+            Join Foodie and discover something delicious every day.
           </p>
         </div>
 
@@ -181,3 +181,4 @@ export default function RegisterPage() {
     </main>
   );
 }
+

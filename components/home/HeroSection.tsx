@@ -13,18 +13,18 @@ export default function HeroSection() {
         <div className="hero-content">
           <span className="hero-badge">
             <Sparkles size={16} />
-            YOUR DAILY FOOD DESTINATION
+            GOOD FOOD, GREAT MOMENTS
           </span>
 
           <h1>
-            Discover Food.
+            Discover restaurants
             <br />
-            <span>Love Every Bite.</span>
+            <span>you will love.</span>
           </h1>
 
           <p>
-            Explore delicious meals, discover exciting flavours
-            and find something amazing to enjoy today.
+            Explore restaurants, discover their menus, and find your next
+            favourite meal with Foodie.
           </p>
 
           <SearchBar />
@@ -34,9 +34,13 @@ export default function HeroSection() {
           </Link>
 
           <div className="hero-info">
-            <span>Fresh Choices</span>
-            <span>Delicious Discoveries</span>
-            <span>Made for Food Lovers</span>
+            <span>Fresh menus.</span>
+            <span>Great flavours.</span>
+            <span>Easy ordering.</span>
+          </div>
+
+          <div className="hero-food-emojis">
+            🍕 🍔 🍜
           </div>
         </div>
 

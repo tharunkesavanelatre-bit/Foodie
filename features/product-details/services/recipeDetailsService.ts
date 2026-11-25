@@ -32,3 +32,4 @@ export async function getRecipeDetails(
 
   return recipe;
 }
+

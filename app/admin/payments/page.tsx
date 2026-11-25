@@ -238,7 +238,7 @@ export default function AdminPaymentsPage() {
     <main className="admin-layout">
       <aside className="admin-sidebar">
         <h2>
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </h2>
 
         <p className="sidebar-label">ADMIN PANEL</p>
@@ -310,7 +310,7 @@ export default function AdminPaymentsPage() {
 
           <div className="admin-stat-card">
             <Receipt size={22} />
-            <h2>₹{collectedAmount.toFixed(2)}</h2>
+            <h2>â‚¹{collectedAmount.toFixed(2)}</h2>
             <p>Collected Amount</p>
           </div>
         </div>
@@ -361,7 +361,7 @@ export default function AdminPaymentsPage() {
                     <td>{payment.method}</td>
 
                     <td>
-                      ₹{Number(payment.amount).toFixed(2)}
+                      â‚¹{Number(payment.amount).toFixed(2)}
                     </td>
 
                     <td>

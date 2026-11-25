@@ -133,7 +133,7 @@ export default function EditFoodPage() {
     <main className="admin-layout">
       <aside className="admin-sidebar">
         <h2>
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </h2>
 
         <p className="sidebar-label">ADMIN PANEL</p>

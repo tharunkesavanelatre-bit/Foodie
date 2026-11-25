@@ -1,4 +1,4 @@
-﻿import type { Meal, FoodProfile } from "../types";
+import type { Meal, FoodProfile } from "../types";
 
 export function getFoodProfile(recipe: Meal): FoodProfile {
   const name = recipe.strMeal.toLowerCase();
@@ -302,3 +302,4 @@ export function getFoodProfile(recipe: Meal): FoodProfile {
 }
 
 // ==========================================
+

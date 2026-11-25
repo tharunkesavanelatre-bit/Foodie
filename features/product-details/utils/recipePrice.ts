@@ -1,4 +1,4 @@
-﻿// ==========================================
+// ==========================================
 
 const SPECIFIC_RECIPE_PRICES: Record<string, number> = {
   "chicken biryani": 249,
@@ -87,3 +87,4 @@ export function getRecipePrice(
 }
 
 // ==========================================
+

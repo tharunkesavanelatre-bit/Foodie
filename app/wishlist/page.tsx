@@ -269,7 +269,7 @@ export default function WishlistPage() {
   return (
     <main className="wishlist-page">
       <header className="wishlist-header">
-        <Link href="/home" className="wishlist-brand">
+        <Link href="/" className="wishlist-brand">
           <ChefHat size={28} />
           <span>FOODIE</span>
         </Link>
@@ -318,7 +318,7 @@ export default function WishlistPage() {
             onClick={() => setMessage("")}
             aria-label="Close message"
           >
-            ×
+            Ã—
           </button>
         </div>
       )}
@@ -409,7 +409,7 @@ export default function WishlistPage() {
 
                       <div className="wishlist-card-price">
                         <strong>
-                          ₹{recipePrice.toFixed(2)}
+                          â‚¹{recipePrice.toFixed(2)}
                         </strong>
                       </div>
 
@@ -460,3 +460,4 @@ export default function WishlistPage() {
     </main>
   );
 }
+

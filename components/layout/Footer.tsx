@@ -28,7 +28,7 @@ export default function Footer() {
             <h2>
               Your cravings.
               <br />
-              Your FOODDIE moment.
+              Your Foodie moment.
             </h2>
 
             <Link href="/products" className="footer-explore-button">
@@ -50,12 +50,12 @@ export default function Footer() {
           {/* Brand */}
           <div className="footer-brand">
             <Link href="/" className="footer-logo">
-              FOODDIE<span>.</span>
+              Foodie<span>.</span>
             </Link>
 
             <p>
               Discover delicious meals, explore exciting flavours
-              and enjoy every bite with FOODDIE.
+              and enjoy every bite with Foodie.
             </p>
 
             <div className="footer-socials">
@@ -75,7 +75,7 @@ export default function Footer() {
 
           {/* Navigation */}
           <div className="footer-column">
-            <h3>Explore FOODDIE</h3>
+            <h3>Explore Foodie</h3>
 
             <div className="footer-links">
               {exploreLinks.map((link) => (
@@ -108,15 +108,15 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="footer-bottom">
-          <p>© 2026 FOODDIE. All rights reserved.</p>
+<div className="footer-bottom">
+  <p>Â© 2026 Foodie. All rights reserved.</p>
 
-          <p>Made for food lovers.</p>
+  <p>Made for food lovers.</p>
 
-          <a href="#top">
-            Back to Top <ArrowUp size={16} />
-          </a>
-        </div>
+  <a href="/#top">
+    Back to Top <ArrowUp size={16} />
+  </a>
+</div>
 
       </div>
     </footer>

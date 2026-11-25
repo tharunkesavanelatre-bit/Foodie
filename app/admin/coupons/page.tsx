@@ -69,7 +69,7 @@ const initialForm: CouponForm = {
 };
 
 const currency = (amount: number) =>
-  `₹${amount.toLocaleString("en-IN")}`;
+  `â‚¹${amount.toLocaleString("en-IN")}`;
 
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -336,7 +336,7 @@ export default function AdminCouponsPage() {
         </Link>
 
         <div className="coupons-brand">
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </div>
 
         <div className="coupons-top-label">
@@ -700,7 +700,7 @@ export default function AdminCouponsPage() {
                     }
                   >
                     <option value="PERCENTAGE">Percentage (%)</option>
-                    <option value="FIXED">Fixed Amount (₹)</option>
+                    <option value="FIXED">Fixed Amount (â‚¹)</option>
                   </select>
                 </label>
 
@@ -724,7 +724,7 @@ export default function AdminCouponsPage() {
                 </label>
 
                 <label>
-                  Minimum Order Amount (₹)
+                  Minimum Order Amount (â‚¹)
                   <input
                     type="number"
                     min="0"
@@ -741,7 +741,7 @@ export default function AdminCouponsPage() {
                 </label>
 
                 <label>
-                  Maximum Discount (₹)
+                  Maximum Discount (â‚¹)
                   <input
                     type="number"
                     min="0.01"

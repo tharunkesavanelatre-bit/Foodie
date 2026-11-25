@@ -143,7 +143,7 @@ export default function AdminOrdersPage() {
     <main className="admin-layout">
       <aside className="admin-sidebar">
         <h2>
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </h2>
 
         <p className="sidebar-label">ADMIN PANEL</p>
@@ -235,7 +235,7 @@ export default function AdminOrdersPage() {
                     <td>{order.items.length}</td>
 
                     <td>
-                      ₹{Number(order.total).toFixed(2)}
+                      â‚¹{Number(order.total).toFixed(2)}
                     </td>
 
                     <td>

@@ -149,7 +149,7 @@ export default function DeliveryDashboard() {
       <header className="delivery-header">
         <div className="delivery-brand">
           <Bike size={28} />
-          <span>FOODDIE<span>.</span></span>
+          <span>Foodie<span>.</span></span>
         </div>
 
         <nav className="delivery-navigation">
@@ -272,10 +272,10 @@ export default function DeliveryDashboard() {
                 </p>
 
                 <div className="delivery-order-bottom">
-                  <span>₹{assignment.order.total.toLocaleString("en-IN")}</span>
+                  <span>â‚¹{assignment.order.total.toLocaleString("en-IN")}</span>
 
                   <Link href="/delivery/assignments">
-                    View Delivery →
+                    View Delivery â†’
                   </Link>
                 </div>
               </article>

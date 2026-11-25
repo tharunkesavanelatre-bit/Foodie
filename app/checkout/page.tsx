@@ -403,7 +403,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <strong>
-                    ₹
+                    â‚¹
                     {(
                       Number(item.price.replace(/[^\d.]/g, "")) *
                       item.quantity
@@ -477,24 +477,24 @@ export default function CheckoutPage() {
 
             <div className="checkout-price-row">
               <span>Subtotal</span>
-              <strong>₹{subtotal.toFixed(2)}</strong>
+              <strong>â‚¹{subtotal.toFixed(2)}</strong>
             </div>
 
             <div className="checkout-price-row">
               <span>Delivery Charges</span>
-              <strong>₹{delivery.toFixed(2)}</strong>
+              <strong>â‚¹{delivery.toFixed(2)}</strong>
             </div>
 
             {discount > 0 && (
               <div className="checkout-price-row checkout-discount-row">
                 <span>Coupon Discount</span>
-                <strong>- ₹{discount.toFixed(2)}</strong>
+                <strong>- â‚¹{discount.toFixed(2)}</strong>
               </div>
             )}
 
             <div className="checkout-total">
               <span>Total Amount</span>
-              <strong>₹{total.toFixed(2)}</strong>
+              <strong>â‚¹{total.toFixed(2)}</strong>
             </div>
 
             <button

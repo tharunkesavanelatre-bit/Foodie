@@ -197,7 +197,7 @@ export default function AdminCustomerDetailsPage() {
         <div className="customer-profile-date">
           <CalendarDays size={18} />
           <div>
-            <span>Joined FOODDIE</span>
+            <span>Joined Foodie</span>
             <strong>{formatDate(customer.createdAt)}</strong>
           </div>
         </div>

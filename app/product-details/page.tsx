@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import RecipeHero from "../../features/product-details/components/RecipeHero";
 import RecipeBackground from "../../features/product-details/components/RecipeBackground";
@@ -124,3 +124,4 @@ export default function ProductDetailsPage() {
     </Suspense>
   );
 }
+

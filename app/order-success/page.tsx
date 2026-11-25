@@ -121,9 +121,9 @@ export default function OrderSuccessPage() {
               <Check size={45} strokeWidth={3} />
             </div>
 
-            <span className="success-icon-sparkle sparkle-one">✦</span>
-            <span className="success-icon-sparkle sparkle-two">✦</span>
-            <span className="success-icon-sparkle sparkle-three">✧</span>
+            <span className="success-icon-sparkle sparkle-one">âœ¦</span>
+            <span className="success-icon-sparkle sparkle-two">âœ¦</span>
+            <span className="success-icon-sparkle sparkle-three">âœ§</span>
           </div>
 
           <h1>
@@ -131,7 +131,7 @@ export default function OrderSuccessPage() {
           </h1>
 
           <p className="success-description">
-            Thank you for choosing FOODDIE. Your order has been
+            Thank you for choosing Foodie. Your order has been
             placed successfully. Get ready to enjoy something delicious!
           </p>
 
@@ -175,10 +175,10 @@ export default function OrderSuccessPage() {
             {order.items.map((item) => (
               <div className="success-order-row" key={item.name}>
                 <span>
-                  {item.name} × {item.quantity}
+                  {item.name} Ã— {item.quantity}
                 </span>
                 <strong>
-                  ₹{(item.price * item.quantity).toFixed(2)}
+                  â‚¹{(item.price * item.quantity).toFixed(2)}
                 </strong>
               </div>
             ))}
@@ -210,7 +210,7 @@ export default function OrderSuccessPage() {
 
             <div className="success-order-total">
               <span>Total Amount</span>
-              <strong>₹{order.total.toFixed(2)}</strong>
+              <strong>â‚¹{order.total.toFixed(2)}</strong>
             </div>
           </div>
 
@@ -243,7 +243,7 @@ export default function OrderSuccessPage() {
 
           <div className="success-footer-note">
             <ShieldCheck size={15} />
-            Thank you for being part of FOODDIE!
+            Thank you for being part of Foodie!
           </div>
         </div>
       </div>

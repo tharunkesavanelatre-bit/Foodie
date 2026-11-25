@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     if (!/^[A-Z0-9_-]{3,30}$/.test(code)) {
       return NextResponse.json(
-        { message: "Coupon code must contain 3–30 letters, numbers, hyphens or underscores." },
+        { message: "Coupon code must contain 3â€“30 letters, numbers, hyphens or underscores." },
         { status: 400 }
       );
     }

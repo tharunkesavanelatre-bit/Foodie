@@ -130,7 +130,7 @@ export default function RestaurantMenuPage() {
       <section className="restaurant-menu-hero">
         <div>
           <span className="restaurant-menu-label">
-            FOODDIE RESTAURANT PARTNER
+            Foodie RESTAURANT PARTNER
           </span>
 
           <h1>{restaurant.name}</h1>

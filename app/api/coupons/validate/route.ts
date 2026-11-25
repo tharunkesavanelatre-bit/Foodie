@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     if (subtotal < minimum) {
       return NextResponse.json(
         {
-          message: `Minimum order amount for this coupon is ₹${minimum.toFixed(2)}.`,
+          message: `Minimum order amount for this coupon is â‚¹${minimum.toFixed(2)}.`,
         },
         { status: 400 }
       );

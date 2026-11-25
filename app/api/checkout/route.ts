@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
 
         if (subtotal < Number(coupon.minOrderAmount)) {
           throw new Error(
-            `Minimum order amount for this coupon is ₹${Number(
+            `Minimum order amount for this coupon is â‚¹${Number(
               coupon.minOrderAmount
             ).toFixed(2)}.`
           );

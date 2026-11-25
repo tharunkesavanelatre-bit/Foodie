@@ -1,4 +1,4 @@
-﻿import type { Meal, Ingredient } from "../types";
+import type { Meal, Ingredient } from "../types";
 
 export function getIngredients(recipe: Meal): Ingredient[] {
   const ingredients: Ingredient[] = [];
@@ -19,3 +19,4 @@ export function getIngredients(recipe: Meal): Ingredient[] {
 }
 
 // ==========================================
+

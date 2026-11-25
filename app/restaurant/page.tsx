@@ -95,7 +95,7 @@ export default function RestaurantDashboard() {
     { title: "Cancelled", value: stats.cancelledOrders, icon: XCircle },
     {
       title: "Total Revenue",
-      value: `₹${stats.totalRevenue.toLocaleString("en-IN")}`,
+      value: `â‚¹${stats.totalRevenue.toLocaleString("en-IN")}`,
       icon: IndianRupee,
     },
   ];
@@ -105,7 +105,7 @@ export default function RestaurantDashboard() {
       <header className="restaurant-header">
         <div className="restaurant-brand">
           <ChefHat size={28} />
-          <span>FOODDIE<span>.</span></span>
+          <span>Foodie<span>.</span></span>
         </div>
 
         <nav className="restaurant-header-info">
@@ -177,7 +177,7 @@ export default function RestaurantDashboard() {
           </div>
 
           <Link href="/restaurant/orders" className="restaurant-view-orders">
-            View All Orders →
+            View All Orders â†’
           </Link>
         </div>
 
@@ -205,7 +205,7 @@ export default function RestaurantDashboard() {
                   <tr key={order.id}>
                     <td>{order.orderId}</td>
                     <td>{order.customerName}</td>
-                    <td>₹{order.total.toLocaleString("en-IN")}</td>
+                    <td>â‚¹{order.total.toLocaleString("en-IN")}</td>
                     <td>
                       <span className="restaurant-order-status">
                         {order.status}

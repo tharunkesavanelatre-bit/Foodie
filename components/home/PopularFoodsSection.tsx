@@ -36,7 +36,7 @@ export default function PopularFoodsSection() {
         />
 
         <div className="popular-food-grid">
-          {foods.map((food) => (
+          {foods.slice(0, 6).map((food) => (
             <FoodCard key={food.name} {...food} />
           ))}
         </div>

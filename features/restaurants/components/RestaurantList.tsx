@@ -76,7 +76,7 @@ export default function RestaurantList() {
 
           <p>
             Explore restaurants, discover their menus, and
-            find your next favourite meal with FOODDIE.
+            find your next favourite meal with Foodie.
           </p>
 
           <p className="restaurant-hero-note">
@@ -86,10 +86,10 @@ export default function RestaurantList() {
 
         <div className="restaurant-hero-visual">
           <div className="hero-food-circle">
-            <span>🍕</span>
-            <span>🍔</span>
-            <span>🍜</span>
-            <span>🍱</span>
+            <span>ðŸ•</span>
+            <span>ðŸ”</span>
+            <span>ðŸœ</span>
+            <span>ðŸ±</span>
           </div>
         </div>
       </div>
@@ -142,7 +142,7 @@ export default function RestaurantList() {
               key={restaurant.id}
             >
               <div className="restaurant-image">
-                🍽️
+                ðŸ½ï¸
                 <span className="restaurant-hero-tag">
                   OPEN NOW
                 </span>

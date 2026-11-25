@@ -23,7 +23,7 @@ export default function AboutPage() {
         </h1>
 
         <p>
-          Welcome to FOODDIE, where discovering delicious food
+          Welcome to Foodie, where discovering delicious food
           becomes a delightful experience. Find your favourites,
           explore new flavours and celebrate every bite.
         </p>
@@ -50,7 +50,7 @@ export default function AboutPage() {
           </h2>
 
           <p>
-            FOODDIE was created with one simple idea: finding
+            Foodie was created with one simple idea: finding
             something delicious should always feel exciting.
           </p>
 

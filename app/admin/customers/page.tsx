@@ -97,7 +97,7 @@ export default function AdminCustomersPage() {
 
           <span className="customers-eyebrow">ADMIN MANAGEMENT</span>
           <h1>Customer Management</h1>
-          <p>View and monitor all registered FOODDIE customers.</p>
+          <p>View and monitor all registered Foodie customers.</p>
         </div>
 
         <button

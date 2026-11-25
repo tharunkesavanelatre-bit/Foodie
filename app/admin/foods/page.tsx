@@ -107,7 +107,7 @@ export default function AdminFoodsPage() {
     <main className="admin-layout">
       <aside className="admin-sidebar">
         <h2>
-          FOODDIE<span>.</span>
+          Foodie<span>.</span>
         </h2>
 
         <p className="sidebar-label">ADMIN PANEL</p>
@@ -127,7 +127,7 @@ export default function AdminFoodsPage() {
         <div className="food-header">
           <div>
             <h1>Food Management</h1>
-            <p>Manage your FOODDIE menu items.</p>
+            <p>Manage your Foodie menu items.</p>
           </div>
 
           <Link href="/admin/foods/new" className="add-food-btn">
@@ -180,7 +180,7 @@ export default function AdminFoodsPage() {
                     <td>{food.category}</td>
 
                     <td>
-                      ₹
+                      â‚¹
                       {Number(food.price).toLocaleString("en-IN")}
                     </td>
 

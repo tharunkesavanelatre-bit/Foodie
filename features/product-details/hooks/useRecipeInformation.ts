@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import type { Meal } from "../types";
 
@@ -22,3 +22,4 @@ export function useRecipeInformation(recipe: Meal | null) {
     recipeTags,
   };
 }
+

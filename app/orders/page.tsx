@@ -82,7 +82,7 @@ export default function OrdersPage() {
   }, []);
 
   function formatPrice(amount: number) {
-    return `₹${Number(amount || 0).toFixed(2)}`;
+    return `â‚¹${Number(amount || 0).toFixed(2)}`;
   }
 
   function getPaymentIcon(status?: string) {
@@ -115,7 +115,7 @@ export default function OrdersPage() {
 
             <p>
               Every delicious choice, all in one place.
-              Check your FOODDIE order history here.
+              Check your Foodie order history here.
             </p>
           </div>
 
@@ -212,7 +212,7 @@ export default function OrdersPage() {
                     >
                       <span>
                         {item.name}
-                        <small> × {item.quantity}</small>
+                        <small> Ã— {item.quantity}</small>
                       </span>
 
                       <strong>{formatPrice(item.price)}</strong>
@@ -347,7 +347,7 @@ export default function OrdersPage() {
         <div className="orders-bottom-note">
           <Receipt size={17} />
           <span>
-            Your FOODDIE order and payment history is securely retrieved
+            Your Foodie order and payment history is securely retrieved
             from your account.
           </span>
         </div>

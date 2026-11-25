@@ -17,11 +17,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "FOODDIE | Discover Delicious Food",
-    template: "%s | FOODDIE",
+    default: "Foodie | Discover Delicious Food",
+    template: "%s | Foodie",
   },
   description:
-    "Discover delicious food, explore exciting flavours, and find your next favourite meal with FOODDIE.",
+    "Discover delicious food, explore exciting flavours, and find your next favourite meal with Foodie.",
 };
 
 export default function RootLayout({

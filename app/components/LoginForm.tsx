@@ -84,7 +84,7 @@ export default function LoginForm() {
             <span className="auth-logo-icon">
               <Utensils size={23} />
             </span>
-            fooddie<span>.</span>
+            Foodie<span>.</span>
           </Link>
 
           <span className="auth-welcome-badge">
@@ -152,7 +152,7 @@ export default function LoginForm() {
 
         <div className="auth-divider">
           <span />
-          <p>NEW TO FOODDIE?</p>
+          <p>NEW TO Foodie?</p>
           <span />
         </div>
 
@@ -168,3 +168,4 @@ export default function LoginForm() {
     </main>
   );
 }
+

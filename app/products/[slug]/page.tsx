@@ -63,7 +63,7 @@ async function FoodDetails({ params }: Props) {
 
             <p className="food-details-description">
               Discover delicious flavours and enjoy this delicious
-              food selection from FOODDIE.
+              food selection from Foodie.
             </p>
 
             <div className="food-details-actions">

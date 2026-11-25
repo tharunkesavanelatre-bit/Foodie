@@ -262,7 +262,7 @@ export default function CartPage() {
 
                     <div className="cart-item-actions">
                       <strong>
-                        ₹
+                        â‚¹
                         {(
                           Number(
                             item.price.replace(/[^\d.]/g, "")
@@ -297,19 +297,19 @@ export default function CartPage() {
 
                 <div className="cart-summary-row">
                   <span>Subtotal</span>
-                  <strong>₹{subtotal.toFixed(2)}</strong>
+                  <strong>â‚¹{subtotal.toFixed(2)}</strong>
                 </div>
 
                 <div className="cart-summary-row">
                   <span>Delivery Charges</span>
-                  <strong>₹{delivery.toFixed(2)}</strong>
+                  <strong>â‚¹{delivery.toFixed(2)}</strong>
                 </div>
 
                 <div className="cart-summary-divider" />
 
                 <div className="cart-summary-total">
                   <span>Total Amount</span>
-                  <strong>₹{total.toFixed(2)}</strong>
+                  <strong>â‚¹{total.toFixed(2)}</strong>
                 </div>
 
                 <Link
@@ -367,7 +367,7 @@ export default function CartPage() {
 
                 <div>
                   <span>Total Spent</span>
-                  <strong>₹{totalSpent.toFixed(2)}</strong>
+                  <strong>â‚¹{totalSpent.toFixed(2)}</strong>
                 </div>
 
                 <div>
@@ -447,13 +447,13 @@ export default function CartPage() {
                         <div className="purchase-item-info">
                           <h4>{item.name}</h4>
                           <span>
-                            ₹{item.price.toFixed(2)} ×{" "}
+                            â‚¹{item.price.toFixed(2)} Ã—{" "}
                             {item.quantity}
                           </span>
                         </div>
 
                         <strong className="purchase-item-price">
-                          ₹
+                          â‚¹
                           {(
                             item.price * item.quantity
                           ).toFixed(2)}
@@ -492,7 +492,7 @@ export default function CartPage() {
                     </div>
 
                     <strong>
-                      ₹{order.total.toFixed(2)}
+                      â‚¹{order.total.toFixed(2)}
                     </strong>
                   </div>
                 </article>

@@ -46,7 +46,7 @@ const placeholders = [
 ];
 
 const navigation = [
-  { label: "Home", href: "/home" },
+  { label: "Home", href: "/" },
   { label: "Categories", href: "/categories" },
   { label: "Explore Food", href: "/products" },
   { label: "My Orders", href: "/orders" },
@@ -211,7 +211,7 @@ export default function HeroSection() {
       >
         {/* UPDATED FOODIE LOGO */}
         <Link
-  href="/home"
+  href="/"
   className="flex shrink-0 items-center gap-2"
 >
   {/* Foodie Logo Icon */}
@@ -285,10 +285,10 @@ export default function HeroSection() {
               <Link
                 href={item.href}
                 aria-current={
-                  item.href === "/home" ? "page" : undefined
+                  item.href === "/" ? "page" : undefined
                 }
                 className={`group relative py-2 text-sm font-medium transition-colors duration-300 ${
-                  item.href === "/home"
+                  item.href === "/"
                     ? "text-[#EA580C]"
                     : "text-gray-500 hover:text-[#171717]"
                 }`}
@@ -297,7 +297,7 @@ export default function HeroSection() {
 
                 <span
                   className={`absolute -bottom-1 left-0 h-[2px] rounded-full bg-[#EA580C] transition-all duration-300 ${
-                    item.href === "/home"
+                    item.href === "/"
                       ? "w-full"
                       : "w-0 group-hover:w-full"
                   }`}
@@ -364,7 +364,7 @@ export default function HeroSection() {
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
                     className={`border-b border-gray-100 py-4 text-sm font-semibold ${
-                      item.href === "/home"
+                      item.href === "/"
                         ? "text-[#EA580C]"
                         : "text-gray-600"
                     }`}
@@ -698,3 +698,4 @@ export default function HeroSection() {
     </main>
   );
 }
+

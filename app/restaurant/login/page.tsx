@@ -69,7 +69,7 @@ export default function RestaurantLoginPage() {
             <span className="auth-logo-icon">
               <Utensils size={23} />
             </span>
-            fooddie<span>.</span>
+            Foodie<span>.</span>
           </Link>
         </div>
 
@@ -80,7 +80,7 @@ export default function RestaurantLoginPage() {
 
           <h1>Restaurant Login</h1>
 
-          <p>Sign in to manage your restaurant on FOODDIE.</p>
+          <p>Sign in to manage your restaurant on Foodie.</p>
         </div>
 
         <form onSubmit={handleLogin} className="auth-form">

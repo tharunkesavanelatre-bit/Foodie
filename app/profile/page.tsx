@@ -165,7 +165,7 @@ export default function ProfilePage() {
 
       <div className="profile-container">
         <div className="profile-breadcrumb">
-          <Link href="/home">
+          <Link href="/">
             <House size={15} />
             Home
           </Link>
@@ -187,7 +187,7 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          <Link href="/home" className="profile-back-button">
+          <Link href="/" className="profile-back-button">
             <ArrowLeft size={17} />
             Back to Home
           </Link>
@@ -227,7 +227,7 @@ export default function ProfilePage() {
               <ChevronRight size={17} />
             </Link>
 
-            <Link href="/home" className="profile-side-link">
+            <Link href="/" className="profile-side-link">
               <span className="profile-side-icon">
                 <House size={19} />
               </span>
@@ -352,7 +352,7 @@ export default function ProfilePage() {
                 <strong>Your account is protected</strong>
                 <p>
                   Your profile information is securely retrieved
-                  and updated through your FOODDIE account.
+                  and updated through your Foodie account.
                 </p>
               </div>
             </div>
@@ -362,3 +362,4 @@ export default function ProfilePage() {
     </main>
   );
 }
+

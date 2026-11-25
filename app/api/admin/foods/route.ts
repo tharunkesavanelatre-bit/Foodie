@@ -3,7 +3,7 @@ import { getAdminWithPermission } from "@/lib/admin-permission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 
-// GET – View all food items
+// GET â€“ View all food items
 export async function GET(request: NextRequest) {
   await connection();
 
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST – Add food
+// POST â€“ Add food
 export async function POST(request: NextRequest) {
   await connection();
 
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT – Update food
+// PUT â€“ Update food
 export async function PUT(request: NextRequest) {
   await connection();
 
@@ -148,7 +148,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE – Remove food
+// DELETE â€“ Remove food
 export async function DELETE(request: NextRequest) {
   await connection();
 

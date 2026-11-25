@@ -130,7 +130,7 @@ export default function Header() {
           </span>
 
           <span className="whitespace-nowrap text-2xl font-extrabold tracking-tight text-stone-900">
-            fooddie<span className="text-orange-600">.</span>
+            Foodie<span className="text-orange-600">.</span>
           </span>
         </Link>
 
@@ -356,3 +356,4 @@ export default function Header() {
     </header>
   );
 }
+

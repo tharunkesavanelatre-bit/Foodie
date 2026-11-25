@@ -99,7 +99,7 @@ export default function DeliveryApplyPage() {
       <section className="delivery-apply-container">
         <div className="delivery-apply-information">
           <Link href="/" className="delivery-apply-brand">
-            fooddie<span>.</span>
+            Foodie<span>.</span>
           </Link>
 
           <div className="delivery-apply-illustration">
