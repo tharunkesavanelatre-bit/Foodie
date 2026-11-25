@@ -459,3 +459,281 @@
     flex: 1;
   }
 }
+/* Delete restaurant button */
+
+.restaurant-delete-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fff1f2;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.restaurant-delete-button:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.restaurant-delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Modal overlay */
+
+.restaurant-delete-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 15, 12, 0.65);
+  backdrop-filter: blur(7px);
+  animation: restaurantFadeIn 0.2s ease;
+}
+
+/* Modal */
+
+.restaurant-delete-modal {
+  position: relative;
+  width: 100%;
+  max-width: 465px;
+  padding: 34px;
+  border: 1px solid #f1e5dc;
+  border-radius: 23px;
+  background: #fffaf6;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+  animation: restaurantModalIn 0.25s ease;
+}
+
+.restaurant-delete-close {
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: #f5ede7;
+  color: #66564c;
+  cursor: pointer;
+}
+
+.restaurant-delete-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 20px;
+  place-items: center;
+  border-radius: 17px;
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.restaurant-delete-eyebrow {
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.restaurant-delete-modal h2 {
+  margin: 9px 0;
+  color: #29201b;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.restaurant-delete-description {
+  margin-bottom: 20px;
+  color: #786b63;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Restaurant information */
+
+.restaurant-delete-info {
+  display: grid;
+  gap: 13px;
+  padding: 17px;
+  border: 1px solid #f0e5dd;
+  border-radius: 13px;
+  background: white;
+}
+
+.restaurant-delete-info div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #65554b;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.restaurant-delete-info svg {
+  flex-shrink: 0;
+  color: #ea580c;
+}
+
+.restaurant-delete-preserve {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 13px;
+  border-radius: 11px;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.restaurant-delete-preserve svg {
+  flex-shrink: 0;
+}
+
+.restaurant-delete-preserve p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Confirmation input */
+
+.restaurant-delete-label {
+  display: block;
+  margin-bottom: 9px;
+  color: #40342d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.restaurant-delete-input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #e8d9ce;
+  border-radius: 10px;
+  outline: none;
+  background: white;
+  color: #29201b;
+  font-size: 13px;
+  transition: border 0.2s ease;
+}
+
+.restaurant-delete-input:focus {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+}
+
+.restaurant-delete-error {
+  margin-top: 9px;
+  color: #dc2626;
+  font-size: 12px;
+}
+
+/* Modal actions */
+
+.restaurant-delete-actions {
+  display: flex;
+  gap: 11px;
+  margin-top: 22px;
+}
+
+.restaurant-delete-actions button {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 45px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.restaurant-delete-cancel {
+  border: 1px solid #e7dcd4;
+  background: white;
+  color: #55473e;
+}
+
+.restaurant-delete-cancel:hover {
+  background: #f5ede7;
+}
+
+.restaurant-delete-confirm {
+  border: 1px solid #dc2626;
+  background: #dc2626;
+  color: white;
+}
+
+.restaurant-delete-confirm:hover:not(:disabled) {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.restaurant-delete-confirm:disabled {
+  border-color: #e5b5b5;
+  background: #e5b5b5;
+  cursor: not-allowed;
+}
+
+.restaurant-delete-actions button:disabled,
+.restaurant-delete-close:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Animations */
+
+@keyframes restaurantFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes restaurantModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 520px) {
+  .restaurant-delete-modal {
+    padding: 25px 20px;
+  }
+
+  .restaurant-delete-modal h2 {
+    font-size: 21px;
+  }
+
+  .restaurant-delete-actions {
+    flex-direction: column-reverse;
+  }
+}
+
