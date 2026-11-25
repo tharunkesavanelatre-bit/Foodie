@@ -19,13 +19,13 @@ export default function FoodCard({
   const foodLink = `/products/${name.toLowerCase().replace(/\s+/g, "-")}`;
 
   return (
-    <article className="popular-app-card">
+    <article className="popular-app-card products-premium-card">
       <Link href={foodLink} className="popular-food-image">
-        <img src={image} alt={name} />
+        <img src={image} alt={name} loading="lazy" />
 
         <span className="popular-food-tag">{tag}</span>
 
-        <span className="popular-food-arrow">
+        <span className="products-card-arrow">
           <ArrowUpRight size={19} />
         </span>
       </Link>
@@ -40,10 +40,17 @@ export default function FoodCard({
           </span>
         </div>
 
-        <div className="popular-food-bottom">
-          <strong>{price}</strong>
+        <div className="products-card-bottom">
+          <div className="products-card-price">
+            <span>PRICE</span>
+            <strong>{price}</strong>
+          </div>
 
-          <Link href={foodLink} aria-label={`Explore ${name}`}>
+          <Link
+            href={foodLink}
+            className="products-card-action"
+            aria-label={`Explore ${name}`}
+          >
             <Plus size={20} />
           </Link>
         </div>

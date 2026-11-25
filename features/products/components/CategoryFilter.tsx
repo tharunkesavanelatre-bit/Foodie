@@ -1,5 +1,7 @@
 "use client";
 
+import { Check, Grid2X2 } from "lucide-react";
+
 type CategoryFilterProps = {
   categories: string[];
   selectedCategory: string;
@@ -11,24 +13,31 @@ export default function CategoryFilter({
   selectedCategory,
   onCategoryChange,
 }: CategoryFilterProps) {
-  return (
-    <div className="flex flex-wrap gap-3">
-      <button
-        onClick={() => onCategoryChange("All")}
-        className={selectedCategory === "All" ? "bg-orange-600 text-white px-4 py-2 rounded-full" : "bg-white px-4 py-2 rounded-full"}
-      >
-        All
-      </button>
+  const allCategories = ["All", ...categories];
 
-      {categories.map((category) => (
-        <button
-          key={category}
-          onClick={() => onCategoryChange(category)}
-          className={selectedCategory === category ? "bg-orange-600 text-white px-4 py-2 rounded-full" : "bg-white px-4 py-2 rounded-full"}
-        >
-          {category}
-        </button>
-      ))}
+  return (
+    <div className="products-category-filter">
+      {allCategories.map((category) => {
+        const isActive = selectedCategory === category;
+
+        return (
+          <button
+            key={category}
+            type="button"
+            onClick={() => onCategoryChange(category)}
+            className={`products-category-pill ${
+              isActive ? "active" : ""
+            }`}
+            aria-pressed={isActive}
+          >
+            {category === "All" && <Grid2X2 size={15} />}
+
+            <span>{category}</span>
+
+            {isActive && <Check size={14} />}
+          </button>
+        );
+      })}
     </div>
   );
 }
