@@ -209,11 +209,30 @@ export default function AdminRestaurantsPage() {
         }),
       });
 
-      const result = await response.json();
+      const responseText = await response.text();
 
-      if (!response.ok) {
-        throw new Error(result.message || "Unable to delete restaurant.");
-      }
+let result: {
+  success?: boolean;
+  message?: string;
+} = {};
+
+try {
+  result = responseText ? JSON.parse(responseText) : {};
+} catch {
+  throw new Error(
+    `Invalid API response. HTTP status: ${response.status}. Check your terminal for server errors.`
+  );
+}
+
+if (!response.ok) {
+  throw new Error(
+    result.message || `Delete failed. HTTP status: ${response.status}.`
+  );
+}
+
+if (!result.success) {
+  throw new Error(result.message || "Restaurant deletion was not confirmed.");
+}
 
       setMessage(result.message || "Restaurant deleted successfully.");
       setSelectedRestaurant(null);

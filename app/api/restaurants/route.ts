@@ -132,3 +132,118 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+// DELETE - Safely delete a specific restaurant
+export async function DELETE(request: NextRequest) {
+  await connection();
+
+  try {
+    // 1. Verify admin permission
+    const admin = await getAdminWithPermission(
+      request,
+      PERMISSIONS.RESTAURANTS
+    );
+
+    if (!admin) {
+      return NextResponse.json(
+        { success: false, message: "Admin access denied." },
+        { status: 403 }
+      );
+    }
+
+    // 2. Read request
+    const body = await request.json();
+
+    const id =
+      typeof body.id === "string" ? body.id.trim() : "";
+
+    const confirmEmail =
+      typeof body.confirmEmail === "string"
+        ? body.confirmEmail.trim().toLowerCase()
+        : "";
+
+    if (!id || !confirmEmail) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Restaurant ID and confirmation email are required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 3. Find restaurant and owner
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id },
+      include: {
+        owner: true,
+      },
+    });
+
+    if (!restaurant) {
+      return NextResponse.json(
+        { success: false, message: "Restaurant not found." },
+        { status: 404 }
+      );
+    }
+
+    // 4. Verify restaurant email
+    if (
+      restaurant.email?.trim().toLowerCase() !== confirmEmail ||
+      confirmEmail !== "sangeetvegrestaurants@gmail.com"
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Restaurant confirmation email does not match.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 5. Delete restaurant safely using transaction
+    await prisma.$transaction(async (tx) => {
+      // Delete only this restaurant's menu foods.
+      // CartItem.foodId becomes null because of SetNull.
+      await tx.food.deleteMany({
+        where: {
+          restaurantId: restaurant.id,
+        },
+      });
+
+      // Preserve owner account and reset restaurant role.
+      if (restaurant.owner.role === "RESTAURANT") {
+        await tx.user.update({
+          where: {
+            id: restaurant.ownerId,
+          },
+          data: {
+            role: "CUSTOMER",
+          },
+        });
+      }
+
+      // Delete restaurant.
+      // Historical orders remain because of SetNull.
+      await tx.restaurant.delete({
+        where: {
+          id: restaurant.id,
+        },
+      });
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `${restaurant.name} has been deleted successfully.`,
+    });
+  } catch (error) {
+    console.error("Restaurant deletion error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unable to delete restaurant. Check the server logs.",
+      },
+      { status: 500 }
+    );
+  }
+}
