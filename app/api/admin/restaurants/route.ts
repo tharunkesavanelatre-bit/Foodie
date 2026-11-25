@@ -119,3 +119,99 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+
+// DELETE - Delete only the specified Sangeet restaurant
+export async function DELETE(request: NextRequest) {
+  await connection();
+
+  try {
+    const admin = await getAdminWithPermission(
+      request,
+      PERMISSIONS.RESTAURANTS
+    );
+
+    if (!admin) {
+      return NextResponse.json(
+        { success: false, message: "Admin access denied." },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+
+    const id =
+      typeof body.id === "string" ? body.id.trim() : "";
+
+    const confirmEmail =
+      typeof body.confirmEmail === "string"
+        ? body.confirmEmail.trim().toLowerCase()
+        : "";
+
+    if (!id || !confirmEmail) {
+      return NextResponse.json(
+        { success: false, message: "Restaurant ID and confirmation email are required." },
+        { status: 400 }
+      );
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id },
+      include: { owner: true },
+    });
+
+    if (!restaurant) {
+      return NextResponse.json(
+        { success: false, message: "Restaurant not found." },
+        { status: 404 }
+      );
+    }
+
+    // Restrict deletion to Sangeet only.
+    const isSangeet =
+      restaurant.name.trim().toLowerCase() === "sangeet" &&
+      restaurant.email?.trim().toLowerCase() ===
+        "sangeetvegrestaurants@gmail.com";
+
+    if (!isSangeet || confirmEmail !== "sangeetvegrestaurants@gmail.com") {
+      return NextResponse.json(
+        { success: false, message: "This restaurant is not authorized for deletion." },
+        { status: 403 }
+      );
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Remove only Sangeet's menu items.
+      await tx.food.deleteMany({
+        where: { restaurantId: restaurant.id },
+      });
+
+      // Preserve the owner's account.
+      if (restaurant.owner.role === "RESTAURANT") {
+        await tx.user.update({
+          where: { id: restaurant.ownerId },
+          data: { role: "CUSTOMER" },
+        });
+      }
+
+      // Preserve historical orders and payments.
+      await tx.restaurant.delete({
+        where: { id: restaurant.id },
+      });
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Sangeet restaurant deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Restaurant deletion error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unable to delete restaurant. Check the server terminal.",
+      },
+      { status: 500 }
+    );
+  }
+}
