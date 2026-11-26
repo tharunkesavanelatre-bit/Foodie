@@ -14,6 +14,8 @@ import {
   CreditCard,
 } from "lucide-react";
 
+import { formatCurrency } from "@/lib/formatCurrency";
+
 type Order = {
   orderId: string;
   name: string;
@@ -121,9 +123,9 @@ export default function OrderSuccessPage() {
               <Check size={45} strokeWidth={3} />
             </div>
 
-            <span className="success-icon-sparkle sparkle-one">âœ¦</span>
-            <span className="success-icon-sparkle sparkle-two">âœ¦</span>
-            <span className="success-icon-sparkle sparkle-three">âœ§</span>
+            <span className="success-icon-sparkle sparkle-one">✦</span>
+            <span className="success-icon-sparkle sparkle-two">✦</span>
+            <span className="success-icon-sparkle sparkle-three">✧</span>
           </div>
 
           <h1>
@@ -175,10 +177,11 @@ export default function OrderSuccessPage() {
             {order.items.map((item) => (
               <div className="success-order-row" key={item.name}>
                 <span>
-                  {item.name} Ã— {item.quantity}
+                  {item.name} × {item.quantity}
                 </span>
+
                 <strong>
-                  â‚¹{(item.price * item.quantity).toFixed(2)}
+                  {formatCurrency(item.price * item.quantity)}
                 </strong>
               </div>
             ))}
@@ -210,7 +213,7 @@ export default function OrderSuccessPage() {
 
             <div className="success-order-total">
               <span>Total Amount</span>
-              <strong>â‚¹{order.total.toFixed(2)}</strong>
+              <strong>{formatCurrency(order.total)}</strong>
             </div>
           </div>
 

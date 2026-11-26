@@ -26,6 +26,7 @@ export default function PopularFoodsSection() {
   return (
     <section className="popular-section">
       <div className="popular-container">
+
         <SectionHeading
           badge="CUSTOMER FAVOURITES"
           title="Popular"
@@ -35,12 +36,16 @@ export default function PopularFoodsSection() {
           badgeClassName="popular-badge"
         />
 
-        <div className="popular-food-grid">
-          {foods.slice(0, 6).map((food) => (
-            <FoodCard key={food.name} {...food} />
+        {/* HORIZONTAL FOOD COLLECTION */}
+        <div className="popular-food-carousel">
+          {foods.slice(0, 8).map((food) => (
+            <div className="popular-food-carousel-item" key={food.name}>
+              <FoodCard {...food} />
+            </div>
           ))}
         </div>
 
+        {/* BENEFITS */}
         <div className="popular-benefits">
           {benefits.map((benefit) => {
             const Icon = benefit.icon;
@@ -48,6 +53,7 @@ export default function PopularFoodsSection() {
             return (
               <div key={benefit.title} className="popular-benefit-card">
                 <Icon size={24} />
+
                 <div>
                   <h3>{benefit.title}</h3>
                   <p>{benefit.description}</p>
@@ -56,6 +62,7 @@ export default function PopularFoodsSection() {
             );
           })}
         </div>
+
       </div>
     </section>
   );

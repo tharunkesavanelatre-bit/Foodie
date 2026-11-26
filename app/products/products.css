@@ -608,154 +608,244 @@
   }
 }
 /* =========================================
-   PREMIUM FOOD CARDS
+   RESPONSIVE FOOD CARDS
 ========================================= */
 
-.products-premium-card {
-  background: #ffffff;
-  border: 1px solid #eee9e4;
-  border-radius: 19px;
-  overflow: hidden;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+@media (max-width: 1100px) {
+  .products-content .products-food-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
-.products-premium-card:hover {
-  transform: translateY(-6px);
-  border-color: #f5d4bf;
-  box-shadow: 0 18px 40px rgba(62, 39, 23, 0.09);
+@media (max-width: 768px) {
+  .products-content .products-food-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .products-content .products-premium-card .popular-food-image {
+    height: 220px;
+  }
+
+  .products-content .products-premium-card .popular-food-details {
+    padding: 15px;
+  }
+
+  .products-content .products-premium-card .popular-food-title h3 {
+    font-size: 15px;
+  }
 }
 
-.products-premium-card .popular-food-image {
-  display: block;
+@media (max-width: 560px) {
+  .products-content .products-food-grid {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+    gap: 22px;
+  }
+
+  .products-content .products-premium-card .popular-food-image {
+    height: 220px;
+  }
+
+  .products-content .products-premium-card .popular-food-details {
+    padding: 18px;
+  }
+}
+/* FOOD IMAGE */
+
+.products-content .products-premium-card .popular-food-image {
   position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
   height: 220px;
+  aspect-ratio: auto;
   overflow: hidden;
-  background: #f7f0e9;
+  background: #fff0e5;
 }
 
-.products-premium-card .popular-food-image img {
+.products-content .products-premium-card .popular-food-image img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.6s ease;
 }
 
-.products-premium-card:hover .popular-food-image img {
-  transform: scale(1.07);
+.products-content .products-premium-card:hover .popular-food-image img {
+  transform: scale(1.06);
 }
 
-.products-premium-card .popular-food-tag {
+/* MUST TRY BADGE */
+
+.products-content .products-premium-card .popular-food-tag {
   position: absolute;
-  top: 15px;
-  left: 15px;
-  padding: 7px 12px;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+
+  padding: 8px 13px;
   border-radius: 30px;
-  background: rgba(255, 255, 255, 0.94);
-  color: #b94d17;
+
+  background: #ea580c;
+  color: #ffffff;
+
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.7px;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  backdrop-filter: blur(10px);
+
+  box-shadow: 0 4px 12px rgba(120, 53, 15, 0.18);
 }
 
-.products-card-arrow {
+/* IMAGE ARROW */
+
+.products-content .products-card-arrow {
   position: absolute;
-  right: 14px;
-  bottom: 14px;
-  width: 38px;
-  height: 38px;
+  right: 13px;
+  bottom: 13px;
+
   display: grid;
   place-items: center;
+
+  width: 38px;
+  height: 38px;
+
   border-radius: 50%;
   background: #ffffff;
-  color: #e85d16;
+  color: #ea580c;
+
+  opacity: 0;
+  transform: translateY(8px);
+
   transition: all 0.3s ease;
 }
 
-.products-premium-card:hover .products-card-arrow {
-  background: #ea580c;
-  color: #ffffff;
-  transform: rotate(45deg);
+.products-content .products-premium-card:hover .products-card-arrow {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.products-premium-card .popular-food-details {
-  padding: 18px;
-}
+/* FOOD DETAILS */
 
-.products-premium-card .popular-food-title {
+.products-content .products-premium-card .popular-food-details {
   display: flex;
-  align-items: flex-start;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-width: 0;
+  padding: 18px;
+  background: #ffffff;
+}
+
+/* FOOD NAME AND RATING */
+
+.products-content .products-premium-card .popular-food-title {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
+  min-width: 0;
 }
 
-.products-premium-card .popular-food-title h3 {
+.products-content .products-premium-card .popular-food-title h3 {
+  min-width: 0;
   margin: 0;
+
   color: #29231f;
-  font-size: 17px;
-  font-weight: 750;
-  line-height: 1.4;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.45;
+
+  overflow-wrap: anywhere;
 }
 
-.products-premium-card .popular-rating {
-  display: flex;
+.products-content .products-premium-card .popular-rating {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
   flex-shrink: 0;
-  color: #d99a24;
+  gap: 5px;
+
+  padding: 6px 9px;
+  border-radius: 30px;
+
+  background: #fff5e8;
+  color: #d99119;
+
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 800;
 }
 
-.products-card-bottom {
+/* PRICE AND ADD BUTTON */
+
+.products-content .products-card-bottom {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
   margin-top: 20px;
   padding-top: 15px;
-  border-top: 1px solid #f0ebe6;
+
+  border-top: 1px solid #f1eae4;
 }
 
-.products-card-price {
+.products-content .products-card-price {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 5px;
 }
 
-.products-card-price span {
+.products-content .products-card-price span {
   color: #a49a92;
   font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-weight: 850;
+  letter-spacing: 1.2px;
 }
 
-.products-card-price strong {
-  color: #e85d16;
-  font-size: 20px;
-  font-weight: 800;
+.products-content .products-card-price strong {
+  color: #ea580c;
+  font-size: 19px;
+  font-weight: 850;
+  line-height: 1.3;
 }
 
-.products-card-action {
-  width: 42px;
-  height: 42px;
+/* CIRCULAR ORANGE BUTTON */
+
+.products-content .products-card-action {
   display: grid;
   place-items: center;
-  border-radius: 13px;
-  background: #fff1e8;
-  color: #e85d16;
-  transition: all 0.25s ease;
-}
+  flex-shrink: 0;
 
-.products-card-action:hover {
+  width: 43px;
+  height: 43px;
+
+  border: none;
+  border-radius: 50%;
+
   background: #ea580c;
   color: #ffffff;
-  transform: translateY(-2px);
+
+  text-decoration: none;
+
+  box-shadow: 0 5px 13px rgba(234, 88, 12, 0.2);
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
+.products-content .products-card-action:hover {
+  background: #c2410c;
+  color: #ffffff;
+  transform: translateY(-3px) rotate(90deg);
+  box-shadow: 0 8px 18px rgba(234, 88, 12, 0.28);
+}
 
 /* =========================================
    PREMIUM CATEGORY FILTER
@@ -805,43 +895,21 @@
 
 
 /* =========================================
-   RESPONSIVE FOOD CARDS
+   RESPONSIVE FOOD GRID
 ========================================= */
 
-@media (max-width: 768px) {
-  .products-premium-card .popular-food-image {
-    height: 190px;
-  }
-
-  .products-premium-card .popular-food-details {
-    padding: 14px;
-  }
-
-  .products-premium-card .popular-food-title h3 {
-    font-size: 15px;
-  }
-
-  .products-card-price strong {
-    font-size: 18px;
-  }
-
-  .products-category-filter {
-    gap: 8px;
-  }
-
-  .products-category-pill {
-    padding: 9px 13px;
-    font-size: 12px;
-  }
+.products-content .products-food-grid {
+  display: grid;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
 }
 
-@media (max-width: 480px) {
-  .products-premium-card .popular-food-image {
-    height: 155px;
-  }
-
-  .products-card-action {
-    width: 36px;
-    height: 36px;
-  }
+.products-content .products-food-item {
+  width: 100%;
+  min-width: 0;
+  animation: products-enter 0.5s ease both;
 }

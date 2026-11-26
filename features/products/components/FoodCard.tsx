@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight, Star, Plus } from "lucide-react";
 
+import { formatCurrency } from "@/lib/formatCurrency";
+
 type FoodCardProps = {
   name: string;
   price: string;
@@ -18,10 +20,21 @@ export default function FoodCard({
 }: FoodCardProps) {
   const foodLink = `/products/${name.toLowerCase().replace(/\s+/g, "-")}`;
 
+  const numericPrice = Number(price.replace(/[^\d.]/g, ""));
+
+  const formattedPrice = formatCurrency(
+    Number.isFinite(numericPrice) ? numericPrice : 0
+  );
+
   return (
     <article className="popular-app-card products-premium-card">
+      {/* FOOD IMAGE */}
       <Link href={foodLink} className="popular-food-image">
-        <img src={image} alt={name} loading="lazy" />
+        <img
+          src={image}
+          alt={name}
+          loading="lazy"
+        />
 
         <span className="popular-food-tag">{tag}</span>
 
@@ -30,6 +43,7 @@ export default function FoodCard({
         </span>
       </Link>
 
+      {/* FOOD DETAILS */}
       <div className="popular-food-details">
         <div className="popular-food-title">
           <h3>{name}</h3>
@@ -40,10 +54,11 @@ export default function FoodCard({
           </span>
         </div>
 
+        {/* PRICE AND ACTION */}
         <div className="products-card-bottom">
           <div className="products-card-price">
             <span>PRICE</span>
-            <strong>{price}</strong>
+            <strong>{formattedPrice}</strong>
           </div>
 
           <Link
@@ -51,7 +66,7 @@ export default function FoodCard({
             className="products-card-action"
             aria-label={`Explore ${name}`}
           >
-            <Plus size={20} />
+            <Plus size={21} strokeWidth={2.5} />
           </Link>
         </div>
       </div>

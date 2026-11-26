@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Star, Sparkles } from "lucide-react";
 import { foods } from "@/data/foods";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -21,6 +22,14 @@ async function FoodDetails({ params }: Props) {
   if (!food) notFound();
 
   const foodId = slug;
+
+  const numericPrice = Number(
+    food.price.replace(/[^\d.]/g, "")
+  );
+
+  const formattedPrice = formatCurrency(
+    Number.isFinite(numericPrice) ? numericPrice : 0
+  );
 
   return (
     <main className="food-details-page">
@@ -59,7 +68,9 @@ async function FoodDetails({ params }: Props) {
               Deliciousness starts at
             </span>
 
-            <p className="food-details-price">{food.price}</p>
+            <p className="food-details-price">
+              {formattedPrice}
+            </p>
 
             <p className="food-details-description">
               Discover delicious flavours and enjoy this delicious

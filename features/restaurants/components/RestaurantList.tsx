@@ -86,10 +86,10 @@ export default function RestaurantList() {
 
         <div className="restaurant-hero-visual">
           <div className="hero-food-circle">
-            <span>ðŸ•</span>
-            <span>ðŸ”</span>
-            <span>ðŸœ</span>
-            <span>ðŸ±</span>
+            <span>{"\u{1F355}"}</span>
+            <span>{"\u{1F354}"}</span>
+            <span>{"\u{1F35C}"}</span>
+            <span>{"\u{1F371}"}</span>
           </div>
         </div>
       </div>
@@ -142,9 +142,10 @@ export default function RestaurantList() {
               key={restaurant.id}
             >
               <div className="restaurant-image">
-                ðŸ½ï¸
+                {"\u{1F37D}\u{FE0F}"}
+
                 <span className="restaurant-hero-tag">
-                  OPEN NOW
+                  {restaurant.isOpen ? "OPEN NOW" : "CLOSED"}
                 </span>
               </div>
 

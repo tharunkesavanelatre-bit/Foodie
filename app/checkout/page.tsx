@@ -20,6 +20,7 @@ import {
 
 import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/components/ui/ToastProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 type AppliedCoupon = {
   code: string;
@@ -53,6 +54,7 @@ export default function CheckoutPage() {
     pincode: "",
   });
 
+  // Calculate subtotal
   const subtotal = cart.reduce(
     (total, item) =>
       total +
@@ -60,12 +62,15 @@ export default function CheckoutPage() {
     0
   );
 
+  // Delivery charges
   const delivery = cart.length > 0 ? 30 : 0;
 
+  // Coupon discount
   const discount = appliedCoupon
     ? Math.min(appliedCoupon.discount, subtotal)
     : 0;
 
+  // Final total
   const total = Math.max(0, subtotal - discount + delivery);
 
   const handleChange = (
@@ -74,6 +79,7 @@ export default function CheckoutPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Apply coupon
   const handleApplyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
 
@@ -146,6 +152,7 @@ export default function CheckoutPage() {
     }
   };
 
+  // Remove coupon
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode("");
@@ -155,13 +162,17 @@ export default function CheckoutPage() {
     showToast("Coupon removed successfully.", "info");
   };
 
+  // Place order
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (submitLock.current) return;
 
     if (cart.length === 0) {
-      showToast("Your cart is empty. Add food before checkout.", "warning");
+      showToast(
+        "Your cart is empty. Add food before checkout.",
+        "warning"
+      );
       return;
     }
 
@@ -212,6 +223,7 @@ export default function CheckoutPage() {
     }
   };
 
+  // Empty cart
   if (cart.length === 0) {
     return (
       <main className="checkout-empty">
@@ -220,6 +232,7 @@ export default function CheckoutPage() {
         </div>
 
         <h1>Your cart is empty</h1>
+
         <p>
           Add something delicious before proceeding to checkout.
         </p>
@@ -249,6 +262,7 @@ export default function CheckoutPage() {
 
         <form onSubmit={handleSubmit} className="checkout-layout">
           <div className="checkout-main">
+            {/* Delivery Information */}
             <section className="checkout-card">
               <div className="checkout-section-heading">
                 <div className="checkout-section-icon">
@@ -322,6 +336,7 @@ export default function CheckoutPage() {
               </div>
             </section>
 
+            {/* Payment Method */}
             <section className="checkout-card">
               <div className="checkout-section-heading">
                 <div className="checkout-section-icon">
@@ -385,6 +400,7 @@ export default function CheckoutPage() {
             </section>
           </div>
 
+          {/* Order Summary */}
           <aside className="checkout-summary">
             <div className="checkout-summary-heading">
               <ShoppingBag size={21} />
@@ -403,19 +419,20 @@ export default function CheckoutPage() {
                   </div>
 
                   <strong>
-                    â‚¹
-                    {(
+                    {formatCurrency(
                       Number(item.price.replace(/[^\d.]/g, "")) *
-                      item.quantity
-                    ).toFixed(2)}
+                        item.quantity
+                    )}
                   </strong>
                 </div>
               ))}
             </div>
 
+            {/* Coupon */}
             <section className="checkout-coupon">
               <div className="checkout-coupon-heading">
                 <TicketPercent size={20} />
+
                 <div>
                   <h3>Have a coupon?</h3>
                   <p>Apply a code and save on your order.</p>
@@ -426,6 +443,7 @@ export default function CheckoutPage() {
                 <div className="checkout-coupon-applied">
                   <div className="checkout-coupon-success">
                     <CheckCircle2 size={19} />
+
                     <div>
                       <strong>{appliedCoupon.code}</strong>
                       <span>Coupon successfully applied</span>
@@ -475,26 +493,27 @@ export default function CheckoutPage() {
               )}
             </section>
 
+            {/* Price Breakdown */}
             <div className="checkout-price-row">
               <span>Subtotal</span>
-              <strong>â‚¹{subtotal.toFixed(2)}</strong>
+              <strong>{formatCurrency(subtotal)}</strong>
             </div>
 
             <div className="checkout-price-row">
               <span>Delivery Charges</span>
-              <strong>â‚¹{delivery.toFixed(2)}</strong>
+              <strong>{formatCurrency(delivery)}</strong>
             </div>
 
             {discount > 0 && (
               <div className="checkout-price-row checkout-discount-row">
                 <span>Coupon Discount</span>
-                <strong>- â‚¹{discount.toFixed(2)}</strong>
+                <strong>- {formatCurrency(discount)}</strong>
               </div>
             )}
 
             <div className="checkout-total">
               <span>Total Amount</span>
-              <strong>â‚¹{total.toFixed(2)}</strong>
+              <strong>{formatCurrency(total)}</strong>
             </div>
 
             <button
@@ -503,6 +522,7 @@ export default function CheckoutPage() {
               disabled={isSubmitting || isApplyingCoupon}
             >
               {isSubmitting ? "Placing Order..." : "Place Order"}
+
               <ArrowLeft
                 size={18}
                 className="checkout-button-arrow"

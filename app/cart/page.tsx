@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import RollingNumber from "@/components/ui/RollingNumber";
+
 import {
   ShoppingBag,
   Plus,
@@ -64,7 +66,9 @@ export default function CartPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Unable to load orders.");
+          throw new Error(
+            data.message || "Unable to load orders."
+          );
         }
 
         setOrders(data.orders || []);
@@ -82,18 +86,17 @@ export default function CartPage() {
     fetchOrders();
   }, []);
 
-  function handleQuantityChange(
+  // UPDATE QUANTITY - NO SUCCESS TOAST
+  async function handleQuantityChange(
     itemId: string,
-    itemName: string,
     quantity: number
   ) {
-    try {
-      updateQuantity(itemId, quantity);
+    if (quantity < 1 || quantity > 99) {
+      return;
+    }
 
-      showToast(
-        `${itemName} quantity updated.`,
-        "success"
-      );
+    try {
+      await updateQuantity(itemId, quantity);
     } catch {
       showToast(
         "Unable to update quantity. Please try again.",
@@ -102,9 +105,13 @@ export default function CartPage() {
     }
   }
 
-  function handleRemoveItem(itemId: string, itemName: string) {
+  // REMOVE ITEM - KEEP SUCCESS TOAST
+  async function handleRemoveItem(
+    itemId: string,
+    itemName: string
+  ) {
     try {
-      removeItem(itemId);
+      await removeItem(itemId);
 
       showToast(
         `${itemName} removed from your cart.`,
@@ -118,15 +125,25 @@ export default function CartPage() {
     }
   }
 
-  const subtotal = cart.reduce(
-    (total, item) =>
-      total +
-      Number(item.price.replace(/[^\d.]/g, "")) * item.quantity,
+  // CART CALCULATIONS
+
+  const subtotal = cart.reduce((total, item) => {
+    const price = Number(
+      item.price.replace(/[^\d.]/g, "")
+    );
+
+    return total + price * item.quantity;
+  }, 0);
+
+  const totalCartQuantity = cart.reduce(
+    (sum, item) => sum + item.quantity,
     0
   );
 
   const delivery = cart.length > 0 ? 30 : 0;
   const total = subtotal + delivery;
+
+  // PURCHASE HISTORY CALCULATIONS
 
   const totalSpent = orders.reduce(
     (sum, order) => sum + order.total,
@@ -156,7 +173,9 @@ export default function CartPage() {
             <span className="cart-label">
               YOUR FOOD SELECTION
             </span>
+
             <h1>My Shopping Cart</h1>
+
             <p>
               Manage your food selections and previous orders.
             </p>
@@ -175,11 +194,16 @@ export default function CartPage() {
               <span className="cart-label">
                 CURRENT SELECTION
               </span>
+
               <h2>Active Cart</h2>
             </div>
 
             <span className="cart-count">
-              {cart.length} items
+              <RollingNumber
+                value={totalCartQuantity}
+                fractionDigits={0}
+              />{" "}
+              {totalCartQuantity === 1 ? "item" : "items"}
             </span>
           </div>
 
@@ -205,83 +229,104 @@ export default function CartPage() {
             </div>
           ) : (
             <div className="cart-layout">
+              {/* CART ITEMS */}
+
               <section className="cart-items-section">
                 <div className="cart-items-header">
                   <h2>Your Items</h2>
                 </div>
 
-                {cart.map((item) => (
-                  <article
-                    key={item.id}
-                    className="cart-item"
-                  >
-                    <div className="cart-item-image">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        width={120}
-                        height={120}
-                        unoptimized
-                      />
-                    </div>
+                {cart.map((item) => {
+                  const itemPrice = Number(
+                    item.price.replace(/[^\d.]/g, "")
+                  );
 
-                    <div className="cart-item-details">
-                      <h3>{item.name}</h3>
-                      <p>{item.price}</p>
+                  const itemTotal =
+                    itemPrice * item.quantity;
 
-                      <div className="cart-quantity">
+                  return (
+                    <article
+                      key={item.id}
+                      className="cart-item"
+                    >
+                      <div className="cart-item-image">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={120}
+                          height={120}
+                          unoptimized
+                        />
+                      </div>
+
+                      <div className="cart-item-details">
+                        <h3>{item.name}</h3>
+
+                        <p>
+                          <RollingNumber
+                            value={itemPrice}
+                            prefix="₹"
+                          />
+                        </p>
+
+                        <div className="cart-quantity">
+                          <button
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.id,
+                                item.quantity - 1
+                              )
+                            }
+                            disabled={item.quantity <= 1}
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus size={15} />
+                          </button>
+
+                          <RollingNumber
+                            value={item.quantity}
+                            fractionDigits={0}
+                          />
+
+                          <button
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.id,
+                                item.quantity + 1
+                              )
+                            }
+                            disabled={item.quantity >= 99}
+                            aria-label="Increase quantity"
+                          >
+                            <Plus size={15} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="cart-item-actions">
+                        <strong>
+                          <RollingNumber
+                            value={itemTotal}
+                            prefix="₹"
+                          />
+                        </strong>
+
                         <button
                           onClick={() =>
-                            handleQuantityChange(
+                            handleRemoveItem(
                               item.id,
-                              item.name,
-                              item.quantity - 1
+                              item.name
                             )
                           }
-                          aria-label="Decrease quantity"
+                          className="cart-remove-button"
+                          aria-label={`Remove ${item.name}`}
                         >
-                          <Minus size={15} />
-                        </button>
-
-                        <span>{item.quantity}</span>
-
-                        <button
-                          onClick={() =>
-                            handleQuantityChange(
-                              item.id,
-                              item.name,
-                              item.quantity + 1
-                            )
-                          }
-                          aria-label="Increase quantity"
-                        >
-                          <Plus size={15} />
+                          <Trash2 size={19} />
                         </button>
                       </div>
-                    </div>
-
-                    <div className="cart-item-actions">
-                      <strong>
-                        â‚¹
-                        {(
-                          Number(
-                            item.price.replace(/[^\d.]/g, "")
-                          ) * item.quantity
-                        ).toFixed(2)}
-                      </strong>
-
-                      <button
-                        onClick={() =>
-                          handleRemoveItem(item.id, item.name)
-                        }
-                        className="cart-remove-button"
-                        aria-label={`Remove ${item.name}`}
-                      >
-                        <Trash2 size={19} />
-                      </button>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  );
+                })}
 
                 <Link
                   href="/products"
@@ -292,24 +337,44 @@ export default function CartPage() {
                 </Link>
               </section>
 
+              {/* ORDER SUMMARY */}
+
               <aside className="cart-summary">
                 <h2>Order Summary</h2>
 
                 <div className="cart-summary-row">
                   <span>Subtotal</span>
-                  <strong>â‚¹{subtotal.toFixed(2)}</strong>
+
+                  <strong>
+                    <RollingNumber
+                      value={subtotal}
+                      prefix="₹"
+                    />
+                  </strong>
                 </div>
 
                 <div className="cart-summary-row">
                   <span>Delivery Charges</span>
-                  <strong>â‚¹{delivery.toFixed(2)}</strong>
+
+                  <strong>
+                    <RollingNumber
+                      value={delivery}
+                      prefix="₹"
+                    />
+                  </strong>
                 </div>
 
                 <div className="cart-summary-divider" />
 
                 <div className="cart-summary-total">
                   <span>Total Amount</span>
-                  <strong>â‚¹{total.toFixed(2)}</strong>
+
+                  <strong>
+                    <RollingNumber
+                      value={total}
+                      prefix="₹"
+                    />
+                  </strong>
                 </div>
 
                 <Link
@@ -341,7 +406,9 @@ export default function CartPage() {
               <span className="cart-label">
                 YOUR PURCHASE HISTORY
               </span>
+
               <h2>Orders & Purchases</h2>
+
               <p>
                 All your confirmed food orders in one place.
               </p>
@@ -349,8 +416,15 @@ export default function CartPage() {
 
             <div className="purchase-count">
               <PackageCheck size={22} />
+
               <div>
-                <strong>{orders.length}</strong>
+                <strong>
+                  <RollingNumber
+                    value={orders.length}
+                    fractionDigits={0}
+                  />
+                </strong>
+
                 <span>Total Orders</span>
               </div>
             </div>
@@ -362,17 +436,35 @@ export default function CartPage() {
               <div className="purchase-stats">
                 <div>
                   <span>Total Orders</span>
-                  <strong>{orders.length}</strong>
+
+                  <strong>
+                    <RollingNumber
+                      value={orders.length}
+                      fractionDigits={0}
+                    />
+                  </strong>
                 </div>
 
                 <div>
                   <span>Total Spent</span>
-                  <strong>â‚¹{totalSpent.toFixed(2)}</strong>
+
+                  <strong>
+                    <RollingNumber
+                      value={totalSpent}
+                      prefix="₹"
+                    />
+                  </strong>
                 </div>
 
                 <div>
                   <span>Items Purchased</span>
-                  <strong>{totalItems}</strong>
+
+                  <strong>
+                    <RollingNumber
+                      value={totalItems}
+                      fractionDigits={0}
+                    />
+                  </strong>
                 </div>
               </div>
             )}
@@ -380,11 +472,15 @@ export default function CartPage() {
           {loadingOrders ? (
             <div className="cart-loader" />
           ) : orderError ? (
-            <p className="orders-message">{orderError}</p>
+            <p className="orders-message">
+              {orderError}
+            </p>
           ) : orders.length === 0 ? (
             <div className="purchase-empty">
               <PackageCheck size={42} />
+
               <h3>Your purchase history is empty</h3>
+
               <p>
                 Your confirmed orders will appear here after checkout.
               </p>
@@ -408,6 +504,7 @@ export default function CartPage() {
                       <span className="purchase-overline">
                         ORDER REFERENCE
                       </span>
+
                       <h3>{order.orderId}</h3>
                     </div>
 
@@ -419,6 +516,7 @@ export default function CartPage() {
 
                   <div className="purchase-date">
                     <CalendarDays size={16} />
+
                     {new Date(
                       order.createdAt
                     ).toLocaleString("en-IN")}
@@ -446,17 +544,23 @@ export default function CartPage() {
 
                         <div className="purchase-item-info">
                           <h4>{item.name}</h4>
+
                           <span>
-                            â‚¹{item.price.toFixed(2)} Ã—{" "}
-                            {item.quantity}
+                            <RollingNumber
+                              value={item.price}
+                              prefix="₹"
+                            />{" "}
+                            × {item.quantity}
                           </span>
                         </div>
 
                         <strong className="purchase-item-price">
-                          â‚¹
-                          {(
-                            item.price * item.quantity
-                          ).toFixed(2)}
+                          <RollingNumber
+                            value={
+                              item.price * item.quantity
+                            }
+                            prefix="₹"
+                          />
                         </strong>
                       </div>
                     ))}
@@ -465,8 +569,10 @@ export default function CartPage() {
                   <div className="purchase-information">
                     <div className="purchase-info-box">
                       <Truck size={19} />
+
                       <div>
                         <span>DELIVERY ADDRESS</span>
+
                         <p>
                           {order.address}, {order.city} -{" "}
                           {order.pincode}
@@ -476,6 +582,7 @@ export default function CartPage() {
 
                     <div className="purchase-info-box">
                       <ShieldCheck size={19} />
+
                       <div>
                         <span>PAYMENT METHOD</span>
                         <p>{order.payment}</p>
@@ -486,13 +593,17 @@ export default function CartPage() {
                   <div className="purchase-total">
                     <div>
                       <span>Order Total</span>
+
                       <small>
                         Including delivery charges
                       </small>
                     </div>
 
                     <strong>
-                      â‚¹{order.total.toFixed(2)}
+                      <RollingNumber
+                        value={order.total}
+                        prefix="₹"
+                      />
                     </strong>
                   </div>
                 </article>

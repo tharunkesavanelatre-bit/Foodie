@@ -6,6 +6,7 @@ import {
   Sparkles,
   Utensils,
 } from "lucide-react";
+import "./about.css";
 
 export default function AboutPage() {
   return (
@@ -19,7 +20,7 @@ export default function AboutPage() {
         <h1>
           More than food.
           <br />
-          <span>It's an experience.</span>
+          <span>It&apos;s an experience.</span>
         </h1>
 
         <p>
@@ -81,7 +82,7 @@ export default function AboutPage() {
             </div>
             <h3>Made with Passion</h3>
             <p>
-              We believe food is more than a meal. It's something
+              We believe food is more than a meal. Its something
               worth enjoying and sharing.
             </p>
           </div>

@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse, connection } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+
+const MAX_CART_QUANTITY = 99;
 
 type Context = {
   params: Promise<{ id: string }>;
 };
 
-// Update cart quantity
-export async function PATCH(request: NextRequest, context: Context) {
+// UPDATE CART QUANTITY
+
+export async function PATCH(
+  request: NextRequest,
+  context: Context
+) {
   await connection();
 
   try {
@@ -21,11 +28,18 @@ export async function PATCH(request: NextRequest, context: Context) {
     }
 
     const { id } = await context.params;
-    const { quantity } = await request.json();
+    const body = await request.json();
+    const quantity = body.quantity;
 
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+    if (
+      !Number.isInteger(quantity) ||
+      quantity < 1 ||
+      quantity > MAX_CART_QUANTITY
+    ) {
       return NextResponse.json(
-        { message: "Quantity must be between 1 and 99." },
+        {
+          message: `Quantity must be between 1 and ${MAX_CART_QUANTITY}.`,
+        },
         { status: 400 }
       );
     }
@@ -33,11 +47,15 @@ export async function PATCH(request: NextRequest, context: Context) {
     const item = await prisma.cartItem.findFirst({
       where: {
         id,
-        cart: { userId: user.id },
+        cart: {
+          userId: user.id,
+        },
       },
       include: {
         food: {
-          include: { restaurant: true },
+          include: {
+            restaurant: true,
+          },
         },
       },
     });
@@ -51,10 +69,12 @@ export async function PATCH(request: NextRequest, context: Context) {
 
     if (
       item.foodId &&
-      (!item.food ||
+      (
+        !item.food ||
         !item.food.isAvailable ||
         item.food.restaurant?.status !== "APPROVED" ||
-        !item.food.restaurant.isOpen)
+        !item.food.restaurant.isOpen
+      )
     ) {
       return NextResponse.json(
         { message: "This food is currently unavailable." },
@@ -63,8 +83,12 @@ export async function PATCH(request: NextRequest, context: Context) {
     }
 
     const updatedItem = await prisma.cartItem.update({
-      where: { id },
-      data: { quantity },
+      where: {
+        id,
+      },
+      data: {
+        quantity,
+      },
     });
 
     return NextResponse.json({
@@ -73,6 +97,7 @@ export async function PATCH(request: NextRequest, context: Context) {
       item: {
         ...updatedItem,
         price: updatedItem.price.toString(),
+        image: updatedItem.image || "",
       },
     });
   } catch (error) {
@@ -85,8 +110,12 @@ export async function PATCH(request: NextRequest, context: Context) {
   }
 }
 
-// Remove cart item
-export async function DELETE(request: NextRequest, context: Context) {
+// REMOVE CART ITEM
+
+export async function DELETE(
+  request: NextRequest,
+  context: Context
+) {
   await connection();
 
   try {
@@ -104,9 +133,13 @@ export async function DELETE(request: NextRequest, context: Context) {
     const item = await prisma.cartItem.findFirst({
       where: {
         id,
-        cart: { userId: user.id },
+        cart: {
+          userId: user.id,
+        },
       },
-      select: { id: true },
+      select: {
+        id: true,
+      },
     });
 
     if (!item) {
@@ -117,7 +150,9 @@ export async function DELETE(request: NextRequest, context: Context) {
     }
 
     await prisma.cartItem.delete({
-      where: { id: item.id },
+      where: {
+        id: item.id,
+      },
     });
 
     return NextResponse.json({

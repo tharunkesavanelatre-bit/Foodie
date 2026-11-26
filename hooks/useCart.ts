@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type CartItem = {
   id: string;
@@ -16,6 +16,14 @@ export type CartItem = {
 export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  // Track the latest update for each cart item.
+  const latestUpdateRef = useRef(new Map<string, number>());
+
+  // Keep database updates in order.
+  const updateQueueRef = useRef(
+    new Map<string, Promise<void>>()
+  );
+
   // Fetch cart from database
   const fetchCart = async () => {
     try {
@@ -24,12 +32,14 @@ export function useCart() {
       });
 
       if (!response.ok) {
-        setCart([]);
         return;
       }
 
       const data = await response.json();
-      setCart(data.items);
+
+      if (Array.isArray(data.items)) {
+        setCart(data.items);
+      }
     } catch (error) {
       console.error("Cart fetch error:", error);
     }
@@ -38,7 +48,6 @@ export function useCart() {
   useEffect(() => {
     fetchCart();
 
-    // Listen for cart changes
     window.addEventListener("fooddie-cart-change", fetchCart);
 
     return () => {
@@ -47,7 +56,9 @@ export function useCart() {
   }, []);
 
   // Add item
-  const addItem = async (item: Omit<CartItem, "id" | "quantity">) => {
+  const addItem = async (
+    item: Omit<CartItem, "id" | "quantity">
+  ) => {
     try {
       const response = await fetch("/api/cart", {
         method: "POST",
@@ -72,35 +83,124 @@ export function useCart() {
     }
   };
 
-  // Update quantity
-  const updateQuantity = async (id: string, quantity: number) => {
+  // Update quantity immediately
+  const updateQuantity = async (
+    id: string,
+    quantity: number
+  ) => {
+    // Handle item removal
     if (quantity <= 0) {
       await removeItem(id);
       return;
     }
 
-    const response = await fetch(`/api/cart/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ quantity }),
-    });
+    // 1. Update the UI immediately
+    setCart((currentCart) =>
+      currentCart.map((item) =>
+        item.id === id
+          ? { ...item, quantity }
+          : item
+      )
+    );
 
-    if (response.ok) {
-      window.dispatchEvent(new Event("fooddie-cart-change"));
-    }
+    // 2. Track the latest requested quantity
+    const version =
+      (latestUpdateRef.current.get(id) ?? 0) + 1;
+
+    latestUpdateRef.current.set(id, version);
+
+    // 3. Queue the database update
+    const previousRequest =
+      updateQueueRef.current.get(id) ?? Promise.resolve();
+
+    const request = previousRequest
+      .catch(() => {})
+      .then(async () => {
+        // Skip outdated updates
+        if (latestUpdateRef.current.get(id) !== version) {
+          return;
+        }
+
+        const response = await fetch(`/api/cart/${id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ quantity }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to update cart quantity.");
+        }
+
+        // Notify other components only for the latest update
+        if (latestUpdateRef.current.get(id) === version) {
+          window.dispatchEvent(
+            new Event("fooddie-cart-change")
+          );
+        }
+      })
+      .catch(async (error) => {
+        console.error("Update quantity error:", error);
+
+        // Restore the database cart if the latest update fails
+        if (latestUpdateRef.current.get(id) === version) {
+          await fetchCart();
+        }
+      });
+
+    updateQueueRef.current.set(id, request);
+
+    await request;
   };
 
   // Remove item
   const removeItem = async (id: string) => {
-    const response = await fetch(`/api/cart/${id}`, {
-      method: "DELETE",
-    });
+    // Update UI immediately
+    setCart((currentCart) =>
+      currentCart.filter((item) => item.id !== id)
+    );
 
-    if (response.ok) {
-      window.dispatchEvent(new Event("fooddie-cart-change"));
-    }
+    const version =
+      (latestUpdateRef.current.get(id) ?? 0) + 1;
+
+    latestUpdateRef.current.set(id, version);
+
+    const previousRequest =
+      updateQueueRef.current.get(id) ?? Promise.resolve();
+
+    const request = previousRequest
+      .catch(() => {})
+      .then(async () => {
+        if (latestUpdateRef.current.get(id) !== version) {
+          return;
+        }
+
+        const response = await fetch(`/api/cart/${id}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to remove cart item.");
+        }
+
+        if (latestUpdateRef.current.get(id) === version) {
+          window.dispatchEvent(
+            new Event("fooddie-cart-change")
+          );
+        }
+      })
+      .catch(async (error) => {
+        console.error("Remove cart error:", error);
+
+        if (latestUpdateRef.current.get(id) === version) {
+          await fetchCart();
+        }
+      });
+
+    updateQueueRef.current.set(id, request);
+
+    await request;
   };
 
   return {

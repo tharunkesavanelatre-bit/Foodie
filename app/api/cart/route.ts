@@ -5,6 +5,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { foods } from "@/data/foods";
 import { getRecipePrice } from "@/features/product-details/utils/recipePrice";
 
+const MAX_CART_QUANTITY = 99;
+
 export async function GET(request: NextRequest) {
   await connection();
 
@@ -34,6 +36,14 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    const subtotal = items.reduce(
+      (sum, item) =>
+        sum + Number(item.price) * item.quantity,
+      0
+    );
+
+    const delivery = items.length > 0 ? 30 : 0;
+
     return NextResponse.json(
       {
         items: items.map((item) => ({
@@ -41,6 +51,15 @@ export async function GET(request: NextRequest) {
           price: item.price.toString(),
           image: item.image || "",
         })),
+        summary: {
+          subtotal,
+          delivery,
+          total: subtotal + delivery,
+          totalQuantity: items.reduce(
+            (sum, item) => sum + item.quantity,
+            0
+          ),
+        },
       },
       {
         headers: {
@@ -84,7 +103,8 @@ export async function POST(request: NextRequest) {
     let category: string | null = null;
     let restaurantId: string | null = null;
 
-    // Restaurant food
+    // RESTAURANT FOOD
+
     if (foodId) {
       const food = await prisma.food.findFirst({
         where: {
@@ -120,7 +140,8 @@ export async function POST(request: NextRequest) {
       restaurantId = food.restaurantId;
     }
 
-    // TheMealDB recipe
+    // THEMEALDB RECIPE
+
     else if (idMeal) {
       const response = await fetch(
         `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${encodeURIComponent(idMeal)}`,
@@ -158,7 +179,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Static catalogue food
+    // STATIC CATALOGUE FOOD
+
     else {
       const staticFood = foods.find(
         (item) =>
@@ -180,14 +202,19 @@ export async function POST(request: NextRequest) {
       category = staticFood.category;
     }
 
-    if (!Number.isFinite(price) || price <= 0) {
+    if (
+      !Number.isFinite(price) ||
+      price <= 0 ||
+      !Number.isFinite(Math.round(price * 100))
+    ) {
       return NextResponse.json(
         { message: "Invalid food price." },
         { status: 400 }
       );
     }
 
-    // Find or create cart
+    // FIND OR CREATE CART
+
     const cart = await prisma.cart.upsert({
       where: {
         userId: user.id,
@@ -198,7 +225,6 @@ export async function POST(request: NextRequest) {
       update: {},
     });
 
-    // Run independent database reads together
     const [existingItems, existingItem] = await Promise.all([
       prisma.cartItem.findMany({
         where: {
@@ -226,8 +252,8 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    // Prevent mixing restaurant orders
-    // or combining different restaurants
+    // PREVENT MIXING RESTAURANTS
+
     if (foodId) {
       const hasDifferentRestaurant = existingItems.some(
         (item) =>
@@ -253,7 +279,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update existing item or create new item
+    // VALIDATE QUANTITY
+
+    if (
+      existingItem &&
+      existingItem.quantity >= MAX_CART_QUANTITY
+    ) {
+      return NextResponse.json(
+        {
+          message: `You can add a maximum of ${MAX_CART_QUANTITY} units of this item.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // SAVE ITEM
+
     const savedItem = existingItem
       ? await prisma.cartItem.update({
           where: {
