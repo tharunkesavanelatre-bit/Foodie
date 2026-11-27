@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Camera,
@@ -8,6 +10,8 @@ import {
   ShoppingBag,
 } from "lucide-react";
 
+import "./Footer.css";
+
 const exploreLinks = [
   { name: "Home", href: "/" },
   { name: "Categories", href: "/categories" },
@@ -16,6 +20,31 @@ const exploreLinks = [
 ];
 
 export default function Footer() {
+  const handleBackToTop = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+
+    document.documentElement.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+
+    document.body.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <footer className="foodie-footer">
       <div className="footer-container">
@@ -31,7 +60,7 @@ export default function Footer() {
               Your Foodie moment.
             </h2>
 
-            <Link href="/products" className="footer-explore-button">
+            <Link href="/" className="footer-explore-button">
               Explore Food <ArrowUpRight size={18} />
             </Link>
           </div>
@@ -59,15 +88,30 @@ export default function Footer() {
             </p>
 
             <div className="footer-socials">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+              >
                 <Camera size={19} />
               </a>
 
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+              >
                 <Globe size={19} />
               </a>
 
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+              >
                 <Play size={19} />
               </a>
             </div>
@@ -100,7 +144,7 @@ export default function Footer() {
               next favourite meal.
             </h3>
 
-            <Link href="/products" className="footer-cta-button">
+            <Link href="/" className="footer-cta-button">
               Start Exploring <ArrowUpRight size={17} />
             </Link>
           </div>
@@ -108,15 +152,35 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-<div className="footer-bottom">
-  <p>Â© 2026 Foodie. All rights reserved.</p>
+        <div className="footer-bottom">
+          <p>© 2026 Foodie. All rights reserved.</p>
 
-  <p>Made for food lovers.</p>
+          <p>Made for food lovers.</p>
 
-  <a href="/#top">
-    Back to Top <ArrowUp size={16} />
-  </a>
-</div>
+          {/* Kinetic Back to Top */}
+          <button
+            type="button"
+            onClick={handleBackToTop}
+            className="footer-back-to-top"
+            aria-label="Scroll to top of current page"
+          >
+            <span className="back-to-top-text">
+              BACK TO TOP
+            </span>
+
+            <span className="back-to-top-arrow-box">
+              <ArrowUp
+                className="back-to-top-arrow arrow-primary"
+                size={19}
+              />
+
+              <ArrowUp
+                className="back-to-top-arrow arrow-secondary"
+                size={19}
+              />
+            </span>
+          </button>
+        </div>
 
       </div>
     </footer>

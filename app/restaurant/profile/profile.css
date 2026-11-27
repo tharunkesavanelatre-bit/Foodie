@@ -158,6 +158,157 @@
   gap: 7px;
 }
 
+/* Restaurant GPS Location */
+
+.restaurant-location-section {
+  margin-top: 30px;
+  padding: 22px;
+  border: 1px solid #fed7aa;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fffaf6 0%, #fff7ed 100%);
+}
+
+.restaurant-location-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+
+.restaurant-location-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.restaurant-location-heading h3 {
+  margin: 0 0 5px;
+  color: #292524;
+  font-size: 16px;
+}
+
+.restaurant-location-heading p {
+  margin: 0;
+  color: #78716c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.restaurant-location-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9px;
+  background: #ea580c;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.restaurant-location-button:hover:not(:disabled) {
+  background: #c2410c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.2);
+}
+
+.restaurant-location-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.restaurant-location-spin {
+  animation: restaurant-location-rotate 1s linear infinite;
+}
+
+@keyframes restaurant-location-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.restaurant-location-details {
+  margin-top: 20px;
+  padding: 17px;
+  border: 1px solid #bbf7d0;
+  border-radius: 11px;
+  background: #f0fdf4;
+}
+
+.restaurant-location-verified {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.restaurant-location-coordinates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.restaurant-location-coordinates div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.restaurant-location-coordinates span {
+  color: #78716c;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.restaurant-location-coordinates strong {
+  color: #292524;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.restaurant-location-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px dashed #fdba74;
+  border-radius: 9px;
+  color: #9a3412;
+  background: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.restaurant-location-empty svg {
+  flex-shrink: 0;
+}
+
+.restaurant-location-note {
+  margin: 15px 0 0;
+  color: #78716c;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
 .restaurant-profile-footer {
   display: flex;
   justify-content: space-between;
@@ -194,6 +345,9 @@
 
 .restaurant-profile-success,
 .restaurant-profile-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 13px 16px;
   margin-bottom: 20px;
   border-radius: 9px;
@@ -249,5 +403,17 @@
 
   .restaurant-profile-header h1 {
     font-size: 26px;
+  }
+
+  .restaurant-location-section {
+    padding: 16px;
+  }
+
+  .restaurant-location-coordinates {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-location-button {
+    width: 100%;
   }
 }

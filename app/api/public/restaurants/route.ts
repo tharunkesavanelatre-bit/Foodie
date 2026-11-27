@@ -19,6 +19,11 @@ export async function GET() {
         city: true,
         pincode: true,
         isOpen: true,
+
+        // Restaurant location coordinates
+        latitude: true,
+        longitude: true,
+
         _count: {
           select: {
             foods: {
@@ -37,6 +42,7 @@ export async function GET() {
     return NextResponse.json(
       {
         success: true,
+        total: restaurants.length,
         restaurants,
       },
       {

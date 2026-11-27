@@ -1,0 +1,170 @@
+/* ==========================================
+   FOODIE — KINETIC BACK TO TOP
+========================================== */
+
+.footer-back-to-top {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+
+  min-width: 158px;
+  padding: 7px 8px 7px 19px;
+
+  overflow: hidden;
+  isolation: isolate;
+
+  border: 1px solid rgba(234, 88, 12, 0.2);
+  border-radius: 50px;
+
+  color: #fff;
+  background: linear-gradient(110deg, #EA580C, #F97316, #FB923C);
+  background-size: 200% 200%;
+
+  box-shadow:
+    0 5px 18px rgba(234, 88, 12, 0.17),
+    inset 0 1px rgba(255, 255, 255, 0.25);
+
+  cursor: pointer;
+
+  animation: foodieGradient 5s ease infinite;
+
+  transition:
+    transform 0.4s cubic-bezier(.2, .8, .2, 1),
+    box-shadow 0.4s ease;
+}
+
+
+
+/* Text */
+
+.back-to-top-text {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  white-space: nowrap;
+
+  transition:
+    letter-spacing 0.4s ease,
+    transform 0.4s ease;
+}
+
+/* Arrow container */
+
+.back-to-top-arrow-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+
+  border-radius: 50%;
+  color: #EA580C;
+  background: #fff;
+
+  box-shadow: 0 3px 10px rgba(75, 30, 10, 0.12);
+}
+
+/* Two-arrow animation */
+
+.back-to-top-arrow {
+  position: absolute;
+  transition:
+    transform 0.45s cubic-bezier(.2, .8, .2, 1),
+    opacity 0.3s ease;
+}
+
+.arrow-primary {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.arrow-secondary {
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+/* Hover */
+
+.footer-back-to-top:hover {
+  transform: translateY(-5px) scale(1.025);
+
+  box-shadow:
+    0 12px 28px rgba(234, 88, 12, 0.28),
+    0 0 0 5px rgba(234, 88, 12, 0.06);
+}
+
+.footer-back-to-top:hover .back-to-top-text {
+  letter-spacing: 2.3px;
+  transform: translateX(2px);
+}
+
+.footer-back-to-top:hover .arrow-primary {
+  transform: translateY(-30px);
+  opacity: 0;
+}
+
+.footer-back-to-top:hover .arrow-secondary {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Click */
+
+.footer-back-to-top:active {
+  transform: scale(0.96);
+}
+
+/* Gradient movement */
+
+@keyframes foodieGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Keyboard accessibility */
+
+.footer-back-to-top:focus-visible {
+  outline: 3px solid rgba(234, 88, 12, 0.35);
+  outline-offset: 5px;
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+  .footer-back-to-top {
+    min-width: 145px;
+    gap: 14px;
+    padding-left: 15px;
+  }
+
+  .back-to-top-text {
+    font-size: 9px;
+  }
+
+  .back-to-top-arrow-box {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-back-to-top,
+  .footer-back-to-top::before,
+  .back-to-top-text,
+  .back-to-top-arrow {
+    animation: none !important;
+    transition: none !important;
+  }
+}
