@@ -1,9 +1,17 @@
+/* =========================================
+   RESTAURANT SECTION
+========================================= */
+
 .restaurant-section {
   width: 100%;
   padding: 40px 5%;
   background: #fffaf6;
   color: #292524;
 }
+
+/* =========================================
+   RESTAURANT HEADING
+========================================= */
 
 .restaurant-heading {
   margin-bottom: 30px;
@@ -20,7 +28,15 @@
   color: #78716c;
 }
 
+/* =========================================
+   RESTAURANT BUTTON
+========================================= */
+
 .restaurant-location-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
   padding: 14px 24px;
   background: #ea580c;
   color: white;
@@ -42,10 +58,18 @@
   cursor: not-allowed;
 }
 
+/* =========================================
+   LOADING / ERROR / EMPTY STATES
+========================================= */
+
 .restaurant-message {
   margin: 20px 0;
   color: #78716c;
 }
+
+/* =========================================
+   RESTAURANT GRID
+========================================= */
 
 .restaurant-grid {
   display: grid;
@@ -53,6 +77,10 @@
   gap: 24px;
   margin-top: 30px;
 }
+
+/* =========================================
+   RESTAURANT CARD
+========================================= */
 
 .restaurant-card {
   overflow: hidden;
@@ -67,14 +95,21 @@
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
+/* =========================================
+   RESTAURANT IMAGE
+========================================= */
+
 .restaurant-image {
   height: 190px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #ffedd5, #fed7aa);
-  font-size: 55px;
 }
+
+/* =========================================
+   RESTAURANT INFORMATION
+========================================= */
 
 .restaurant-info {
   padding: 20px;
@@ -87,7 +122,9 @@
 }
 
 .restaurant-cuisine {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 12px;
   background: #fff1e8;
   color: #ea580c;
@@ -98,14 +135,29 @@
 }
 
 .restaurant-address {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
   margin: 14px 0;
   color: #78716c;
   font-size: 13px;
   line-height: 1.6;
 }
 
+.restaurant-address svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* =========================================
+   RESTAURANT MENU LINK
+========================================= */
+
 .restaurant-directions {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   padding: 11px 18px;
   background: #ea580c;
   color: white;
@@ -113,17 +165,323 @@
   text-decoration: none;
   font-size: 13px;
   font-weight: 700;
+  transition: 0.3s ease;
 }
 
 .restaurant-directions:hover {
   background: #c2410c;
 }
 
+/* =========================================
+   RESTAURANT HERO
+========================================= */
+
+.restaurant-hero {
+  min-height: auto;
+  width: 100%;
+  padding: 65px 35px 45px;
+  margin-bottom: 65px;
+  border-radius: 28px;
+
+  background: linear-gradient(
+    120deg,
+    #fff1e7,
+    #ffdfc5
+  );
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 45px;
+
+  overflow: hidden;
+  position: relative;
+}
+
+/* =========================================
+   CENTERED HERO CONTENT
+========================================= */
+
+.restaurant-hero-content {
+  width: 100%;
+  max-width: 850px;
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* =========================================
+   HERO TAG
+========================================= */
+
+.restaurant-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 9px 16px;
+
+  background: white;
+  color: #ea580c;
+
+  border-radius: 30px;
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+/* =========================================
+   HERO TITLE
+========================================= */
+
+.restaurant-hero-content h1 {
+  width: 100%;
+  margin-top: 25px;
+
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1.12;
+  font-weight: 900;
+
+  color: #292524;
+}
+
+.restaurant-hero-content h1 span {
+  display: block;
+}
+
+/* =========================================
+   HERO DESCRIPTION
+========================================= */
+
+.restaurant-hero-content > p {
+  max-width: 600px;
+  margin: 20px auto 0;
+
+  color: #78716c;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* =========================================
+   HERO NOTE
+========================================= */
+
+.restaurant-hero-note {
+  margin-top: 20px;
+  color: #78716c;
+  font-size: 13px;
+}
+
+/* =========================================
+   HERO HIGHLIGHTS
+========================================= */
+
+.restaurant-hero-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* =========================================
+   FOOD IMAGE MARQUEE
+========================================= */
+
+.restaurant-food-marquee {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+
+  overflow: hidden;
+  padding: 12px 0;
+
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+}
+
+/* =========================================
+   MARQUEE TRACK
+========================================= */
+
+.restaurant-marquee-track {
+  display: flex;
+  width: max-content;
+
+  animation: restaurantMarquee 35s linear infinite;
+
+  will-change: transform;
+}
+
+/* =========================================
+   MARQUEE IMAGE GROUP
+========================================= */
+
+.restaurant-marquee-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  gap: 22px;
+  padding-right: 22px;
+}
+
+/* =========================================
+   MARQUEE CARD
+========================================= */
+
+.restaurant-marquee-card {
+  width: 210px;
+  flex-shrink: 0;
+
+  padding: 7px;
+
+  overflow: hidden;
+  border-radius: 18px;
+
+  background: white;
+
+  box-shadow: 0 8px 25px rgba(120, 53, 15, 0.12);
+
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.restaurant-marquee-card:hover {
+  transform: translateY(-8px);
+
+  box-shadow: 0 15px 30px rgba(120, 53, 15, 0.2);
+}
+
+/* =========================================
+   MARQUEE IMAGE
+========================================= */
+
+.restaurant-marquee-image {
+  width: 100%;
+  height: 140px;
+
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 13px;
+}
+
+.restaurant-marquee-image img {
+  transition: transform 0.7s ease;
+}
+
+.restaurant-marquee-card:hover img {
+  transform: scale(1.1);
+}
+
+/* =========================================
+   MARQUEE IMAGE NAME
+========================================= */
+
+.restaurant-marquee-card > span {
+  display: block;
+
+  padding: 11px 5px 5px;
+
+  text-align: center;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  color: #44403c;
+}
+
+/* =========================================
+   CONTINUOUS RIGHT-TO-LEFT ANIMATION
+========================================= */
+
+@keyframes restaurantMarquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause animation on hover */
+
+.restaurant-food-marquee:hover .restaurant-marquee-track {
+  animation-play-state: paused;
+}
+
+/* =========================================
+   TABLET RESPONSIVE
+========================================= */
+
 @media (max-width: 1000px) {
   .restaurant-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* =========================================
+   TABLET / MOBILE HERO
+========================================= */
+
+@media (max-width: 768px) {
+  .restaurant-hero {
+    padding: 45px 20px 30px;
+    gap: 30px;
+  }
+
+  .restaurant-hero-content h1 {
+    font-size: clamp(32px, 7vw, 44px);
+  }
+
+  .restaurant-hero-content > p {
+    font-size: 14px;
+  }
+
+  .restaurant-hero-highlights {
+    gap: 14px;
+  }
+
+  .restaurant-marquee-group {
+    gap: 15px;
+    padding-right: 15px;
+  }
+
+  .restaurant-marquee-card {
+    width: 165px;
+  }
+
+  .restaurant-marquee-image {
+    height: 110px;
+  }
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
 
 @media (max-width: 600px) {
   .restaurant-section {
@@ -138,113 +496,167 @@
     font-size: 26px;
   }
 }
-/* RESTAURANT HERO */
 
-.restaurant-hero {
-  min-height: 430px;
-  padding: 65px;
-  margin-bottom: 65px;
-  border-radius: 28px;
-  background: linear-gradient(120deg, #fff1e7, #ffdfc5);
+@media (max-width: 480px) {
+  .restaurant-hero {
+    padding: 35px 15px 25px;
+    border-radius: 20px;
+  }
+
+  .restaurant-hero-content h1 {
+    font-size: 32px;
+  }
+
+  .restaurant-hero-highlights {
+    gap: 12px;
+  }
+
+  .restaurant-hero-highlights > div {
+    font-size: 12px;
+  }
+
+  .restaurant-marquee-card {
+    width: 145px;
+  }
+
+  .restaurant-marquee-image {
+    height: 100px;
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .restaurant-marquee-track {
+    animation: none;
+  }
+}
+/* ==========================================
+   NEARBY RESTAURANT LOCATION
+========================================== */
+
+.restaurant-location-panel {
+  width: min(1100px, 92%);
+  margin: 35px auto;
+  padding: 22px 26px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  overflow: hidden;
-  position: relative;
+  gap: 20px;
+  background: #fff;
+  border: 1px solid #ffeadb;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(234, 88, 12, 0.06);
 }
 
-.restaurant-hero-content {
-  max-width: 570px;
-  position: relative;
-  z-index: 2;
+.restaurant-location-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.restaurant-hero-tag {
-  display: inline-block;
-  padding: 9px 16px;
-  background: white;
-  color: #ea580c;
-  border-radius: 30px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-}
-
-.restaurant-hero-content h1 {
-  margin-top: 25px;
-  font-size: clamp(36px, 5vw, 58px);
-  line-height: 1.12;
-  font-weight: 900;
-  color: #292524;
-}
-
-.restaurant-hero-content h1 span {
-  display: block;
-  color: #ea580c;
-}
-
-.restaurant-hero-content > p {
-  margin: 20px 0 28px;
-  max-width: 460px;
-  color: #78716c;
-  font-size: 16px;
-  line-height: 1.8;
-}
-
-.restaurant-hero-note {
-  margin-top: 20px;
-  color: #78716c;
-  font-size: 13px;
-}
-
-.restaurant-hero-visual {
-  width: 350px;
-  height: 350px;
-  flex-shrink: 0;
+.restaurant-location-icon {
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  color: #ea580c;
+  background: #fff1e7;
+  border-radius: 14px;
 }
 
-.hero-food-circle {
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 20px 60px rgba(234, 88, 12, 0.15);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  place-items: center;
-  transform: rotate(-8deg);
+.restaurant-location-content h3 {
+  margin: 0 0 5px;
+  color: #292524;
+  font-size: 16px;
+  font-weight: 700;
 }
 
-.hero-food-circle span {
-  font-size: 85px;
-  transition: transform 0.3s ease;
+.restaurant-location-content p {
+  margin: 0;
+  color: #78716c;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
-.hero-food-circle span:hover {
-  transform: scale(1.2);
+.restaurant-location-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 19px;
+  flex-shrink: 0;
+  color: #fff;
+  background: #ea580c;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  .restaurant-hero {
-    padding: 35px 25px;
-    flex-direction: column;
+.restaurant-location-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.restaurant-location-error {
+  width: min(1100px, 92%);
+  margin: -15px auto 25px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.restaurant-location-summary {
+  width: min(1100px, 92%);
+  margin: -15px auto 25px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.restaurant-location-summary span {
+  color: #78716c;
+  font-weight: 400;
+}
+
+.restaurant-distance {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 0;
+  color: #ea580c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 640px) {
+  .restaurant-location-panel {
     align-items: flex-start;
+    flex-direction: column;
+    padding: 19px;
   }
 
-  .restaurant-hero-visual {
+  .restaurant-location-btn {
     width: 100%;
-    height: 250px;
-  }
-
-  .hero-food-circle {
-    width: 220px;
-    height: 220px;
-  }
-
-  .hero-food-circle span {
-    font-size: 60px;
   }
 }
