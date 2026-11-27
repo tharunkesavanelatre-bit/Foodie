@@ -15,13 +15,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = "https://foodie-1c4y.vercel.app";
+const title = "Foodie | Discover Delicious Food";
+const description =
+  "Discover delicious food, explore exciting flavours, and find your next favourite meal with Foodie.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "Foodie | Discover Delicious Food",
+    default: title,
     template: "%s | Foodie",
   },
-  description:
-    "Discover delicious food, explore exciting flavours, and find your next favourite meal with Foodie.",
+  description,
+  openGraph: {
+    type: "website",
+    siteName: "Foodie",
+    url: "/",
+    title,
+    description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({
